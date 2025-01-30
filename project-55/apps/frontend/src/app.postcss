@@ -3,6 +3,13 @@
 @tailwind utilities;
 @tailwind variants;
 
+html, body { @apply w-screen h-screen overflow-hidden; }
+
+:root [data-theme='vintage'] {
+	--theme-font-family-base: system-ui;
+	--theme-font-family-heading: system-ui;
+}
+
 /* vintage theme */
 @font-face {
 	font-family: 'Abril Fatface';
