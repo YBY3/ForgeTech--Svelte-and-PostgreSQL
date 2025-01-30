@@ -14,7 +14,7 @@
 
         <!-- Team Member 1 -->
         <div class="text-center">
-            <a href="/about-us/austenradigk">
+            <a href="/about-us/austen-radigk">
                 <img 
                     class="w-32 h-32 rounded-full mx-auto shadow-lg" 
                     src="/austen-pics/austen-profile-pic.png" 
@@ -26,7 +26,7 @@
 
         <!-- Team Member 2 -->
         <div class="text-center">
-            <a href="/about-us/analeemaharaj">
+            <a href="/about-us/analee-maharaj">
                 <img 
                     class="w-32 h-32 rounded-full mx-auto shadow-lg" 
                     src="analee-pics/Profile Pic.png" 
@@ -38,7 +38,7 @@
 
         <!-- Team Member 3 -->
         <div class="text-center">
-            <a href="/about-us/omarcarmona">
+            <a href="/about-us/omar-carmona">
                 <img class="w-32 h-32 rounded-full mx-auto shadow-lg" src="/omar-pics/ProfilePicture-cropped.png" alt="Team Member 3">
             </a>
             <h3 class="text-xl font-semibold mt-4">Omar Carmona</h3>
@@ -46,7 +46,7 @@
 
         <!-- Team Member 4 -->
         <div class="text-center">
-            <a href="/about-us/leoguerrero">
+            <a href="/about-us/leo-guerrero">
                 <img class="w-32 h-32 rounded-full mx-auto shadow-lg" src="/leo-pics/leo-cropped.png" alt="Team Member 4">
             </a>
             <h3 class="text-xl font-semibold mt-4">Leo Guerrero</h3>
