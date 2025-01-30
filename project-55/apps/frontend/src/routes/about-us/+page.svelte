@@ -39,7 +39,7 @@
         <!-- Team Member 3 -->
         <div class="text-center">
             <a href="/about-us/omarcarmona">
-                <img class="w-32 h-32 rounded-full mx-auto shadow-lg" src="/omar-pics/ProfilePicture.jpg" alt="Team Member 3">
+                <img class="w-32 h-32 rounded-full mx-auto shadow-lg" src="/omar-pics/ProfilePicture-cropped.png" alt="Team Member 3">
             </a>
             <h3 class="text-xl font-semibold mt-4">Omar Carmona</h3>
         </div>
@@ -47,7 +47,7 @@
         <!-- Team Member 4 -->
         <div class="text-center">
             <a href="/about-us/leoguerrero">
-                <img class="w-32 h-32 rounded-full mx-auto shadow-lg" src="/leo-pics/leo.jpg" alt="Team Member 4">
+                <img class="w-32 h-32 rounded-full mx-auto shadow-lg" src="/leo-pics/leo-cropped.png" alt="Team Member 4">
             </a>
             <h3 class="text-xl font-semibold mt-4">Leo Guerrero</h3>
         </div>

@@ -50,7 +50,7 @@
         <h3 class="text-xl font-semibold">Some Interests</h3>
 
         <!-- Interest 1 -->
-        <div class="flex flex-col gap-[5px] items-center">
+        <div class="w-full max-w-[800px] flex flex-col gap-[5px] items-center">
             <h3 class="text-md font-semibold">1. Public Transportation</h3>
             <p>
                 I like trains, I would like to see more of them in Austin.
@@ -63,7 +63,7 @@
         </div>
 
         <!-- Interest 2 -->
-        <div class="flex flex-col gap-[5px] items-center">
+        <div class="w-full max-w-[800px] flex flex-col gap-[5px] items-center">
             <h3 class="text-md font-semibold">2. Cool Cars</h3>
             <p>
                 I like cars, I would like to see cool ones in Austin as well.
