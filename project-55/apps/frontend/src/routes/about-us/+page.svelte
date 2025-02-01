@@ -39,7 +39,10 @@
         <!-- Team Member 3 -->
         <div class="text-center">
             <a href="/about-us/omar-carmona">
-                <img class="w-32 h-32 rounded-full mx-auto shadow-lg" src="/omar-pics/ProfilePicture-cropped.png" alt="Team Member 3">
+                <img 
+                    class="w-32 h-32 rounded-full mx-auto shadow-lg" 
+                    src="/omar-pics/ProfilePicture-cropped.png" 
+                    alt="Team Member 3">
             </a>
             <h3 class="text-xl font-semibold mt-4">Omar Carmona</h3>
         </div>
@@ -47,17 +50,23 @@
         <!-- Team Member 4 -->
         <div class="text-center">
             <a href="/about-us/leo-guerrero">
-                <img class="w-32 h-32 rounded-full mx-auto shadow-lg" src="/leo-pics/leo-cropped.png" alt="Team Member 4">
+                <img 
+                    class="w-32 h-32 rounded-full mx-auto shadow-lg" 
+                    src="/leo-pics/leo-cropped.png" 
+                    alt="Team Member 4">
             </a>
             <h3 class="text-xl font-semibold mt-4">Leo Guerrero</h3>
         </div>
 
         <!-- Team Member 5 -->
         <div class="text-center">
-            <a href="/team-member-4-about">
-                <img class="w-32 h-32 rounded-full mx-auto shadow-lg" src="team-member-5.jpg" alt="Team Member 4">
+            <a href="/about-us/alex-rosas">
+                <img 
+                    class="w-32 h-32 rounded-full mx-auto shadow-lg" 
+                    src="alex-pics/alex-cropped.png" 
+                    alt="Team Member 5">
             </a>
-            <h3 class="text-xl font-semibold mt-4">Sam Johnson</h3>
+            <h3 class="text-xl font-semibold mt-4">Alex Rosas</h3>
         </div>
         
     </div>
