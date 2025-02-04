@@ -2,7 +2,7 @@
 
     <!-- Profile -->
     <div class="pb-4">
-        <div class="flex gap-[30px] items-center justify-center w-full h-auto card variant-ringed rounded-lg p-4">
+        <div class="flex gap-[30px] items-center justify-center w-full h-auto card variant-ringed-primary rounded-lg p-4">
 
             <!-- Profile Pic -->
             <div class="flex flex-col gap-[15px]">
@@ -34,7 +34,7 @@
 
     <!-- Bio -->
     <div class="pb-4">
-        <div class="flex flex-col gap-[15px] items-center justify-center text-center w-full h-auto card variant-ringed rounded-lg p-4">
+        <div class="flex flex-col gap-[15px] items-center justify-center text-center w-full h-auto card variant-ringed-secondary rounded-lg p-4">
             <h3 class="text-xl font-semibold">Short Biography</h3>
             <p>
                 I am a passionate about big ideas and want to grow my skills to acheive them. 
@@ -46,7 +46,7 @@
     </div> 
 
     <!-- Interests -->
-    <div class="flex flex-col gap-[15px] items-center justify-center text-center w-full h-auto card variant-ringed rounded-lg p-4">
+    <div class="flex flex-col gap-[15px] items-center justify-center text-center w-full h-auto card variant-ringed-tertiary rounded-lg p-4">
         <h3 class="text-xl font-semibold">Some Interests</h3>
 
         <!-- Interest 1 -->
