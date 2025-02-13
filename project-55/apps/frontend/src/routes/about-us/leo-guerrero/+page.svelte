@@ -1,20 +1,25 @@
 
-<div class="space-y-9 h-full overflow-y-auto">
-    <div class="container h-full mx-auto flex justify-center items-center">
-        <div class="space-y-9">
-            <img class="w-64 mx-auto rounded-full" src="/leo-pics/leo-cropped.png">
-            <h1 class="text-7xl">Leo Guerrero</h1>
-            <h1 class="text-5xl text-center">About</h1>
-            <button class="w-full text-center bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-100 transition-all duration-300 ease-in-out hover:text-black">
+<div class="space-y-5 h-full overflow-y-auto ">
+    <br>
+    <div class="flex flex-col items-center justify-center space-y-9 md:flex-row md:space-x-6">
+    
+        <div class="flex flex-col items-center space-y-4">
+            <img class="w-64 rounded-full" src="/leo-pics/leo-cropped.png">
+            <h1 class="text-6xl sm:text-7xl md:text-9xl">Leo Guerrero</h1>
+            <h1 class="text-xl sm:text-2xl md:text-4xl text-primary-500">Software Engineer</h1>
+            <br>
+            <button class="w-40 h-14 bg-transparent border-2 border-black dark:border-2 dark:border-white dark:text-white rounded-full hover:bg-primary-500 transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)] hover:border-none">
                 <a href="https://github.com/Leo-guerrero"><i class="fab fa-github"></i> Github</a>
             </button>
-            
         </div>
-        
     </div>
-    <div class="text-center">
-        <div class="space-y-8 bg-surface-100 dark:bg-surface-800 max-w-3xl mx-auto p-4 rounded-2xl">
-            <p class ="text-xl"> 
+    <hr class="border-t border-white w-full w-3/4 mx-auto">
+
+    <h1 class="text-xl text-center text-primary-500">get to know more...</h1>
+    <h1 class="text-7xl text-center">About Me</h1>
+    <div >
+        <div class="space-y-8 bg-surface-100 dark:bg-surface-800 w-full md:w-3/4 mx-auto p-4 rounded-2xl">
+            <p class ="text-xl leading-loose"> 
                 I chose computer science because I have always had an interest in computers. I built my first computer when 
                 I was a sophomore in high school so I could play video games. From there that's when my love for computers grew. 
                 I then got into video game development, specifically programming, and web development. Through the course project
@@ -25,7 +30,7 @@
         <br>
         <br>
         
-        <div class="card p-4 grid grid-cols-[auto_1fr_auto] gap-4 items-center bg-transparent">
+        <div class="card p-4 grid grid-cols-[auto_1fr_auto] gap-4 items-center bg-surface-100 dark:bg-surface-800 w-full md:w-3/4 mx-auto">
             <!-- Button: Left -->
             <button type="button" class="btn-icon variant-filled" on:click={carouselLeft}>
                 <i class="fa-solid fa-arrow-left" />
@@ -47,31 +52,32 @@
                 <i class="fa-solid fa-arrow-right" />
             </button>
         </div>
-        <p class ="text-2xl"> 
-            <br>
+        <br>
+        <p class ="text-2xl w-full md:w-3/4 bg-surface-100 dark:bg-surface-800 mx-auto p-4 rounded-2xl leading-loose"> 
             {#if num == 1}
                 <span>
-                    Like I said before I like playing video games. I prefer to play on a Computer.<br>
-                    It also looks like the computer I built back when I was a sophomore so it has a<br>
+                    Like I said before I like playing video games. I prefer to play on a Computer.
+                    It also looks like the computer I built back when I was a sophomore so it has a
                     special place in my heart!
                 </span>
             {:else}
                 <span>
-                    I love to play souls games, one of my favorite games of all time is Bloodborne <br>
-                    although Elden ring is a good game... I think Bloodborne is still better. I also <br>
+                    I love to play souls games, one of my favorite games of all time is Bloodborne 
+                    although Elden ring is a good game... I think Bloodborne is still better. I also 
                     wish it gets a remaster one day. 
                 </span>
             {/if}
         </p> 
         <br>
         <br>
+    </div>
+    
+    </div>
+    
 
-    </div>
-    
-    </div>
-    
 
 <script lang="ts">
+
     import { onMount } from 'svelte';
     import '@fortawesome/fontawesome-free/css/all.min.css';
 
