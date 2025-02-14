@@ -1,7 +1,16 @@
 <script lang="ts">
 	import '../app.postcss';
 	import { AppBar, LightSwitch, Avatar } from '@skeletonlabs/skeleton';
-	import { orderStore } from "$lib/stores/orders";
+	import { productsStore } from "$lib/stores/ProductsStore";
+	import { ordersStore } from "$lib/stores/OrdersStore";
+
+	//Data (data from backend)
+	export let data;
+
+	//Save Product Data in Products Store
+	if (data.products) {
+		productsStore.set(data.products);
+	}	
 </script>
 
 
@@ -33,9 +42,9 @@
 			🛒 <!-- Cart Icon -->
 
 			<!-- Cart Counter Badge -->
-			{#if $orderStore.length > 0}
+			{#if $ordersStore.length > 0}
 				<span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-					{$orderStore.length}
+					{$ordersStore.length}
 				</span>
 			{/if}
 			</a>
