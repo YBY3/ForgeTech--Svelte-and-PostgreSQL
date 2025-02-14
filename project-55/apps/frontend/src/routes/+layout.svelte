@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import '../app.postcss';
 	import { AppBar, LightSwitch, Avatar } from '@skeletonlabs/skeleton';
 	import { orderStore } from "$lib/stores/orders";
@@ -24,9 +24,6 @@
 		<svelte:fragment slot="trail">
 			<LightSwitch />
 			<!-- Temp Icon Logo -->
-<<<<<<< HEAD
-			
-=======
 			<Avatar initials="JD" background="bg-primary-500" width="w-14" />
 
 			<!-- Added: Cart Icon with Items Count -->
@@ -45,7 +42,6 @@
 			<!-- End of Cart Icon Section -->
 
 		</svelte:fragment> 
->>>>>>> origin/catalog
 		
 	</AppBar>
 
@@ -55,7 +51,3 @@
 	</div>
 
 </div>
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/catalog
