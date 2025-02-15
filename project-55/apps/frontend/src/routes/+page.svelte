@@ -14,9 +14,12 @@
         visible = true;
     }
   </script>
+
   
   <!-- this is being rendered as a component to the layout, use div instead of main for best practice -->
   <div class="h-full bg-background flex flex-col items-center overflow-y-auto">
+
+    <a href="/"><img src="/FT.png" class="w-64 mr-5"></a>
 
     <!-- Main Content -->
     <br><h1 class="text-4xl font-bold">Featured Product</h1>
