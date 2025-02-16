@@ -3,7 +3,6 @@
 	import { AppBar, LightSwitch, Avatar } from '@skeletonlabs/skeleton';
 	import { productsStore } from "$lib/stores/ProductsStore";
 	import { ordersStore } from "$lib/stores/OrdersStore";
-
 	//Data (data from backend)
 	export let data;
 
@@ -37,9 +36,9 @@
 
 			<!-- Added: Cart Icon with Items Count -->
 			<a href="/orders" 
-			class="relative ml-4 w-10 h-10 bg-white text-gray-800 border border-gray-300 flex items-center justify-center rounded-md hover:bg-primary-500 hover:text-white transition-colors duration-300"
+			class="relative ml-4 w-10 h-10 border-2 border-black dark:border-white flex items-center justify-center rounded-full hover:bg-primary-500 hover:text-white transition-colors duration-300 hover:border-none hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
 			>
-			🛒 <!-- Cart Icon -->
+			<i class="fa-solid fa-cart-shopping"></i> <!-- Cart Icon 🛒 -->
 
 			<!-- Cart Counter Badge -->
 			{#if $ordersStore.length > 0}

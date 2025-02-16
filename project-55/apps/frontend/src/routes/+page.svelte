@@ -1,7 +1,7 @@
 <script lang="ts">
     import { productsStore } from "$lib/stores/ProductsStore";
     import type { ProductType } from "$lib/types/ProductTypes"
-
+    import '@fortawesome/fontawesome-free/css/all.min.css';
     // These variables are only used locally, no need for writeable 
     let featuredProduct: ProductType = $productsStore[0]
     let visible = false;
@@ -16,10 +16,48 @@
   </script>
   
   <!-- this is being rendered as a component to the layout, use div instead of main for best practice -->
-  <div class="h-full bg-background flex flex-col items-center overflow-y-auto">
+  <div class="h-full bg-background flex flex-col items-center overflow-y-auto scroll-smooth">
+    
+    <div class="relative w-full h-full"> 
+    <img class="absolute top-0 left-0 w-full h-full object-contain object-[85%] z-[-1] hidden xl:block" src="LandingPage-pic/gpu.png" alt="GPU Image">
+    <div class="z-[-2] absolute top-[47%] left-[70%] -translate-x-1/2 -translate-y-1/2 w-[30rem] h-[30rem] bg-primary-500 rounded-full blur-3xl opacity-30 animate-pulse hidden xl:block"></div>
 
+
+    <div class="items-center space-x-4 sm:space-x-6 md:space-x-8 w-full space-y-2 px-0 md:px-16 xl:px-32 mt-8 md:mt-32 mb-32">
+        <img src="LandingPage-pic/Logo Icon.png" class="w-24 sm:w-24 md:w-32">
+        <h1 class="text-4xl sm:text-4xl md:text-6xl font-bold">
+            <span class="text-primary-500">Forge</span> power.
+        </h1>
+        <h1 class="text-4xl sm:text-4xl md:text-6xl font-bold">
+            <span class="text-primary-500">Fuel</span> performance.
+        </h1>
+        
+        <p class="text-base md:text-lg max-w-xs sm:max-w-sm md:max-w-lg">
+            Whether you're building a custom rig or upgrading your current setup,
+            we offer a wide range of components—ranging from the latest hardware to
+            reliable, refurbished parts.
+        </p>
+        
+        <div class="flex space-x-4 mt-6">
+            <a href="/catalog"><button type="button" class="btn border-2 border-primary-500 text-white rounded-lg bg-primary-500 px-8 py-3 hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]">
+                Shop <i class="fa-solid fa-arrow-right ml-1"></i>
+            </button></a>
+            <button type="button" class="btn rounded-lg border-2 border-white px-8 py-3 hover:bg-white transition-all duration-300 ease-in-out hover:text-black">
+                Learn More 
+            </button>
+        </div>
+    </div>
+    </div>
+
+<div class="sticky top-0 w-full variant-glass-surface text-center flex justify-evenly py-6 z-[2]">
+    <button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out"><a href="#products">PRODUCTS</a></button>
+    <button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out"><a href="#partnersID">PARTNERS</a></button>
+    <button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out"><a href="#AboutID">CONTACT</a></button>
+    <button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out"><a href="#AboutID">ABOUT</a></button>
+</div>
+    
     <!-- Main Content -->
-    <br><h1 class="text-4xl font-bold">Featured Product</h1>
+    <br><h1 class="text-4xl font-bold" id="products">Featured Product</h1>
     <div class="container mx-auto p-4 flex flex-col items-center text-center">
         {#if featuredProduct}
             <!-- Featured Product -->
@@ -87,9 +125,24 @@
         </div>
         <div class="container mx-auto p-4 flex flex-col items-center text-center pb-20"></div>
 
+<h1 class="text-4xl font-bold" id="partnersID">Partners</h1>
+<br>
+<div class="logo-cloud grid-cols-2 sm:grid-cols-4 md:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-0.5">
+	<a class="logo-item p-8 text-xl">AMD</a>
+	<a class="logo-item p-8 text-xl">Nvidia</a>
+	<a class="logo-item p-8 text-xl">Intel</a>
+	<a class="logo-item p-8 text-xl">Qualcomm</a>
+	<a class="logo-item p-8 text-xl">Stark Industries</a>
+	<a class="logo-item p-8 text-xl">Samsung</a>
+	<a class="logo-item p-8 text-xl">ZOTAC</a>
+	<a class="logo-item p-8 text-xl">Wonka Inc.</a>
+</div>
+<br>
+<br>
+
         <!-- About Us -->
-        <h1 class="text-4xl font-bold">About The Company</h1> <br>
-        <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md w-full max-w-4xl">
+        <h1 class="text-4xl font-bold" id="AboutID">About The Company</h1> <br>
+        <div class="bg-surface-100 dark:bg-surface-800 p-6 rounded-lg shadow-md w-full max-w-4xl">
             <p class="text-white-700">We are a group of college students with a 
             passion for technology, dedicated to providing high-quality 
             computer parts for both new and old systems. Whether you're 
