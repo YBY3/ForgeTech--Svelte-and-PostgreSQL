@@ -20,11 +20,10 @@
 		
 		<!-- Navigation -->
 		<svelte:fragment slot="lead">
-			<a href="/"><img src="/FT.png" class="w-64 mr-5"></a>
+			<a href="/"><img src="/FT.png" class="w-[200px] mb-[2px] mr-5"></a>
 			<div class="flex gap-[20px]">
-				<!--<strong class="text-xl uppercase"><a class="hover:text-primary-500 transition-colors duration-300" href="/">Home Page</a></strong> -->
-				<strong class="text-xl uppercase"><a class="hover:text-primary-500 transition-colors duration-300" href="/about-us">About Us</a></strong>
 				<strong class="text-xl uppercase"><a class="hover:text-primary-500 transition-colors duration-300" href="/catalog">Catalog</a></strong>
+				<strong class="text-xl uppercase"><a class="hover:text-primary-500 transition-colors duration-300" href="/about-us">About Us</a></strong>
 			</div>
 		</svelte:fragment>
 

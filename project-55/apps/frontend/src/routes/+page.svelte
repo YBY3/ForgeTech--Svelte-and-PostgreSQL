@@ -14,6 +14,7 @@
         visible = true;
     }
   </script>
+
   
   <!-- this is being rendered as a component to the layout, use div instead of main for best practice -->
   <div class="h-full bg-background flex flex-col items-center overflow-y-auto scroll-smooth">
