@@ -25,3 +25,34 @@ class Product(db.Model):
             'components': self.components,
             'image': self.image
         }
+    
+    #user model
+
+#User model
+class User(db.Model):
+    
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(128), unique=True, nullable=False)
+    password = db.Column(db.String(256), nullable=False)
+    email = db.Column(db.String(256), nullable=False)
+    name = db.Column(db.String(128), nullable=False)
+    profile_pic = db.Column(db.String(128), nullable=False)
+    user_type = db.Column(db.String(128), nullable=False)
+    
+    
+    def __repr__(self):
+        return f'<User {self.name}>'
+    
+    #decided to add a to_dict file to easily convert to a JSON 
+    #used to connect to the frontend
+    #removed password to ensure the password is not exposed
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'name': self.name,
+            'user_type': self.user_type,
+            'profile_pic': self.profile_pic
+        }
+    
