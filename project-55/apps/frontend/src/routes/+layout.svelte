@@ -6,9 +6,9 @@
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 	import '@fortawesome/fontawesome-free/css/all.min.css';
 	
-import { storePopup } from '@skeletonlabs/skeleton';
-storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
-			
+	import { storePopup } from '@skeletonlabs/skeleton';
+	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
+	
 	//Data (data from backend)
 	export let data;
 
@@ -27,19 +27,18 @@ storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 	target: 'popupClick',
 	placement: 'bottom',
 	closeQuery: '#will-close'
-};
-const popupClickIcon: PopupSettings = {
-	event: 'click',
-	target: 'popupClickIcon',
-	placement: 'bottom',
-	closeQuery: '#will-close_two'
-};
-let showPopup = true;	
+	};
+	const popupClickIcon: PopupSettings = {
+		event: 'click',
+		target: 'popupClickIcon',
+		placement: 'bottom',
+		closeQuery: '#will-close_two'
+	};
+	let showPopup = true;
 </script>
 
 
 <div class="flex flex-col w-full h-full">
-
 	{#if showPopup}
 	<div class="w-full bg-primary-500 text-white flex justify-between items-center py-1 text-lg">
 		<span class="flex-grow text-center">Save up to 25% on our winter sale!</span>
@@ -69,14 +68,10 @@ let showPopup = true;
 
 		<!-- User Navigation -->
 		<svelte:fragment slot="trail">
-			
-					<!-- Menu Button -->
-
-	<button class="btn relative p-2 rounded-md md:hidden" use:popup={popupClickIcon}>
-		<i class="fas fa-bars text-2xl block"></i>
-	</button>
-
-
+			<!-- Menu Button -->
+			<button class="btn relative p-2 rounded-md md:hidden" use:popup={popupClickIcon}>
+			<i class="fas fa-bars text-2xl block"></i>
+			</button>
 
 			<!-- Temp Icon Logo -->
 			<button use:popup={popupClick}><Avatar initials="JD" background="bg-primary-500" width="w-14" /></button>
@@ -85,7 +80,7 @@ let showPopup = true;
 				<div class="grid grid-cols-1 gap-2">
 				<div class="py-2 flex justify-center" ><LightSwitch /></div>
 				<a href="/Account"><button class="btn hover:dark:bg-primary-900 hover:bg-primary-100">Account</button></a>
-				<button class="btn hover:dark:bg-primary-900 hover:bg-primary-100">Login</button>
+				<a href="/log-in"><button class="btn hover:dark:bg-primary-900 hover:bg-primary-100">Login</button></a>
 				<hr class="border-t w-full mx-auto">
 				<button id="will-close" class="btn text-white bg-surface-500 hover:bg-primary-500">Close</button>
 				</div>
@@ -122,7 +117,7 @@ let showPopup = true;
 	</AppBar>
 
 	<!-- PAGE CONTENT (height is the space under the header (80px)) -->
-	<div id="content-container" class="w-full h-[calc(100%-80px)]">
+	<div id="content-container" class="w-full overflow-auto">
 		<slot />
 	</div>
 

@@ -36,14 +36,13 @@
     <br>
     <br>
     <div class="flex flex-col items-center"><h1 class="text-3xl sm:text-4xl md:text-4xl">Your Orders</h1></div>
-    <br>
     {#if $ordersStore.length === 0}
     <p class="text-center text-lg">Your order is empty. <a href="/catalog" class="text-blue-500">Browse Products</a></p>
 
 {:else}
-    <ul class="space-y-4 p-2 sm:p-12">
+    <ul class="space-y-4 p-12">
     {#each $ordersStore as product, index}
-        <li class="flex items-center justify-between p-4 rounded-lg shadow-md dark:bg-surface-700 bg-surface-200 card card-hover">
+        <li class="flex items-center justify-between p-4 border rounded-lg shadow-md">
 
             <!-- Image & Product Info Section -->
             <div class="flex items-center gap-4">
