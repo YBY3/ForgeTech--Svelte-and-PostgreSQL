@@ -55,4 +55,25 @@ class User(db.Model):
             'user_type': self.user_type,
             'profile_pic': self.profile_pic
         }
-    
+
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    # Link the order to a user
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    # Store order items as JSON (list of product dictionaries)
+    order_items = db.Column(db.JSON, nullable=False)
+    total = db.Column(db.Float, nullable=False)
+    # Status can be 'Pending', 'Placed', etc.
+    status = db.Column(db.String(50), default='Pending')
+
+    def __repr__(self):
+        return f'<Order {self.id} by User {self.user_id}>'
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'order_items': self.order_items,
+            'total': self.total,
+            'status': self.status
+        }

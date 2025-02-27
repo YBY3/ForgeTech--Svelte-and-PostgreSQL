@@ -23,7 +23,7 @@ from functools import wraps
 # imported db to access the database
 from .extensions import db
 # imported User and Product models
-from .models import User, Product
+from .models import User, Product, Order
 
 #created a blueprint called main
 main = Blueprint('main', __name__)
@@ -43,7 +43,7 @@ def login_required(f):
     return decorated_function
 
 @main.route('/products')
-@login_required  
+# @login_required (Commented out for testing purposes. Enable once done)
 def get_products():
     products = Product.query.all()
     productData = [product.to_dict() for product in products]
@@ -163,3 +163,58 @@ def logout():
 #     users = User.query.all()
 #     Userdata = [user.to_dict() for user in users]
 #     return Userdata
+
+@main.route('/orders/confirm', methods=['POST'])
+# @login_required (Commented out for testing purposes. Enable once done)
+def confirm_order():
+    """
+    This endpoint confirms the placement of an order.
+    It requires a logged-in user (checked by login_required).
+    The expected JSON payload should include:
+      - "order_items": a list of product dictionaries
+      - "total": the total price of the order
+    """
+    try:
+        data = request.get_json()
+
+        # Validate that required order data is provided
+        if not data or 'order_items' not in data or 'total' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'Missing order data'
+            }), 400
+
+        # Get the user_id from the session (set during login)
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({
+                'success': False,
+                'error': 'User not logged in'
+            }), 401
+
+        # Create a new Order with the provided order items and total
+        new_order = Order(
+            user_id=user_id,
+            order_items=data['order_items'],
+            total=data['total'],
+            status='Placed'
+        )
+
+        # Add to the database
+        db.session.add(new_order)
+        db.session.commit()
+
+        # Return a confirmation message with a redirect URL.
+        return jsonify({
+            'success': True,
+            'message': 'Order placed successfully.',
+            'redirect': '/order-confirmation'  # Home Page for now
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'error': 'Failed to place order',
+            'message': str(e)
+        }), 500
