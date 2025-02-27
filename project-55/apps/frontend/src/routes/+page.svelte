@@ -70,7 +70,7 @@
     <div class="container mx-auto p-4 flex flex-col items-center text-center">
         {#if featuredProduct}
             <!-- Featured Product -->
-            <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md w-96">
+            <div class="bg-surface-100 dark:bg-surface-800 p-6 rounded-lg shadow-md w-64 sm:w-96">
                 <h2 class="text-2xl font-semibold text-white-900">{featuredProduct.name}</h2>
                 <!-- The image is not working right now in the backend, will fix this later -->
                 <!-- <img src="{featuredProduct.image}" alt="{featuredProduct.name}" class="max-w-full h-auto rounded-lg shadow-md mt-3" /> -->
@@ -122,13 +122,13 @@
         <!-- Buttons & Cart Display -->
         <br>
         <div class="flex items-center space-x-4">
-            <button on:click={handleLogin} class="bg-gray-800 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition">
+            <button on:click={handleLogin} class="bg-surface-100 hover:bg-primary-500 transition dark:bg-surface-800 px-4 py-2 rounded-lg shadow-md">
                 Login
             </button>
-            <button disabled class="bg-gray-800 text-white px-4 py-2 rounded-lg shadow-md opacity-50 cursor-not-allowed">
+            <button disabled class="bg-surface-100 dark:bg-surface-800 px-4 py-2 rounded-lg shadow-md opacity-50 cursor-not-allowed">
                 Add to Cart
             </button>
-            <span class="bg-gray-300 text-gray-800 px-3 py-1 rounded-full shadow-md text-lg font-semibold">
+            <span class="bg-surface-100 dark:bg-surface-800 px-3 py-1 rounded-full shadow-md text-lg font-semibold">
                 0
             </span>
         </div>
