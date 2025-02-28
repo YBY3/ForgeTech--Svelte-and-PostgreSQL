@@ -1,6 +1,7 @@
 #connecting model to the database
 from flask_app.extensions import db
 
+
 #Product Model, used the format from frontend provided to create the catalog and order functionalitites
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -28,6 +29,7 @@ class Product(db.Model):
     
     #user model
 
+
 #User model
 class User(db.Model):
     
@@ -35,8 +37,8 @@ class User(db.Model):
     username = db.Column(db.String(128), unique=True, nullable=False)
     password = db.Column(db.String(256), nullable=False)
     email = db.Column(db.String(256), nullable=False)
-    name = db.Column(db.String(128), nullable=False)
-    profile_pic = db.Column(db.String(128), nullable=False)
+    name = db.Column(db.String(128), nullable=True)
+    profile_pic = db.Column(db.String(128), nullable=True)
     user_type = db.Column(db.String(128), nullable=False)
     
     
@@ -55,6 +57,7 @@ class User(db.Model):
             'user_type': self.user_type,
             'profile_pic': self.profile_pic
         }
+
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)

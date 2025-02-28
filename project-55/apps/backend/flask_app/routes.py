@@ -87,7 +87,8 @@ def signup():
         new_user = User(
             username=data['username'],
             email=data['email'],
-            password=generate_password_hash(data['password'], method='pbkdf2:sha256')
+            password=generate_password_hash(data['password'], method='pbkdf2:sha256'),
+            user_type='customer'
         )
 
         # Add to database
