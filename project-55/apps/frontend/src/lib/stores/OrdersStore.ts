@@ -12,11 +12,7 @@ export function addToOrder(product: ProductType) {
 
 
 export function removeFromOrder(productId: number) {
-  ordersStore.update(currentOrder => {
-      const index = currentOrder.findIndex(product => product.id === productId);
-      if (index !== -1) {
-          currentOrder.splice(index, 1); 
-      }
-      return [...currentOrder]; 
+    ordersStore.update(currentOrder => {
+    return currentOrder.filter(product => product.id !== productId);
   });
 }

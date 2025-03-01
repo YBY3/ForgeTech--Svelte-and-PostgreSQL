@@ -1,7 +1,7 @@
 <script lang="ts">
     import { productsStore } from "$lib/stores/ProductsStore"; 
     import type { ProductType } from "$lib/types/ProductTypes";
-    import ProductCard from "$lib/components/ProductCard/ProductCard.svelte";
+    import ProductCard from "$lib/components/product/ProductCard.svelte";
   
     let selectedProduct: ProductType;
     let catalogView = true;
