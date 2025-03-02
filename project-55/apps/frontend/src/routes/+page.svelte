@@ -1,18 +1,28 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { productsStore } from "$lib/stores/ProductsStore";
     import type { ProductType } from "$lib/types/ProductTypes"
+
+    //Product Data
+    export let data;
+    let featuredProduct: ProductType;
+
     // These variables are only used locally, no need for writeable 
-    let featuredProduct: ProductType = $productsStore[0]
     let visible = false;
     let message = "Login functionality coming soon!"; 
     let title = "Notice"; 
+
+    onMount(() => {
+      if (data.products) {
+        featuredProduct = data.products[0];
+      }
+    });
 
      // Function to handle login
     function handleLogin() {
         // Show the alert with the message when login is clicked
         visible = true;
     }
-
 
   </script>
 
@@ -26,7 +36,8 @@
 
 
     <div class="flex flex-col items-center md:text-left md:items-start space-x-4 sm:space-x-6 md:space-x-8 space-y-2 px-0 md:px-16 xl:px-32 mt-8 md:mt-32 mb-32">
-        <img src="LandingPage-pic/Logo Icon.png" class="w-24 sm:w-24 md:w-32">
+        <!-- Causing Errors! -->
+        <!-- <img src="LandingPage-pic/Logo Icon.png" class="w-24 sm:w-24 md:w-32"> -->
         <h1 class="[@media(max-width:430px)]:text-3xl text-5xl sm:text-6xl md:text-6xl font-bold">
             <span class="text-primary-500">Forge</span> power.
         </h1>

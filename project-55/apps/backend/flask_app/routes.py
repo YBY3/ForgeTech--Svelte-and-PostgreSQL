@@ -25,8 +25,13 @@ from .extensions import db
 # imported User and Product models
 from .models import User, Product, Order
 
+# cookie stuff, will need this later :)
+# import jwt
+# import datetime
+
 #created a blueprint called main
 main = Blueprint('main', __name__)
+
 
 #Login required decorator, user "login_required" to protect routes that require authentication
 def login_required(f):
@@ -41,20 +46,6 @@ def login_required(f):
             }), 401
         return f(*args, **kwargs)
     return decorated_function
-
-@main.route('/products')
-# @login_required (Commented out for testing purposes. Enable once done)
-def get_products():
-    products = Product.query.all()
-    productData = [product.to_dict() for product in products]
-    return jsonify(productData)
-
-@main.route('/users')
-@login_required  
-def get_users():
-    users = User.query.all()
-    userData = [user.to_dict() for user in users]
-    return jsonify(userData)
 
 
 @main.route('/signup', methods=['POST'])
@@ -108,23 +99,25 @@ def signup():
             'error': 'Failed to create user',
             'message': str(e)
         }), 500
+    
 
 @main.route('/login', methods=['POST'])
 def login():
     try:
         data = request.get_json()
 
-        if not all(k in data for k in ['username', 'password']):
+        if not all(k in data for k in ['email', 'password']):
             return jsonify({
                 'success': False,
                 'error': 'Missing required fields'
             }), 400
 
-        user = User.query.filter_by(username=data['username']).first()
+        # Change 'username' to 'email' in the query
+        user = User.query.filter_by(email=data['email']).first()
 
         if user and check_password_hash(user.password, data['password']):
             # Store user id in session
-            session['user_id'] = user.id  
+            # session['user_id'] = user.id  
             return jsonify({
                 'success': True,
                 'message': 'Login successful',
@@ -133,7 +126,7 @@ def login():
         else:
             return jsonify({
                 'success': False,
-                'error': 'Invalid username or password'
+                'error': 'Invalid email or password'
             }), 401
 
     except Exception as e:
@@ -142,28 +135,24 @@ def login():
             'error': 'Login failed',
             'message': str(e)
         }), 500
+    
        
-@main.route('/logout')
-def logout():
-    session.clear()
-    return jsonify({
-        'success': True,
-        'message': 'Logged out successfully'
-    }), 200
+# @main.route('/logout')
+# def logout():
+#     session.pop('user_id', None)
+#     return jsonify({
+#         'success': True,
+#         'message': 'Logged out successfully'
+#     }), 200
 
-# #product route within the main route
-# @main.route('/products')
-# def get_products():
-#     products = Product.query.all()
-#     productData = [product.to_dict() for product in products]
-#     return productData
 
-# #user route within blueprint 
-# @main.route('/users')
-# def get_users():
-#     users = User.query.all()
-#     Userdata = [user.to_dict() for user in users]
-#     return Userdata
+@main.route('/products')
+# @login_required (Commented out for testing purposes. Enable once done)
+def get_products():
+    products = Product.query.all()
+    productData = [product.to_dict() for product in products]
+    return jsonify(productData)
+
 
 @main.route('/orders/confirm', methods=['POST'])
 # @login_required (Commented out for testing purposes. Enable once done)

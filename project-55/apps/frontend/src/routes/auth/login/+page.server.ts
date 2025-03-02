@@ -1,40 +1,44 @@
-import { sendToFlask } from '$lib/api';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
+import { getFlaskURL } from '$lib/api';
+import { invalidate } from '$app/navigation';
 
 
 export const actions = {
-    login: async ({ request }) => {
-
+    login: async ({ request, cookies }) => {
         try {
             const formData = await request.formData();
-
-            // Convert FormData to an object matching Flask's expected JSON
             const jsonData = {
-                password: formData.get('password'),
-                email: formData.get('email')
+                email: formData.get('email'),
+                password: formData.get('password')
             };
 
-            // Call sendToFlask to send the data to Flask
-            const flaskResponse = await sendToFlask('login', jsonData);
+            const flaskResponse = await fetch(`${getFlaskURL()}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(jsonData)
+            });
 
-            // If Flask returns an unexpected success=false, fail gracefully
-            return fail(400, { message: flaskResponse.error || 'Login failed' });
-        } catch (error) {
-            console.error('Error in login action:', error);
+            const responseData = await flaskResponse.json();
 
-            if (error instanceof Response && error.status === 303) {
-                throw error;
+            if (!flaskResponse.ok || !responseData.success) {
+                return fail(flaskResponse.status, { message: responseData.error || 'Login failed' });
             }
 
-            // Extract status and message from sendToFlask error
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            const statusMatch = errorMessage.match(/Failed to fetch from Flask API: (\d+)/);
-            const status = statusMatch ? parseInt(statusMatch[1], 10) : 500;
-
-            // Return failure response to the client
-            return fail(status >= 200 && status < 600 ? status : 500, {
-                message: errorMessage
+            cookies.set('user', JSON.stringify(responseData.user), {
+                path: '/',
+                httpOnly: false,
+                secure: false,   
+                sameSite: 'strict',
+                maxAge: 1800 // 30 minutes in seconds
             });
+
+            invalidate('app:load');
+            return { success: true };
+        } 
+        
+        catch (error) {
+            console.error('Error in login action:', error);
+            return fail(500, { message: 'Internal server error' });
         }
     }
 };

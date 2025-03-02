@@ -35,11 +35,10 @@
             if (!response.ok) {
                 throw new Error(result.message || 'Failed to sign up');
             }
-            else {
-                //Success - redirect
-                window.location.href = '/catalog';
-            }
-
+       
+            //Success - redirect
+            window.location.href = '/catalog';
+        
         } catch (error) {
             console.error('Error signing up:', error);
         } finally {

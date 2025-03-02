@@ -1,8 +1,11 @@
+import { redirect } from '@sveltejs/kit';
+
+
 export const load = async ({ locals }) => {
     if (locals.user) {
         return { user: locals.user };
     }
     else {
-        return { user: null };
+        throw redirect(302, '/auth/login');
     }
 };
