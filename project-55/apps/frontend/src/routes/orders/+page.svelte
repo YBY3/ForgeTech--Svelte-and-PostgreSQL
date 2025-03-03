@@ -19,6 +19,14 @@
 	});
 
     async function confirmOrder() {
+        if (submitting) {
+            toastStore.trigger({
+                message: 'Already Confirming Order, Please Wait',
+                background: 'variant-filled-error'
+            });
+            return;
+        }
+
         if (!$ordersStore.length) {
             toastStore.trigger({
                 message: 'Your Cart is Empty',

@@ -9,3 +9,10 @@ export type ProductType = {
     components: string[];
     image: string;
 };
+
+
+export type ProductPreviewType = {
+    id: number;
+    name: string;
+    price: number;
+}

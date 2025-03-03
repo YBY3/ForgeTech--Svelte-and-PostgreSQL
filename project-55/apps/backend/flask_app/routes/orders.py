@@ -65,5 +65,56 @@ def add_order():
 # goal: remove order via order id
 
 
-# get_all_orders route
-# goal: get all orders via user id
+@order_bp.route('/get_all_orders', methods=['POST'])
+def get_all_orders():
+    try:
+        data = request.get_json()
+
+        # Validate Request Body
+        if not data or 'user_id' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'Missing user_id in request'
+            }), 400
+
+        user_id = data['user_id']
+
+        # Query all orders for the given user ID, including products
+        orders = Order.query.filter_by(user_id=user_id).all()
+
+        # Check if any orders exist
+        if not orders:
+            return jsonify({
+                'success': False,
+                'error': 'No orders found for this user'
+            }), 404
+
+        # Convert orders to a list of dictionaries with product details
+        order_data = []
+        for order in orders:
+            order_info = {
+                "id": order.id,
+                "user_id": order.user_id,
+                "total": order.total,
+                "status": order.status,
+                "products": [
+                    {
+                        "id": product.id,
+                        "name": product.name,
+                        "price": product.price,
+                    } for product in order.products
+                ]
+            }
+            order_data.append(order_info)
+
+        return jsonify({
+            'success': True,
+            'orders': order_data
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': 'Failed to fetch orders',
+            'message': str(e)
+        }), 500

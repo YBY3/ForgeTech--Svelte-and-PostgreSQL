@@ -14,7 +14,13 @@
         //Prevent Default Submission
         event.preventDefault();
         //If Already Submitting, Exit
-        if (submitting) return;
+        if (submitting) {
+            toastStore.trigger({
+                message: 'Already Signing Up, Please Wait',
+                background: 'variant-filled-error'
+            });
+            return;
+        }
         //Checks if Form is Valid / Filled Out Required Items
         else if (!form.checkValidity()) return;
 
