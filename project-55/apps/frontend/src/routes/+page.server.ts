@@ -4,7 +4,7 @@ import type { ProductType } from '$lib/types/ProductTypes.js';
 
 export const load = async ({ fetch }) => {
     try {
-        const response = await fetch(`${getFlaskURL()}/products`);
+        const response = await fetch(`${getFlaskURL()}/api/products/get_all_products`); //change to single product later
 
         if (!response.ok) {
             throw new Error('Failed to fetch products');

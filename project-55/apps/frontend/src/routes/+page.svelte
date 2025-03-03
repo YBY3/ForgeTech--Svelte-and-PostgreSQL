@@ -36,8 +36,7 @@
 
 
     <div class="flex flex-col items-center md:text-left md:items-start space-x-4 sm:space-x-6 md:space-x-8 space-y-2 px-0 md:px-16 xl:px-32 mt-8 md:mt-32 mb-32">
-        <!-- Causing Errors! -->
-        <!-- <img src="LandingPage-pic/Logo Icon.png" class="w-24 sm:w-24 md:w-32"> -->
+        <img src="LandingPage-pic/Logo Icon.png" class="w-24 sm:w-24 md:w-32">
         <h1 class="[@media(max-width:430px)]:text-3xl text-5xl sm:text-6xl md:text-6xl font-bold">
             <span class="text-primary-500">Forge</span> power.
         </h1>

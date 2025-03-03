@@ -7,7 +7,7 @@ export const load = async ({ locals, fetch }) => {
     if (locals.user) {
 
         try {
-            const response = await fetch(`${getFlaskURL()}/products`);
+            const response = await fetch(`${getFlaskURL()}/api/products/get_all_products`);
     
             if (!response.ok) {
                 throw new Error('Failed to fetch products');

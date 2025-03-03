@@ -1,6 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { getFlaskURL } from '$lib/api';
-import { invalidate } from '$app/navigation';
 
 
 export const actions = {
@@ -12,7 +11,7 @@ export const actions = {
                 password: formData.get('password')
             };
 
-            const flaskResponse = await fetch(`${getFlaskURL()}/login`, {
+            const flaskResponse = await fetch(`${getFlaskURL()}/api/users/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(jsonData)
@@ -20,8 +19,9 @@ export const actions = {
 
             const responseData = await flaskResponse.json();
 
-            if (!flaskResponse.ok || !responseData.success) {
-                return fail(flaskResponse.status, { message: responseData.error || 'Login failed' });
+            if (!flaskResponse.ok) {
+                console.error('Login Failed:', responseData.error );
+                return fail(flaskResponse.status, responseData);
             }
 
             cookies.set('user', JSON.stringify(responseData.user), {
@@ -32,13 +32,12 @@ export const actions = {
                 maxAge: 1800 // 30 minutes in seconds
             });
 
-            invalidate('app:load');
             return { success: true };
         } 
         
         catch (error) {
             console.error('Error in login action:', error);
-            return fail(500, { message: 'Internal server error' });
+            return fail(500, { error: 'Internal Server Error' });
         }
     }
 };

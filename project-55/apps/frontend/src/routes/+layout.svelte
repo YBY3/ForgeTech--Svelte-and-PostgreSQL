@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import '../app.postcss';
-	import { AppBar, LightSwitch, type PopupSettings, popup } from '@skeletonlabs/skeleton';
+	import { AppBar, LightSwitch, type PopupSettings, popup, Toast } from '@skeletonlabs/skeleton';
 	import { ordersStore } from "$lib/stores/OrdersStore";
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 	import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -38,6 +38,9 @@
         window.location.href = '/auth/login';
     }
 </script>
+
+
+<Toast position="tr" />
 
 
 {#if mounted}
@@ -101,7 +104,7 @@
 							<div class="py-2 flex justify-center" ><LightSwitch /></div>
 							<hr class="border-t w-full mx-auto">
 							<a href="/profile" class="w-full block"><button class="btn hover:bg-primary-500 w-full">Profile </button></a>
-							<a href="/catalog" class="w-full block"><button class="btn hover:bg-primary-500 w-full">Products </button></a>
+							<a href="/catalog" class="w-full block"><button class="btn hover:bg-primary-500 w-full">Catalog </button></a>
 							<a href="/about-us" class="w-full block"><button class="btn hover:bg-primary-500 w-full">About Us</button></a>
 							<hr class="border-t w-full mx-auto">
 							<div class="pt-2">
@@ -115,8 +118,8 @@
 					<!-- Darkmode Selector / Login / Sing-up Buttons -->
 					<div class="flex items-center gap-8 card variant-soft p-4 rounded-lg">
 						<LightSwitch />
-						<a class="hover:text-primary-500 transition-colors duration-300 text-xl hidden md:block" href="/auth/login">Login</a>
-						<a class="hover:text-primary-500 transition-colors duration-300 text-xl hidden md:block" href="/auth/sign-up">Sign Up</a>
+						<a class="hover:text-primary-500 transition-colors duration-300 text-xl" href="/auth/login">Login</a>
+						<a class="hover:text-primary-500 transition-colors duration-300 text-xl" href="/auth/sign-up">Sign Up</a>
 					</div>
 				{/if}
 

@@ -20,7 +20,7 @@
     <div class="h-full overflow-y-auto">
         <div class="flex flex-col items-center justify-center space-y-3 md:space-x-6">
             <br>
-            <h1 class="text-3xl sm:text-4xl md:text-4xl">Your Account</h1>
+            <h1 class="text-3xl sm:text-4xl md:text-4xl">{userData.name}</h1>
             <br>
             <h1 class="text-xl">Profile Picture</h1>
             <Avatar initials="JD" background="bg-primary-500" width="w-32" />
@@ -32,13 +32,13 @@
         <div class="flex flex-col items-center justify-center space-y-7 text-center">
             <h1 class="text-xl">{userData.username}</h1>
             <h1 class="text-xl">{userData.email}</h1>
+            <h1 class="text-xl">Role: {userData.user_type}</h1>
         </div>
         <br>
         <hr class="border-t w-full mx-auto">
         <br>
 
         <div class="flex flex-col items-center justify-center space-y-7 text-center">
-            <h1 class="text-xl">Role: {userData.user_type}</h1>
             <!-- <h1 class="text-xl">What will you be using Forge Tech for?</h1>
             <select class="select w-64 ml-4">
                 <option>Select</option>            

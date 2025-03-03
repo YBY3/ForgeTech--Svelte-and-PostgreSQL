@@ -1,10 +1,14 @@
 <script lang="ts">
+	import { invalidate } from '$app/navigation';
+	import { getToastStore } from '@skeletonlabs/skeleton';
+
 	//Form Data
 	let form: HTMLFormElement;
 
 	//Form Elements
 	let showPassword = false;
 	let submitting = false;
+	const toastStore = getToastStore();
 
 	async function handleSignUp(event: SubmitEvent) {
         //Prevent Default Submission
@@ -31,17 +35,26 @@
             });
 
             const result = await response.json();
+			const parsedResultData = JSON.parse(result.data);
+            const success = parsedResultData[parsedResultData[0].success];
 
-            if (!response.ok) {
-                throw new Error(result.message || 'Failed to sign up');
+            if (success) {
+				//Reload App
+				invalidate('app:load');
+				//Go to Catalog
+                window.location.href = '/catalog';
             }
             else {
-                //Success - redirect
-                window.location.href = '/auth/login';
+				const errorMessage = parsedResultData[parsedResultData[0].error];
+                throw new Error(errorMessage);
             }
 
         } catch (error) {
-            console.error('Error signing up:', error);
+			const errorMessage: string = `${error}`;
+			toastStore.trigger({
+                message: errorMessage,
+                background: 'variant-filled-error'
+            });
         } finally {
             submitting = false;
         }
@@ -82,6 +95,17 @@
 							class="mt-1 w-full px-2 py-2 border-b border-gray-500 focus:border-primary focus:outline-none bg-transparent text-on-surface" placeholder="Enter Last Name"
 						/>
 					</div>
+				</div>
+
+				<div class="max-w-md mx-auto">
+					<label for="email" class="block text-sm font-medium text-on-surface">Username</label>
+					<input 
+						type="text" 
+						id="userName" 
+						name="userName"
+						required
+						class="mt-1 w-full px-2 py-2 border-b border-gray-500 focus:border-primary focus:outline-none bg-transparent text-on-surface" placeholder="Enter Username"
+					/>
 				</div>
 
 				<div class="max-w-md mx-auto">

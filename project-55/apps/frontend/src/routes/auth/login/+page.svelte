@@ -1,10 +1,14 @@
 <script lang="ts">
+    import { invalidate } from '$app/navigation';
+    import { getToastStore } from '@skeletonlabs/skeleton';
+
     //Form Data
 	let form: HTMLFormElement;
 
     //Form Elements
     let showPassword = false;
     let submitting = false;
+    const toastStore = getToastStore();
 
     async function handleLogin(event: SubmitEvent) {
         //Prevent Default Submission
@@ -31,16 +35,26 @@
             });
 
             const result = await response.json();
+            const parsedResultData = JSON.parse(result.data);
+            const success = parsedResultData[parsedResultData[0].success];
 
-            if (!response.ok) {
-                throw new Error(result.message || 'Failed to sign up');
+            if (success) {
+                //Reload App
+				invalidate('app:load');
+				//Go to Catalog
+                window.location.href = '/catalog';
             }
-       
-            //Success - redirect
-            window.location.href = '/catalog';
+            else {
+				const errorMessage = parsedResultData[parsedResultData[0].error];
+                throw new Error(errorMessage);
+            }
         
         } catch (error) {
-            console.error('Error signing up:', error);
+            const errorMessage: string = `${error}`;
+			toastStore.trigger({
+                message: errorMessage,
+                background: 'variant-filled-error'
+            });
         } finally {
             submitting = false;
         }

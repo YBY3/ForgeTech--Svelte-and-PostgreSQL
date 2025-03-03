@@ -1,41 +1,45 @@
-import { sendToFlask } from '$lib/api';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
+import { getFlaskURL } from '$lib/api';
 
 
 export const actions = {
-    signup: async ({ request }) => {
-
+    signup: async ({ request, cookies }) => {
         try {
             const formData = await request.formData();
-
-            // Convert FormData to an object matching Flask's expected JSON
             const jsonData = {
-                username: `${formData.get('firstName')}${formData.get('lastName')}`,
-                password: formData.get('password'),
-                email: formData.get('email')
+                name: `${formData.get('firstName')} ${formData.get('lastName')}`,
+                username: formData.get('userName'),
+                email: formData.get('email'),
+                password: formData.get('password')
             };
 
-            // Call sendToFlask to send the data to Flask
-            const flaskResponse = await sendToFlask('signup', jsonData);
+            const flaskResponse = await fetch(`${getFlaskURL()}/api/users/signup`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(jsonData)
+            });
 
-            // If Flask returns an unexpected success=false, fail gracefully
-            return fail(400, { message: flaskResponse.error || 'Signup failed' });
-        } catch (error) {
-            console.error('Error in signup action:', error);
+            const responseData = await flaskResponse.json();
 
-            if (error instanceof Response && error.status === 303) {
-                throw error;
+            if (!flaskResponse.ok) {
+                console.error(responseData);
+                console.error('Sign-up Failed:', responseData.error );
+                return fail(flaskResponse.status, responseData);
             }
 
-            // Extract status and message from sendToFlask error
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            const statusMatch = errorMessage.match(/Failed to fetch from Flask API: (\d+)/);
-            const status = statusMatch ? parseInt(statusMatch[1], 10) : 500;
-
-            // Return failure response to the client
-            return fail(status >= 200 && status < 600 ? status : 500, {
-                message: errorMessage
+            cookies.set('user', JSON.stringify(responseData.user), {
+                path: '/',
+                httpOnly: false,
+                secure: false,
+                sameSite: 'strict',
+                maxAge: 1800 // 30 minutes
             });
+
+            return { success: true };
+
+        } catch (error) {
+            console.error('Error in signup action:', error);
+            return fail(500, { error: 'Internal Server Error' });
         }
     }
 };
