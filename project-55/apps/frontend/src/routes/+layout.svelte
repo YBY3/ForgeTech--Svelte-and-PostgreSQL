@@ -16,7 +16,7 @@
 	//Layout Elements
 	let mounted = false;
 	let showClickable = true;
-	let isLoggedIn = false
+	import { isLoggedIn } from '$lib/stores/authStore';
 
 	//Popup Settings
 	const menuPopup: PopupSettings = {
@@ -28,7 +28,7 @@
 
 	onMount(() => {
 		if (data.user) {
-			isLoggedIn = true;
+			isLoggedIn.set(true);
 		}
 		mounted = true;
 	});
@@ -59,7 +59,7 @@
 			<svelte:fragment slot="lead">
 				<a href="/">
 					<img 
-					src="LandingPage-pic/Logo Icon.png" 
+					src="LandingPage-pic/Logo Icon.png"
 					alt="Logo" 
 					class="w-[70px] mb-[2px] mr-5 block md:hidden" />
 					<img 
@@ -71,7 +71,7 @@
 
 			<!-- User Navigation -->
 			<svelte:fragment slot="trail">
-				{#if isLoggedIn}
+				
 
 					<div class="flex items-center gap-4 card variant-soft pl-4 pr-4 pt-2 pb-2 rounded-lg">
 						<!-- Menu Button -->
@@ -103,26 +103,23 @@
 						<div class="grid grid-cols-1 gap-1">
 							<div class="py-2 flex justify-center" ><LightSwitch /></div>
 							<hr class="border-t w-full mx-auto">
+					{#if $isLoggedIn}
 							<a href="/profile" class="w-full block"><button class="btn hover:bg-primary-500 w-full">Profile </button></a>
-							<a href="/catalog" class="w-full block"><button class="btn hover:bg-primary-500 w-full">Catalog </button></a>
+							<a href="/catalog" class="w-full block"><button class="btn hover:bg-primary-500 w-full">Products </button></a>
 							<a href="/about-us" class="w-full block"><button class="btn hover:bg-primary-500 w-full">About Us</button></a>
 							<hr class="border-t w-full mx-auto">
 							<div class="pt-2">
 								<button on:click={logout} class="btn w-full text-white bg-primary-500">Logout</button>
 							</div>
+					{:else}
+						<a href="/catalog" class="w-full block"><button class="btn hover:bg-primary-500 w-full">Products </button></a>
+						<a href="/about-us" class="w-full block"><button class="btn hover:bg-primary-500 w-full">About Us</button></a>
+						<a class="btn hover:bg-primary-500 w-full" href="/auth/login">Login</a>
+						<a class="btn hover:bg-primary-500 w-full" href="/auth/sign-up">Sign Up</a>
+					{/if}
 						</div>
 					</div>
-					
-				{:else}
-
-					<!-- Darkmode Selector / Login / Sing-up Buttons -->
-					<div class="flex items-center gap-8 card variant-soft p-4 rounded-lg">
-						<LightSwitch />
-						<a class="hover:text-primary-500 transition-colors duration-300 text-xl" href="/auth/login">Login</a>
-						<a class="hover:text-primary-500 transition-colors duration-300 text-xl" href="/auth/sign-up">Sign Up</a>
-					</div>
-				{/if}
-
+		
 			</svelte:fragment> 
 			
 		</AppBar>

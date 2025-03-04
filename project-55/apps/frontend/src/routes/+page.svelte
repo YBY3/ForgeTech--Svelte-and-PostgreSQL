@@ -28,7 +28,7 @@
 
   
   <!-- this is being rendered as a component to the layout, use div instead of main for best practice -->
-  <div class="h-full bg-background flex flex-col items-center overflow-y-auto scroll-smooth">
+  <div class="h-full bg-background flex flex-col items-center overflow-y-auto overflow-x-hidden scroll-smooth">
     
     <div class="relative w-full h-full"> 
     <img class="absolute top-0 left-0 w-full h-full object-contain object-[85%] z-[-1] hidden xl:block" src="LandingPage-pic/gpu.png" alt="GPU Image">
@@ -61,7 +61,7 @@
     </div>
     </div>
 
-<div class="sticky top-0 w-full variant-glass-surface md:text-center md:flex md:justify-evenly py-6 z-[2]" id="second_tab">
+<div class="sticky top-0 w-full variant-glass-surface md:text-center md:flex md:justify-evenly py-6 z-[2] text-primary-500 dark:text-white" id="second_tab">
     <!--<button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out block md:hidden px-8"><a href="#products">PRODUCTS</a></button>-->
     <select class="select w-32 block md:hidden ml-4">
         <option value="1">Featured</option>
@@ -76,23 +76,46 @@
 </div>
     
     <!-- Main Content -->
-    <br><h1 class="text-4xl font-bold" id="products">Featured Product</h1>
-    <div class="container mx-auto p-4 flex flex-col items-center text-center">
+    <!--<h1 class="text-4xl font-bold" id="products">Featured</h1> p-4 was below!-->
+    <div class="container mx-auto flex flex-col items-center">
         {#if featuredProduct}
-            <!-- Featured Product -->
-            <div class="bg-surface-100 dark:bg-surface-800 p-6 rounded-lg shadow-md w-64 sm:w-96">
-                <h2 class="text-2xl font-semibold text-white-900">{featuredProduct.name}</h2>
+    <div class="bg-black w-screen">
+        <br>
+        <h2 id="products" class="text-2xl font-semibold text-white-900 font-bold text-center text-white">{featuredProduct.name}</h2>
+        <br>
+        <h1 class="text-2xl sm:text-4xl font-bold text-center text-white">Unleash powerful graphics for gamers and creators.</h1>
+        <br>
+        <div class="flex lg:flex-row flex-col items-center justify-center gap-x-6">
+            <div class="w-full lg:w-1/2 [@media(min-width:2000px)]:ml-32 [@media(min-width:2400px)]:ml-96">
+            <img 
+            class="rounded-lg"
+            src={featuredProduct.image} 
+            alt={featuredProduct.name}
+            />
+            </div>
+            <div class="flex-1 p-6 rounded-lg w-full [@media(min-width:2000px)]:-ml-32 [@media(min-width:2400px)]:-ml-64 text-white">
                 <!-- The image is not working right now in the backend, will fix this later -->
                 <!-- <img src="{featuredProduct.image}" alt="{featuredProduct.name}" class="max-w-full h-auto rounded-lg shadow-md mt-3" /> -->
-                <p class="text-red-500 mt-2">{featuredProduct.description}</p>
-                <p class="text-lg font-bold mt-1 text-green-600">${featuredProduct.price}</p>
-                <h3 class="text-xl font-semibold mt-2 text-white-800">Components:</h3>
+                <p class="mt-2"><span class="text-primary-500 text-3xl font-bold">Unmatched Performance</span><br>
+                    Experience smooth, lifelike visuals with cutting-edge ray tracing technology.</p>
+                <br>
+                <p class="mt-2"><span class="text-primary-500 text-3xl font-bold">Effortless Rendering</span><br>
+                    Seamlessly bring your world to life with unmatched graphics power and optimization.</p>
+                <br>
+                <p class="mt-2"><span class="text-primary-500 text-3xl font-bold">Gaming at the Edge</span><br>
+                    Elevate your experience with blazing-fast cores and AI-driven performance.</p>
+                <br>
+                <div class="border-2 border-white py-2 px-6 rounded-lg inline-block"><p class="text-lg font-bold">${featuredProduct.price}</p></div>
+                <!--<h3 class="text-xl font-semibold mt-2 text-white-800">Components:</h3>
+
                 <ul class="list-disc list-inside text-white-700">
                     {#each featuredProduct.components as component}
                         <li>{component}</li>
                     {/each}
-                </ul>
+                </ul>-->
             </div>
+        </div>
+    </div>
         {:else}
             <!-- Instead of Temperary Product, Use a Error Message -->
             <div class="w-auto h-auto card variant-ghost-error rounded-lg p-4">
@@ -130,21 +153,9 @@
         
         <!-- we want this for logged in users only, would consider removing this logic -->
         <!-- Buttons & Cart Display -->
-        <br>
-        <div class="flex items-center space-x-4">
-            <button on:click={handleLogin} class="bg-surface-100 hover:bg-primary-500 transition dark:bg-surface-800 px-4 py-2 rounded-lg shadow-md">
-                Login
-            </button>
-            <button disabled class="bg-surface-100 dark:bg-surface-800 px-4 py-2 rounded-lg shadow-md opacity-50 cursor-not-allowed">
-                Add to Cart
-            </button>
-            <span class="bg-surface-100 dark:bg-surface-800 px-3 py-1 rounded-full shadow-md text-lg font-semibold">
-                0
-            </span>
-        </div>
         <div class="container mx-auto p-4 flex flex-col items-center text-center pb-20"></div>
 
-<h1 class="text-4xl font-bold" id="partnersID">Partners</h1>
+<h1 class="text-4xl font-bold" id="partnersID">Our hardware partners</h1>
 <br>
 <div class="logo-cloud grid-cols-2 sm:grid-cols-4 md:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-0.5">
 	<a class="logo-item p-8 text-xl">AMD</a>
@@ -160,7 +171,8 @@
 <br>
 
         <!-- About Us -->
-        <h1 class="text-4xl font-bold" id="AboutID">About The Company</h1> <br>
+         <div class="p-4">
+        <h1 class="text-4xl font-bold text-center" id="AboutID">About The Company</h1> <br>
         <div class="bg-surface-100 dark:bg-surface-800 p-6 rounded-lg shadow-md w-full max-w-4xl">
             <p class="text-white-700">We are a group of college students with a 
             passion for technology, dedicated to providing high-quality 
@@ -173,7 +185,7 @@
             one part at a time!
             </p>
         </div> <br>
-
+        </div>
 
     </div>
 </div>

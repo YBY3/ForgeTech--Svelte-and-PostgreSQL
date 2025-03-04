@@ -1,13 +1,21 @@
 <script lang="ts">
   import type { ProductType } from "$lib/types/ProductTypes";
   import { addToOrder } from "$lib/stores/OrdersStore";
+  import { isLoggedIn } from '$lib/stores/authStore';
 
   export let product: ProductType;
   export let onProductSelect: ((product: ProductType) => void) | null = null;
   export let detailedView: boolean = false;
+
+
+  let isDisabled;
+
+  $: isDisabled = !$isLoggedIn;
+
+
 </script>
 
-<div class="w-full relative card variant-filled-primary card-hover rounded-lg shadow-md p-4 h-[400px] flex flex-col justify-between">
+<div class="w-full relative card bg-surface-200 dark:bg-surface-800 card-hover rounded-lg shadow-md p-4 h-[400px] flex flex-col justify-between">
   
   <!-- Clickable Product Image (Only if not in detailed view) -->
   {#if !detailedView}
@@ -48,20 +56,24 @@
 
     <!-- Price & Cart Button Section -->
     <div class="flex justify-between items-center mt-4">
-      <p class="text-lg font-semibold text-gray-900">${product.price.toFixed(2)}</p>
+      <p class="text-lg font-semibold">${product.price.toFixed(2)}</p>
 
       <!-- Add to Cart Button with Tooltip -->
       <div class="relative group">
         <button 
-          class="w-10 h-10 bg-white border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-100 transition shadow-lg"
-          on:click={() => addToOrder(product)}
+          class="w-10 h-10 border border-2 border-black dark:border-white rounded-md flex items-center justify-center hover:bg-primary-500 transition hover:border-none hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)] disabled:opacity-50 disabled:cursor-not-allowed"
+          on:click={() => addToOrder(product)} disabled={isDisabled}
         >
-          🛒
+        <i class="fa-solid fa-cart-shopping"></i>
         </button>
 
         <!-- Tooltip Above -->
         <span class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-sm px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-          Add to Cart
+          {#if $isLoggedIn}
+              Add to Cart
+          {:else}
+              Login 
+          {/if}
         </span>
       </div>
     </div>

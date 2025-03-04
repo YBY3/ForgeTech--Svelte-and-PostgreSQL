@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import type { ProductType } from "$lib/types/ProductTypes";
     import ProductCard from "$lib/components/product/ProductCard.svelte";
+    
 
     //Product Data
     export let data;
