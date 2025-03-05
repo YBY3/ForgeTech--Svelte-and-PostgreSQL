@@ -117,7 +117,8 @@
 				<div class="max-w-md mx-auto">
 					<label for="email" class="block text-sm font-medium text-on-surface">Email address</label>
 					<input 
-						type="email" 
+						type="text"
+						pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
 						id="email" 
 						name="email"
 						required
