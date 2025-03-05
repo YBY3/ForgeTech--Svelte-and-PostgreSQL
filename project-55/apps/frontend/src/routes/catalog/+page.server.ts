@@ -3,7 +3,7 @@ import { getFlaskURL } from '$lib/api';
 import type { ProductType } from '$lib/types/ProductTypes.js';
 
 
-export const load = async ({ fetch }) => {
+export const load = async ({ locals, fetch }) => {
     try {
         const response = await fetch(`${getFlaskURL()}/api/products/get_all_products`);
 
@@ -11,7 +11,12 @@ export const load = async ({ fetch }) => {
             throw new Error('Failed to fetch products');
         }
         const products: ProductType[] = await response.json();
-        return { products: products };
+
+        if (locals.user) {
+            return { user: locals.user, products: products };
+        } else {
+            return { products: products };
+        }
     } 
     
     catch (error) {

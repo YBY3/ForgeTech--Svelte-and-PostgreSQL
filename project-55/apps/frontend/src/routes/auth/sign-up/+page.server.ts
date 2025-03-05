@@ -22,7 +22,6 @@ export const actions = {
             const responseData = await flaskResponse.json();
 
             if (!flaskResponse.ok) {
-                console.error(responseData);
                 console.error('Sign-up Failed:', responseData.error );
                 return fail(flaskResponse.status, responseData);
             }
