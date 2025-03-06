@@ -15,12 +15,12 @@
 
 </script>
 
-<div class="w-full relative card bg-surface-200 dark:bg-surface-800 card-hover rounded-lg shadow-md p-4 h-[400px] flex flex-col justify-between">
+<div class="w-full relative border border-gray-600 card-hover rounded-none shadow-md p-2 flex flex-col justify-between hover:bg-gray-200 hover:bg-opacity-5">
   
   <!-- Clickable Product Image (Only if not in detailed view) -->
   {#if !detailedView}
     <button 
-      class="w-full h-40 flex items-center justify-center bg-gray-200 rounded-md"
+      class="w-full h-80 flex items-center justify-center bg-gray-200 rounded-md"
       on:click={() => onProductSelect && onProductSelect(product)}
     >
       <!-- Ensure consistent image size -->
@@ -33,15 +33,17 @@
   {/if}
 
   <!-- Product Details -->
+   <br>
   <div class="flex flex-col flex-grow justify-between">
-    <h2 class="text-lg font-semibold text-black-800">{product.name}</h2>
-    <p class="text-black-600 text-sm truncate">{product.description}</p>
+    <h2 class="text-lg font-bold text-black-800 px-2">{product.name}</h2>
+    <p class="text-black-600 text-sm truncate px-2">{product.description}</p>
 
     <!-- Extra Details (Only in Detailed View) -->
     {#if detailedView}
       <div>
+        
         <img 
-            class="w-full h-full rounded-md" 
+            class="w-full h-full object-cover rounded-md" 
             src={product.image} 
             alt={product.name}
         />
@@ -55,8 +57,8 @@
     {/if}
 
     <!-- Price & Cart Button Section -->
-    <div class="flex justify-between items-center mt-4">
-      <p class="text-lg font-semibold">${product.price.toFixed(2)}</p>
+    <div class="flex justify-between items-center mt-4 px-2 py-2">
+      <p class="text-lg font-bold">${product.price.toFixed(2)}</p>
 
       <!-- Add to Cart Button with Tooltip -->
       <div class="relative group">

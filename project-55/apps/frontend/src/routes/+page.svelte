@@ -155,7 +155,7 @@
         <!-- Buttons & Cart Display -->
         <div class="container mx-auto p-4 flex flex-col items-center text-center pb-20"></div>
 
-<h1 class="text-4xl font-bold" id="partnersID">Our hardware partners</h1>
+<h1 class="text-4xl font-bold text-center" id="partnersID">Our hardware partners</h1>
 <br>
 <div class="logo-cloud grid-cols-2 sm:grid-cols-4 md:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-0.5">
 	<a class="logo-item p-8 text-xl">AMD</a>
@@ -169,12 +169,17 @@
 </div>
 <br>
 <br>
+<br>
+<br>
+<br>
+<br>
 
         <!-- About Us -->
-         <div class="p-4">
-        <h1 class="text-4xl font-bold text-center" id="AboutID">About The Company</h1> <br>
-        <div class="bg-surface-100 dark:bg-surface-800 p-6 rounded-lg shadow-md w-full max-w-4xl">
-            <p class="text-white-700">We are a group of college students with a 
+        <div class="lg:py-16 bg-primary-500 w-screen flex flex-col lg:flex-row items-center lg:items-start justify-center gap-8">
+        
+        <div class="p-6 px-4 rounded-lg w-full max-w-xl">
+            <h1 class="text-4xl font-bold text-white [@media(max-width:430px)]:text-3xl text-5xl sm:text-6xl md:text-6xl" id="AboutID">About Forge Tech</h1> <br>
+            <p class="text-gray-200 text-sm sm:text-lg">We are a group of college students with a 
             passion for technology, dedicated to providing high-quality 
             computer parts for both new and old systems. Whether you're 
             building a custom rig or upgrading your current setup, we 
@@ -184,7 +189,14 @@
             the growth of young entrepreneurs. Join us in shaping the future, 
             one part at a time!
             </p>
-        </div> <br>
+            <br>
+            <a href="/about-us"><button class="text-black font-bold p-2 border-2 border-black rounded-lg hover:bg-white transition-all duration-300 ease-in-out hover:border-white">Meet the Team <i class="fa-solid fa-arrow-right ml-1"></i></button></a>
+        </div> 
+        
+            <div class="p-2">
+            <img class ="w-96 rounded-full"src="leo-pics/leo-cropped.png">
+            </div>
+
         </div>
 
     </div>

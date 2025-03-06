@@ -33,8 +33,11 @@
 {#if productData}
   {#if catalogView}
     <div class="flex flex-col items-center w-full h-full overflow-y-auto">
+      
       <br>
       <h1 class="text-center text-4xl font-medium">Our Products</h1>
+      
+      
       <br>
       <!-- Catalog Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
@@ -53,6 +56,7 @@
   {:else if productView}
   
     <!-- Product Detail View using ProductCard.svelte -->
+     <br>
     <div class="flex flex-col items-center justify-center about-me w-full h-full overflow-y-auto">
       <div class="w-1/3 mx-auto text-center p-6">
         <ProductCard product={selectedProduct} detailedView={true} />
