@@ -2,7 +2,6 @@
     import { onMount } from 'svelte';
     import type { ProductType } from "$lib/types/ProductTypes";
     import ProductCard from "$lib/components/product/ProductCard.svelte";
-    
 
     //Product Data
     export let data;
@@ -12,8 +11,12 @@
     let selectedProduct: ProductType;
     let catalogView = true;
     let productView = false;
+    let isLoggedIn = false;
 
     onMount(() => {
+      if (data.user) {
+        isLoggedIn = true;
+      }
       if (data.products) {
         productData = data.products;
       }
@@ -48,6 +51,7 @@
               selectedProduct = product;
               showProductView();
             }} 
+            isLoggedIn={isLoggedIn}
           />
         {/each}
       </div>  

@@ -16,7 +16,7 @@
 	//Layout Elements
 	let mounted = false;
 	let showClickable = true;
-	import { isLoggedIn } from '$lib/stores/authStore';
+	let isLoggedIn = false;
 
 	//Popup Settings
 	const menuPopup: PopupSettings = {
@@ -28,7 +28,7 @@
 
 	onMount(() => {
 		if (data.user) {
-			isLoggedIn.set(true);
+			isLoggedIn = true;
 		}
 		mounted = true;
 	});
@@ -103,20 +103,20 @@
 						<div class="grid grid-cols-1 gap-1">
 							<div class="py-2 flex justify-center" ><LightSwitch /></div>
 							<hr class="border-t w-full mx-auto">
-					{#if $isLoggedIn}
-							<a href="/profile" class="w-full block"><button class="btn hover:bg-primary-500 w-full">Profile </button></a>
-							<a href="/catalog" class="w-full block"><button class="btn hover:bg-primary-500 w-full">Products </button></a>
-							<a href="/about-us" class="w-full block"><button class="btn hover:bg-primary-500 w-full">About Us</button></a>
-							<hr class="border-t w-full mx-auto">
-							<div class="pt-2">
-								<button on:click={logout} class="btn w-full text-white bg-primary-500">Logout</button>
-							</div>
-					{:else}
-						<a href="/catalog" class="w-full block"><button class="btn hover:bg-primary-500 w-full">Products </button></a>
-						<a href="/about-us" class="w-full block"><button class="btn hover:bg-primary-500 w-full">About Us</button></a>
-						<a class="btn hover:bg-primary-500 w-full" href="/auth/login">Login</a>
-						<a class="btn hover:bg-primary-500 w-full" href="/auth/sign-up">Sign Up</a>
-					{/if}
+							{#if isLoggedIn}
+								<a href="/profile" class="w-full block"><button class="btn hover:bg-primary-500 w-full">Profile </button></a>
+								<a href="/catalog" class="w-full block"><button class="btn hover:bg-primary-500 w-full">Products </button></a>
+								<a href="/about-us" class="w-full block"><button class="btn hover:bg-primary-500 w-full">About Us</button></a>
+								<hr class="border-t w-full mx-auto">
+								<div class="pt-2">
+									<button on:click={logout} class="btn w-full text-white bg-primary-500">Logout</button>
+								</div>
+							{:else}
+								<a href="/catalog" class="w-full block"><button class="btn hover:bg-primary-500 w-full">Products </button></a>
+								<a href="/about-us" class="w-full block"><button class="btn hover:bg-primary-500 w-full">About Us</button></a>
+								<a class="btn hover:bg-primary-500 w-full" href="/auth/login">Login</a>
+								<a class="btn hover:bg-primary-500 w-full" href="/auth/sign-up">Sign Up</a>
+							{/if}
 						</div>
 					</div>
 		
