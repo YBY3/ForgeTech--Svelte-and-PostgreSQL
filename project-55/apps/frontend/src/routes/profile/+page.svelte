@@ -10,6 +10,7 @@
 	export let data;
 	let userData: UserType;
 	let pastOrders: PastOrderType[];
+	let isEmployee: boolean = false;
 	
 	// Page Elements (Toast Notifications)
 	const toastStore = getToastStore();
@@ -17,6 +18,7 @@
 	onMount(() => {
 		if (data.user) {
 			userData = data.user;
+			isEmployee = userData.user_type === 'employee'; // Check if user is employee
 		}
 		if (data.pastOrders) {
 			pastOrders = data.pastOrders;
@@ -83,6 +85,24 @@
 		<br>
 		<br>
 
+		<!-- Conditional Employee Section -->
+        {#if isEmployee}
+            <div class="flex flex-col items-center">
+                <h1 class="text-2xl font-semibold">Employee Dashboard</h1>
+                <p class="text-lg text-gray-700">Welcome, {userData.name}! You can manage inventory and orders.</p>
+
+                <!-- Placeholder for Claimed Orders -->
+                <div class="mt-4 p-4 border border-gray-300 rounded-lg">
+                    <h2 class="text-xl font-semibold">Claimed Customer Orders</h2>
+                    <p class="text-gray-600 italic">Feature coming soon...</p>
+                </div>
+
+                <a href="/admin/orders" class="btn-primary mt-4">Manage Orders</a>
+                <a href="/admin/products" class="btn-secondary mt-2">Manage Products</a>
+            </div>
+        {/if}
+
+		{#if !isEmployee}
 		<!-- Past Orders Section -->
 		<div class="flex flex-col items-center">
 			<h1 class="text-3xl sm:text-4xl md:text-4xl">Past Orders</h1>
@@ -115,5 +135,7 @@
 				</p>
 			{/if}
 		</div>
+		{/if}
+		
 	</div>
 {/if}
