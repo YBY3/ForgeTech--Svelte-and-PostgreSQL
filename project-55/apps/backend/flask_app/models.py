@@ -99,4 +99,3 @@ class Order(db.Model):
              # To show creation timestamp
             'created_at': self.created_at
         }
-
