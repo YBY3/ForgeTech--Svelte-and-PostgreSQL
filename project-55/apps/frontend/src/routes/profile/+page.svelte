@@ -85,22 +85,61 @@
 		<br>
 		<br>
 
+		<!-- placeholder for claimed orders -->
+		 
 		<!-- Conditional Employee Section -->
-        {#if isEmployee}
+        <!-- {#if isEmployee}
             <div class="flex flex-col items-center">
                 <h1 class="text-2xl font-semibold">Employee Dashboard</h1>
-                <p class="text-lg text-gray-700">Welcome, {userData.name}! You can manage inventory and orders.</p>
+                <p class="text-lg text-gray-700">Welcome, {userData.name}! You can manage orders under here.</p> -->
 
                 <!-- Placeholder for Claimed Orders -->
-                <div class="mt-4 p-4 border border-gray-300 rounded-lg">
+                <!-- <div class="mt-4 p-4 border border-gray-300 rounded-lg">
                     <h2 class="text-xl font-semibold">Claimed Customer Orders</h2>
                     <p class="text-gray-600 italic">Feature coming soon...</p>
-                </div>
-
-                <a href="/admin/orders" class="btn-primary mt-4">Manage Orders</a>
-                <a href="/admin/products" class="btn-secondary mt-2">Manage Products</a>
+                </div> 
+				<br><br>
             </div>
-        {/if}
+        {/if} -->
+
+		<!-- Prep for employee order claims -->
+		{#if isEmployee}
+    	<div class="flex flex-col items-center">
+			<h1 class="text-2xl font-semibold">Employee Dashboard</h1>
+			<p class="text-lg text-gray-700">Welcome, {userData.name}! You can see your claimed orders here.</p>
+
+			<!-- Display claimed orders -->
+			<div class="mt-4 p-4 border border-gray-300 rounded-lg">
+				<h2 class="text-xl font-semibold">Claimed Orders</h2>
+				{#if pastOrders && pastOrders.length > 0}
+					<ul>
+						{#each pastOrders as order (order.id)}
+							<div class="flex flex-col gap-2 items-center card variant-ringed p-4">
+								<li>
+									<strong>Order ID:</strong> {order.id} <br>
+									<strong>Total:</strong> ${order.total} <br>
+									<strong>Status:</strong> {order.status} <br>
+									<strong>Products:</strong>
+									<ul class="mt-2">
+										{#each groupProducts(order.products) as product}
+											<li class="flex items-center gap-2">
+												<ProductSmallPreview product={product} />
+												<span class="font-semibold text-black-800">x{product.quantity}</span>
+											</li>
+										{/each}
+									</ul>
+								</li>
+								<hr class="w-full border-t">
+							</div>
+						{/each}
+					</ul>
+				{:else}
+					<p class="text-center text-lg text-gray-600">No claimed orders yet :/ </p>
+				{/if}
+			</div>
+		</div>
+		{/if}
+
 
 		{#if !isEmployee}
 		<!-- Past Orders Section -->

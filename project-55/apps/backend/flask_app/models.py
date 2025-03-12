@@ -74,18 +74,14 @@ class Order(db.Model):
     products = db.relationship('Product', secondary=order_product, back_populates='orders')
     total = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(50), default='Pending')
-<<<<<<< HEAD
+
     #created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Potential line for time
-    
-=======
-    
+
     # Link to employee
     claimed_by_employee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  
     # Timestamp for ordering
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  
-
->>>>>>> authsprint3
-
+    
     def __repr__(self):
         return f'<Order {self.id} by User {self.user_id}>'
 
@@ -96,8 +92,7 @@ class Order(db.Model):
             'user_id': self.user_id,
             'product_ids': [product.id for product in self.products],
             'total': self.total,
-<<<<<<< HEAD
-            'status': self.status
+            'status': self.status,
         
 
 # Potential OrderItem Class needed for keeping track of quanitity
@@ -107,12 +102,9 @@ class Order(db.Model):
 #     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
 #     quantity = db.Column(db.Integer, nullable=False, default=1)
 #     product = db.relationship('Product')
-=======
             'status': self.status,
             # To show claim status
             'claimed_by_employee_id': self.claimed_by_employee_id,  
              # To show creation timestamp
             'created_at': self.created_at
         }
-
->>>>>>> authsprint3
