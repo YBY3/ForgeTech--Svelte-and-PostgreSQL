@@ -1,5 +1,6 @@
 #connecting model to the database
 from flask_app.extensions import db
+#from datetime import datetime #Potential import for time
 
 
 #User Model
@@ -68,6 +69,7 @@ class Order(db.Model):
     products = db.relationship('Product', secondary=order_product, back_populates='orders')
     total = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(50), default='Pending')
+    #created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Potential line for time
 
     def __repr__(self):
         return f'<Order {self.id} by User {self.user_id}>'
@@ -80,3 +82,11 @@ class Order(db.Model):
             'total': self.total,
             'status': self.status
         }
+
+# Potential OrderItem Class needed for keeping track of quanitity
+# class OrderItem(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
+#     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+#     quantity = db.Column(db.Integer, nullable=False, default=1)
+#     product = db.relationship('Product')
