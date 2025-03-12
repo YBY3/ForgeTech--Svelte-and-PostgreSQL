@@ -21,7 +21,9 @@
 			isEmployee = userData.user_type === 'employee'; // Check if user is employee
 		}
 		if (data.pastOrders) {
-			pastOrders = data.pastOrders;
+			// pastOrders = data.pastOrders;
+			pastOrders = data.pastOrders.sort((a, b) => b.id - a.id);
+
 		}
 		if (data.error) {
 			toastStore.trigger({

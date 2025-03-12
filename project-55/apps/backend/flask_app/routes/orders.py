@@ -100,7 +100,10 @@ def get_all_orders():
 
 
         # Query all orders for the given user ID, including products
-        orders = Order.query.filter_by(user_id=user_id).all()
+        # orders = Order.query.filter_by(user_id=user_id).all()
+        past_orders = Order.query.filter_by(user_id=user_id).order_by(Order.id.desc()).all()
+    
+
 
 
         # Check if any orders exist
