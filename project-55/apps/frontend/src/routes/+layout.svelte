@@ -73,7 +73,7 @@
 			<svelte:fragment slot="trail">
 				
 
-					<div class="flex items-center gap-4 card variant-soft pl-4 pr-4 pt-2 pb-2 rounded-lg">
+					<div class="flex items-center gap-4 pl-4 pr-4 pt-2 pb-2 rounded-lg">
 						<!-- Menu Button -->
 						<button
 							class="btn relative p-2 rounded-md"

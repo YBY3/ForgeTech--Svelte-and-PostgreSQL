@@ -61,7 +61,7 @@
     </div>
     </div>
 
-<div class="sticky top-0 w-full variant-glass-surface md:text-center md:flex md:justify-evenly py-6 z-[2] text-primary-500 dark:text-white" id="second_tab">
+<div class="sticky top-0 w-full variant-glass-surface md:text-center md:flex md:justify-evenly py-6 z-[2] text-secondary-600 dark:text-white" id="second_tab">
     <!--<button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out block md:hidden px-8"><a href="#products">PRODUCTS</a></button>-->
     <select class="select w-32 block md:hidden ml-4">
         <option value="1">Featured</option>
@@ -79,9 +79,9 @@
     <!--<h1 class="text-4xl font-bold" id="products">Featured</h1> p-4 was below!-->
     <div class="container mx-auto flex flex-col items-center">
         {#if featuredProduct}
-    <div class="bg-black w-screen">
+    <div id="products" class="bg-black w-screen">
         <br>
-        <h2 id="products" class="text-2xl font-semibold text-white-900 font-bold text-center text-white">{featuredProduct.name}</h2>
+        <h2 class="text-2xl font-semibold text-white-900 font-bold text-center text-white">NVIDIA GeForce RTX 3090 Ti</h2>
         <br>
         <h1 class="text-2xl sm:text-4xl font-bold text-center text-white">Unleash powerful graphics for gamers and creators.</h1>
         <br>
@@ -89,8 +89,8 @@
             <div class="w-full lg:w-1/2 [@media(min-width:2000px)]:ml-32 [@media(min-width:2400px)]:ml-96">
             <img 
             class="rounded-lg"
-            src={featuredProduct.image} 
-            alt={featuredProduct.name}
+            src="catalog-images/gpu.jpg"
+            alt="NVIDIA GeForce RTX 3090 Ti"
             />
             </div>
             <div class="flex-1 p-6 rounded-lg w-full [@media(min-width:2000px)]:-ml-32 [@media(min-width:2400px)]:-ml-64 text-white">
@@ -105,7 +105,7 @@
                 <p class="mt-2"><span class="text-primary-500 text-3xl font-bold">Gaming at the Edge</span><br>
                     Elevate your experience with blazing-fast cores and AI-driven performance.</p>
                 <br>
-                <div class="border-2 border-white py-2 px-6 rounded-lg inline-block"><p class="text-lg font-bold">${featuredProduct.price}</p></div>
+                <div class="border-2 border-white py-2 px-6 rounded-lg inline-block"><p class="text-lg font-bold">$1,780</p></div>
                 <!--<h3 class="text-xl font-semibold mt-2 text-white-800">Components:</h3>
 
                 <ul class="list-disc list-inside text-white-700">
@@ -118,6 +118,7 @@
     </div>
         {:else}
             <!-- Instead of Temperary Product, Use a Error Message -->
+             <br>
             <div class="w-auto h-auto card variant-ghost-error rounded-lg p-4">
                 <div class="text-2xl font-bold">The Product Information Failed to Load :/</div>
                 <div class="text-xl">if refreshing fails, we are working on fix</div>
@@ -153,23 +154,22 @@
         
         <!-- we want this for logged in users only, would consider removing this logic -->
         <!-- Buttons & Cart Display -->
-        <div class="container mx-auto p-4 flex flex-col items-center text-center pb-20"></div>
+        <!--<div class="container mx-auto p-4 flex flex-col items-center text-center pb-20"></div>-->
 
-<h1 class="text-4xl font-bold text-center" id="partnersID">Our hardware partners</h1>
-<br>
-<div class="logo-cloud grid-cols-2 sm:grid-cols-4 md:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-0.5">
-	<a class="logo-item p-8 text-xl">AMD</a>
-	<a class="logo-item p-8 text-xl">Nvidia</a>
-	<a class="logo-item p-8 text-xl">Intel</a>
-	<a class="logo-item p-8 text-xl">Qualcomm</a>
-	<a class="logo-item p-8 text-xl">Stark Industries</a>
-	<a class="logo-item p-8 text-xl">Samsung</a>
-	<a class="logo-item p-8 text-xl">ZOTAC</a>
-	<a class="logo-item p-8 text-xl">Wonka Inc.</a>
-</div>
 <br>
 <br>
 <br>
+
+<h1 class="text-4xl sm:text-6xl md:text-6xl font-bold text-center" id="partnersID">Our hardware partners</h1>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 items-center">
+    <div class="w-64"><img src="LandingPage-pic/nv.webp"></div>
+    <div class="w-64"><img src="LandingPage-pic/evga-logo.png"></div>
+    <div class="w-64"><img src="LandingPage-pic/AMDNORM.webp"></div>
+    <div class="w-64"><img src="LandingPage-pic/MSI-Logo.png"></div>
+    <div class="w-64"><img src="LandingPage-pic/GIGA.png"></div>
+    <div class="w-64"><img src="LandingPage-pic/intel.png"></div>
+    </div>
 <br>
 <br>
 <br>
@@ -178,7 +178,7 @@
         <div class="lg:py-16 bg-primary-500 w-screen flex flex-col lg:flex-row items-center lg:items-start justify-center gap-8">
         
         <div class="p-6 px-4 rounded-lg w-full max-w-xl">
-            <h1 class="text-4xl font-bold text-white [@media(max-width:430px)]:text-3xl text-5xl sm:text-6xl md:text-6xl" id="AboutID">About Forge Tech</h1> <br>
+            <h1 class="text-4xl font-bold text-white [@media(max-width:430px)]:text-3xl text-4xl sm:text-6xl md:text-6xl" id="AboutID">About Forge Tech</h1> <br>
             <p class="text-gray-200 text-sm sm:text-lg">We are a group of college students with a 
             passion for technology, dedicated to providing high-quality 
             computer parts for both new and old systems. Whether you're 
