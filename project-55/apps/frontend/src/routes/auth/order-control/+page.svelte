@@ -1,10 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { goto, invalidate } from '$app/navigation';
   import OrderSmallPreview from '$lib/components/OrderSmallPreview.svelte';
-  import { getFlaskURL } from '$lib/api';
   import type { PastOrderType } from '$lib/types/OrderTypes';
   import type { UserType } from '$lib/types/UserTypes';
+  import { getToastStore } from '@skeletonlabs/skeleton';
 
   export let data: {
     user: UserType;
@@ -16,6 +15,8 @@
   let userData: UserType;
   let unclaimedOrders: PastOrderType[] = [];
   let claimedOrders: PastOrderType[] = [];
+  let submitting = false;
+  const toastStore = getToastStore();
 
   onMount(() => {
     userData = data.user;
@@ -23,60 +24,138 @@
     claimedOrders = data.claimedOrders;
   });
 
-// Claim an order
-async function claimOrder(orderId: number) {
-  try {
-    const res = await fetch(`${getFlaskURL()}/api/orders/claim`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ order_id: orderId, employee_id: userData.id })
-    });
-    const result = await res.json();
-
-    if (res.ok && result) {
-      // Optionally update the UI immediately
-      unclaimedOrders = unclaimedOrders.filter((o) => o.id !== orderId);
-      claimedOrders = [result, ...claimedOrders];
-
-      // Force a full page reload
-      location.reload();
-    } else {
-      console.error('Error claiming order:', result.error);
+  async function claimOrder(orderId: number) {
+    //If Already Submitting, Exit
+    if (submitting) {
+      toastStore.trigger({
+        message: 'Already Managing Order Claim, Please Wait',
+        background: 'variant-filled-error'
+      });
+      return;
     }
-  } catch (error) {
-    console.error('Error claiming order:', error);
-  }
-}
 
-// Unclaim an order
-async function unclaimOrder(orderId: number) {
-  try {
-    const res = await fetch(`${getFlaskURL()}/api/orders/unclaim`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ order_id: orderId })
-    });
-    const result = await res.json();
+    //Try Submitting
+    try {
+      submitting = true;
+      const formData = new FormData();
+      formData.append("order_id", JSON.stringify(orderId));
+      formData.append("employee_id", JSON.stringify(userData.id)); 
 
-    if (res.ok && result) {
-      // Optionally update the UI immediately
-      claimedOrders = claimedOrders.filter((o) => o.id !== orderId);
-      unclaimedOrders = [result, ...unclaimedOrders];
+      // Log the form data entries for debugging
+      // for (const [key, value] of formData.entries()) {
+      // 	console.log(`${key}: ${value}`);
+      // }
 
-      // Force a full page reload
-      location.reload();
-    } else {
-      console.error('Error unclaiming order:', result.error);
+      //Post Form Data
+      const response = await fetch('?/claimOrder', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+      const parsedResultData = JSON.parse(result.data);
+      const success = parsedResultData[parsedResultData[0].success];
+
+      if (success) {
+        // Success Message
+        const successMessage = parsedResultData[parsedResultData[0].message];
+        toastStore.trigger({
+          message: successMessage,
+          background: 'variant-filled-success'
+        });
+
+        // Update UI
+        const orderToMove = unclaimedOrders.find((o) => o.id === orderId);
+        if (orderToMove) {
+          unclaimedOrders = unclaimedOrders.filter((o) => o.id !== orderId);
+          orderToMove.status = "claimed";
+          claimedOrders = [{ ...orderToMove, claimed_by_employee_id: userData.id }, ...claimedOrders];
+        }
+      }
+      else {
+        const errorMessage = parsedResultData[parsedResultData[0].error];
+        throw new Error(errorMessage);
+      }
+
+    } catch (error) {
+      const errorMessage: string = `${error}`;
+      toastStore.trigger({
+        message: errorMessage,
+        background: 'variant-filled-error'
+      });
+    } finally {
+      submitting = false;
     }
-  } catch (error) {
-    console.error('Error unclaiming order:', error);
   }
-}
+
+  async function unclaimOrder(orderId: number) {
+    //If Already Submitting, Exit
+    if (submitting) {
+      toastStore.trigger({
+        message: 'Already Managing Order Claim, Please Wait',
+        background: 'variant-filled-error'
+      });
+      return;
+    }
+
+    //Try Submitting
+    try {
+      submitting = true;
+      const formData = new FormData();
+      formData.append("order_id", JSON.stringify(orderId));
+
+      // Log the form data entries for debugging
+      // for (const [key, value] of formData.entries()) {
+      // 	console.log(`${key}: ${value}`);
+      // }
+
+      //Post Form Data
+      const response = await fetch('?/unclaimOrder', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+      const parsedResultData = JSON.parse(result.data);
+      const success = parsedResultData[parsedResultData[0].success];
+
+      if (success) {
+        // Success Message
+        const successMessage = parsedResultData[parsedResultData[0].message];
+        toastStore.trigger({
+          message: successMessage,
+          background: 'variant-filled-success'
+        });
+
+        // Update UI
+        const orderToMove = claimedOrders.find((o) => o.id === orderId);
+        if (orderToMove) {
+          claimedOrders = unclaimedOrders.filter((o) => o.id !== orderId);
+          orderToMove.status = "pending";
+          unclaimedOrders = [{ ...orderToMove, claimed_by_employee_id: userData.id }, ...claimedOrders];
+        }
+      }
+      else {
+        const errorMessage = parsedResultData[parsedResultData[0].error];
+        throw new Error(errorMessage);
+      }
+
+    } catch (error) {
+      const errorMessage: string = `${error}`;
+      toastStore.trigger({
+        message: errorMessage,
+        background: 'variant-filled-error'
+      });
+    } finally {
+      submitting = false;
+    }
+  }
 
 </script>
 
+
 <div class="max-w-5xl mx-auto p-6">
-  <h1 class="text-center text-4xl font-bold mb-6">Order Dashboard</h1>
+  <h1 class="text-center text-4xl font-bold mb-6">Order Control</h1>
 
   <div class="flex flex-col md:flex-row gap-6">
     <!-- Unclaimed Orders Column -->

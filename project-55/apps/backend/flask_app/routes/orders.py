@@ -241,10 +241,16 @@ def claim_order():
     # Fetch the order from the database
     order = Order.query.get(order_id)
     if not order:
-        return jsonify({"error": "Order not found"}), 404
+        return jsonify({
+            'success': False,
+            'error': 'Order not found'
+        }), 404
     
     if order.status != 'pending':
-        return jsonify({"error": "Order has already been claimed"}), 400
+        return jsonify({
+            'success': False,
+            'error': 'Order has already been claimed'
+        }), 400
     
     # Update the order status and assign the employee using the correct field name
     order.status = 'claimed'
@@ -253,7 +259,10 @@ def claim_order():
     # Commit the changes to the database
     db.session.commit()
     
-    return jsonify(order.to_dict())
+    return jsonify({
+        'success': True,
+        'message': 'Order Claimed Successfully'
+    }), 200
 
 
 @order_bp.route('/unclaim', methods=['POST'])
@@ -261,17 +270,25 @@ def unclaim_order():
     # Retrieve the order ID from the request
     order_id = request.json.get('order_id')
     if not order_id:
-        return jsonify({"error": "Order ID is required"}), 400
+        return jsonify({
+            'success': False,
+            'error': 'Order ID not Found'
+        }), 400
 
     # Fetch the order from the database
     order = Order.query.get(order_id)
     if not order:
-        return jsonify({"error": "Order not found"}), 404
+        return jsonify({
+            'success': False,
+            'error': 'Order not Found'
+        }), 404
 
     # Check if the order is actually claimed before attempting to unclaim it
     if order.status not in ['claimed', 'working', 'confirmed']:
-        return jsonify({"error": "Order is not in a state that can be unclaimed"}), 400
-
+        return jsonify({
+            'success': False,
+            'error': 'Order is not Claimed'
+        }), 400
 
     # Revert the order's status to 'pending' and remove the employee assignment
     order.status = 'pending'
@@ -280,7 +297,11 @@ def unclaim_order():
     # Commit the changes to the database
     db.session.commit()
 
-    return jsonify(order.to_dict())
+    return jsonify({
+        'success': True,
+        'message': 'Order Unclaimed Successfully'
+    }), 200
+
 
 #RETRIEVE ORDER DETAILS (PARAM: ORDER_ID)
 @order_bp.route('/orderDetails/<int:order_id>', methods=['GET'])

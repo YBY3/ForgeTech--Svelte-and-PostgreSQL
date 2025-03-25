@@ -121,8 +121,11 @@
 										<button class="btn hover:bg-primary-500 w-full">Catalog</button>
 									</a>
 								{:else if data.user.user_type === 'employee'}
-									<a href="/ordersDashboard" class="w-full block">
-										<button class="btn hover:bg-primary-500 w-full">Orders Dashboard</button>
+									<a href="/auth/order-control" class="w-full block">
+										<button class="btn hover:bg-primary-500 w-full">Order Control</button>
+									</a>
+									<a href="/auth/product-control" class="w-full block">
+										<button class="btn hover:bg-primary-500 w-full">Product Control</button>
 									</a>
 								{/if}
 							{/if}

@@ -1,7 +1,8 @@
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { getFlaskURL } from '$lib/api';
 import type { PastOrderType } from '$lib/types/OrderTypes';
 import type { UserType } from '$lib/types/UserTypes';
+
 
 export const load = async ({ locals, fetch }) => {
   // Only allow employee users
@@ -56,3 +57,65 @@ export const load = async ({ locals, fetch }) => {
   return { user: locals.user, unclaimedOrders, claimedOrders, error };
 };
 
+
+export const actions = {
+
+  claimOrder: async ({ request, fetch }) => {
+    try {
+      const formData = await request.formData();
+      const jsonData = {
+          order_id: formData.get('order_id'),
+          employee_id: formData.get('employee_id')
+      };
+
+      const flaskResponse = await fetch(`${getFlaskURL()}/api/orders/claim`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(jsonData)
+      });
+
+      const responseData = await flaskResponse.json();
+
+      if (!flaskResponse.ok) {
+        console.error('Claiming Order Failed:', responseData.error );
+        return fail(flaskResponse.status, responseData);
+      }
+
+      return { success: true, message: responseData.message };
+    } 
+
+    catch (error) {
+      console.error('Error in claimOrder action:', error);
+      return fail(500, { error: 'Internal Server Error' });
+    }
+  },
+
+  unclaimOrder: async ({ request, fetch }) => {
+    try {
+      const formData = await request.formData();
+      const jsonData = {
+          order_id: formData.get('order_id')
+      };
+
+      const flaskResponse = await fetch(`${getFlaskURL()}/api/orders/unclaim`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(jsonData)
+      });
+
+      const responseData = await flaskResponse.json();
+
+      if (!flaskResponse.ok) {
+        console.error('Unclaiming Order Failed:', responseData.error );
+        return fail(flaskResponse.status, responseData);
+      }
+
+      return { success: true, message: responseData.message };
+    } 
+
+    catch (error) {
+      console.error('Error in unclaimOrder action:', error);
+      return fail(500, { error: 'Internal Server Error' });
+    }
+  }
+};
