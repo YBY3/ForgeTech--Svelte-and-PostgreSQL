@@ -21,16 +21,16 @@
   -->
   <div class={`relative w-full h-auto grid grid-cols-[50px_1fr] gap-4 place-items-center justify-items-center card variant-ghost ${orderDisplay ? '' : 'card-hover'} rounded-lg p-4 ${orderDisplay ? '' : 'group'}`}>
     <!-- First Column: Display quantity if available (in orderDisplay mode) or product id otherwise -->
-    <div class="font-semibold text-black-800">
-      {#if orderDisplay && product.quantity !== undefined}
+    <div class="flex items-center font-semibold text-black-800">
+      <!-- {#if orderDisplay && product.quantity !== undefined}
         <span class="text-sm">x{product.quantity}</span>
       {:else}
-        {product.id}
-      {/if}
+        
+      {/if} -->
     </div>
     
     <!-- Second Column: Product Name -->
-    <div class="w-full">
+    <div class="w-full flext items-center">
       <h2 class="text-lg font-semibold text-black-800">{product.name}</h2>
     </div>
   

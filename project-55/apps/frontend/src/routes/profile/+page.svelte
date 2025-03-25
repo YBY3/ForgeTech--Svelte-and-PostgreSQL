@@ -4,12 +4,13 @@
 	import { Avatar, FileButton } from "@skeletonlabs/skeleton";
 	import ProductSmallPreview from '$lib/components/product/ProductSmallPreview.svelte';
 	import type { UserType } from '$lib/types/UserTypes';
-	import type { PastOrderType } from '$lib/types/OrderTypes.js';
+	import type { PastOrderType } from '$lib/types/OrderTypes';
 
-	// User Data
+	// User Data from the load function
 	export let data;
 	let userData: UserType;
-	let pastOrders: PastOrderType[];
+	// This variable will hold either claimed orders (for employees) or past orders (for customers)
+	let pastOrders: PastOrderType[] = [];
 	let isEmployee: boolean = false;
 	
 	// Page Elements (Toast Notifications)
@@ -20,10 +21,11 @@
 			userData = data.user;
 			isEmployee = userData.user_type === 'employee'; // Check if user is employee
 		}
-		if (data.pastOrders) {
-			// pastOrders = data.pastOrders;
+		// If employee, use claimedOrders; otherwise, use pastOrders
+		if (isEmployee && data.claimedOrders) {
+			pastOrders = data.claimedOrders.sort((a, b) => b.id - a.id);
+		} else if (data.pastOrders) {
 			pastOrders = data.pastOrders.sort((a, b) => b.id - a.id);
-
 		}
 		if (data.error) {
 			toastStore.trigger({
@@ -50,7 +52,6 @@
 		return Object.values(grouped);
 	}
 </script>
-
 
 {#if userData} 
 	<div class="h-full overflow-y-auto">
@@ -87,81 +88,72 @@
 		<br>
 		<br>
 
-		<!-- placeholder for claimed orders -->
-		 
-		<!-- Conditional Employee Section -->
-        <!-- {#if isEmployee}
-            <div class="flex flex-col items-center">
-                <h1 class="text-2xl font-semibold">Employee Dashboard</h1>
-                <p class="text-lg text-gray-700">Welcome, {userData.name}! You can manage orders under here.</p> -->
-
-                <!-- Placeholder for Claimed Orders -->
-                <!-- <div class="mt-4 p-4 border border-gray-300 rounded-lg">
-                    <h2 class="text-xl font-semibold">Claimed Customer Orders</h2>
-                    <p class="text-gray-600 italic">Feature coming soon...</p>
-                </div> 
-				<br><br>
-            </div>
-        {/if} -->
-
-		<!-- Prep for employee order claims -->
+		<!-- Employee Dashboard Section (for claimed orders) -->
 		{#if isEmployee}
-    	<div class="flex flex-col items-center">
+		<div class="flex flex-col items-center">
 			<h1 class="text-2xl font-semibold">Employee Dashboard</h1>
 			<p class="text-lg text-gray-700">Welcome, {userData.name}! You can see your claimed orders here.</p>
 
 			<!-- Display claimed orders -->
-			<div class="mt-4 p-4 border border-gray-300 rounded-lg">
+			<div class="mt-4 p-4 border border-gray-300 rounded-lg w-full max-w-lg">
 				<h2 class="text-xl font-semibold">Claimed Orders</h2>
+				<br>
 				{#if pastOrders && pastOrders.length > 0}
 					<ul>
 						{#each pastOrders as order (order.id)}
-							<div class="flex flex-col gap-2 items-center card variant-ringed p-4">
-								<li>
-									<strong>Order ID:</strong> {order.id} <br>
-									<strong>Total:</strong> ${order.total} <br>
-									<strong>Status:</strong> {order.status} <br>
-									<strong>Products:</strong>
-									<ul class="mt-2">
-										{#each groupProducts(order.products) as product}
-											<li class="flex items-center gap-2">
-												<ProductSmallPreview product={product} />
-												<span class="font-semibold text-black-800">x{product.quantity}</span>
-											</li>
-										{/each}
-									</ul>
-								</li>
-								<hr class="w-full border-t">
-							</div>
+							<!-- Wrap each order in a clickable anchor -->
+							<li>
+								<a href={`/profile/expandedOrderViewEmployee?orderId=${order.id}`} class="order-link">									<div class="flex flex-col gap-2 items-center card variant-ringed p-4 cursor-pointer">
+										<div class="group border rounded-lg p-4 transition-transform duration-300 transform hover:scale-105 cursor-pointer">
+											<strong>Order ID:</strong> {order.id} <br>
+											<strong>Total:</strong> ${order.total.toFixed(2)} <br>
+											<strong>Status:</strong> {order.status} <br>
+											<strong>Time Placed:</strong> {new Date(order.created_at).toLocaleString()} <br>
+											<strong>Products:</strong>
+											<ul class="mt-2">
+												{#each groupProducts(order.products) as product}
+													<li class="flex items-center gap-2">
+														<ProductSmallPreview product={product} />
+														<!-- <span class="font-semibold text-black-800">x{product.quantity}</span> -->
+													</li>
+												{/each}
+											</ul>
+										</div>
+										<hr class="w-full border-t">
+										<p class="text-blue-500 underline">View Details</p>
+									</div>
+								</a>
+							</li>
 						{/each}
 					</ul>
 				{:else}
 					<p class="text-center text-lg text-gray-600">No claimed orders yet :/ </p>
+					<br>
 				{/if}
 			</div>
 		</div>
 		{/if}
 
-
+		<!-- Past Orders Section for Customers -->
 		{#if !isEmployee}
-		<!-- Past Orders Section -->
 		<div class="flex flex-col items-center">
 			<h1 class="text-3xl sm:text-4xl md:text-4xl">Past Orders</h1>
             <br>
-			{#if pastOrders}
+			{#if pastOrders && pastOrders.length > 0}
 				<ul>
 					{#each pastOrders as order (order.id)}
 						<div class="flex flex-col gap-2 items-center card variant-ringed p-4">
 							<li>
 								<strong>Order ID:</strong> {order.id} <br>
-								<strong>Total:</strong> ${order.total} <br>
+								<strong>Total:</strong> ${order.total.toFixed(2)} <br>
 								<strong>Status:</strong> {order.status} <br>
+								<strong>Time Placed:</strong> {new Date(order.created_at).toLocaleString()} <br>
 								<strong>Products:</strong>
 								<ul class="mt-2">
 									{#each groupProducts(order.products) as product}
 										<li class="flex items-center gap-2">
 											<ProductSmallPreview product={product} />
-                                            <span class="font-semibold text-black-800">x{product.quantity}</span>
+											<!-- <span class="font-semibold text-black-800">x{product.quantity}</span> -->
 										</li>
 									{/each}
 								</ul>

@@ -15,7 +15,7 @@
 
 
 <div class="relative w-full h-auto grid grid-cols-[50px_1fr_100px] gap-4 place-items-center justify-items-center card variant-ghost card-hover rounded-lg p-4 group">
-    <div class="font-semibold text-black-800">{product.id}</div>
+    <div class="font-semibold text-black-800"></div>
     <h2 class="text-lg font-semibold text-black-800">{product.name}</h2>
     <div class="font-semibold text-black-800">${product.price}</div>
 

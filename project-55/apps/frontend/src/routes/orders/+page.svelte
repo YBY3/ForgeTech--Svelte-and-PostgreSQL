@@ -40,7 +40,7 @@
             const formData = new FormData();
             formData.append('product_ids', JSON.stringify($ordersStore.map(item => item.id)));
             formData.append('total', $ordersStore.reduce((sum, item) => sum + item.price, 0).toFixed(2));
-            formData.append('status', 'confirmed');
+            formData.append('status', 'pending'); //(3/19/25) Changed status to pending for testing purposes on route in orders
 
             const response = await fetch('?/add_order', {
                 method: 'POST',

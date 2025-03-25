@@ -76,7 +76,7 @@ class Order(db.Model):
     # Relationship with Products
     products = db.relationship('Product', secondary=order_product, back_populates='orders')
     total = db.Column(db.Float, nullable=False)
-    status = db.Column(db.String(50), default='Pending')
+    status = db.Column(db.String(50), default='pending')
     # Link to employee
     claimed_by_employee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  
     # Timestamp for ordering

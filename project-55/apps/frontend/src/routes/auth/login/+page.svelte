@@ -48,7 +48,7 @@
                 //Reload App
 				invalidate('app:load');
 				//Go to Catalog
-                window.location.href = '/catalog';
+                window.location.href = '/profile';
             }
             else {
 				const errorMessage = parsedResultData[parsedResultData[0].error];

@@ -30,7 +30,7 @@ export const actions = {
                     user_id: locals.user.id,
                     product_ids: product_ids,
                     total: formData.get('total'),
-                    status: 'confirmed'
+                    status: 'pending'
                 };
 
                 const flaskResponse = await fetch(`${getFlaskURL()}/api/orders/add_order`, {
