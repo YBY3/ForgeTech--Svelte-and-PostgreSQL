@@ -24,6 +24,13 @@
     claimedOrders = data.claimedOrders;
   });
 
+  $: {
+    console.log('Unclaimed Orders changed:', unclaimedOrders);
+  }
+  $: {
+    console.log('Claimed Orders changed:', claimedOrders);
+  }
+
   async function claimOrder(orderId: number) {
     //If Already Submitting, Exit
     if (submitting) {
@@ -130,9 +137,9 @@
         // Update UI
         const orderToMove = claimedOrders.find((o) => o.id === orderId);
         if (orderToMove) {
-          claimedOrders = unclaimedOrders.filter((o) => o.id !== orderId);
+          claimedOrders = claimedOrders.filter((o) => o.id !== orderId);
           orderToMove.status = "pending";
-          unclaimedOrders = [{ ...orderToMove, claimed_by_employee_id: userData.id }, ...claimedOrders];
+          unclaimedOrders = [{ ...orderToMove, claimed_by_employee_id: undefined }, ...unclaimedOrders];
         }
       }
       else {
