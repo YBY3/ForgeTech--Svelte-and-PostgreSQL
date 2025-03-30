@@ -6,7 +6,7 @@
 	async function confirmOrder() {
 		if (!order) return;
 			try {
-				const res = await fetch(`${getFlaskURL()}/api/orders/confirm`, {
+				const res = await fetch(`${getFlaskURL()}/api/ordersControl/confirm`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -30,7 +30,7 @@
 	async function workingOrder() {
 	if (!order) return;
 		try {
-			const res = await fetch(`${getFlaskURL()}/api/orders/working`, {
+			const res = await fetch(`${getFlaskURL()}/api/ordersControl/working`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -54,7 +54,7 @@
 	async function removeOrder() {
 	if (!order) return;
 		try {
-			const res = await fetch(`${getFlaskURL()}/api/orders/unclaim`, {
+			const res = await fetch(`${getFlaskURL()}/api/ordersControl/unclaim`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

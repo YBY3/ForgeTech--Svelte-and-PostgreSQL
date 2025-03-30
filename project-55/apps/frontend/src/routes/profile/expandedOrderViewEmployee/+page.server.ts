@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ url, fetch, locals }) => {
   let error: string | undefined = undefined;
 
   try {
-    const apiUrl = `${getFlaskURL()}/api/orders/orderDetails/${orderId}`;
+    const apiUrl = `${getFlaskURL()}/api/ordersControl/orderDetails/${orderId}`;
     console.log("Fetching order details from:", apiUrl);
 
     const res = await fetch(apiUrl, {

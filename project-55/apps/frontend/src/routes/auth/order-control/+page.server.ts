@@ -16,7 +16,7 @@ export const load = async ({ locals, fetch }) => {
 
   // Fetch unclaimed orders
   try {
-    const res = await fetch(`${getFlaskURL()}/api/orders/unclaimed`, {
+    const res = await fetch(`${getFlaskURL()}/api/ordersControl/unclaimed`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     });
@@ -36,7 +36,7 @@ export const load = async ({ locals, fetch }) => {
 
   // Fetch claimed orders for the employee dashboard
   try {
-    const res = await fetch(`${getFlaskURL()}/api/orders/employeeDashboard/${locals.user.id}`, {
+    const res = await fetch(`${getFlaskURL()}/api/ordersControl/employeeDashboard/${locals.user.id}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     });
@@ -68,7 +68,7 @@ export const actions = {
           employee_id: formData.get('employee_id')
       };
 
-      const flaskResponse = await fetch(`${getFlaskURL()}/api/orders/claim`, {
+      const flaskResponse = await fetch(`${getFlaskURL()}/api/ordersControl/claim`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(jsonData)
@@ -97,7 +97,7 @@ export const actions = {
           order_id: formData.get('order_id')
       };
 
-      const flaskResponse = await fetch(`${getFlaskURL()}/api/orders/unclaim`, {
+      const flaskResponse = await fetch(`${getFlaskURL()}/api/ordersControl/unclaim`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(jsonData)
