@@ -253,10 +253,6 @@ def signup():
             }), 400
 
 
-
-
-
-
         # Validate password strength
         if not validate_password(data['password']):
             return jsonify({
@@ -408,6 +404,9 @@ def login():
 
 
         if user and check_password_hash(user.password, data['password']):
+            #added to check the last time the user logged in
+            user.active_by = datetime.utcnow()
+            db.session.commit()
 
 
             return jsonify({

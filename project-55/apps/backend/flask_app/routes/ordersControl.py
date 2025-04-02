@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_app.extensions import db
-from flask_app.models import Product, Order, User
+from flask_app.models import Product, Order, User, OrderProduct
 
 order_control_bp = Blueprint('ordersControl', __name__)
 
@@ -30,21 +30,46 @@ def get_unclaimed_orders():
         # Convert orders to a list of dictionaries with product details
         order_data = []
         for order in unclaimed_orders:
+            order_items = OrderProduct.query.filter_by(order_id=order.id).all()
+            products_with_quantity = []
+            # order_info = {
+            #     "id": order.id,
+            #     "user_id": order.user_id,
+            #     "total": order.total,
+            #     "status": order.status,
+            #     "products": [
+            #         {
+            #             "id": product.id,
+            #             "name": product.name,
+            #             "price": product.price,
+            #         } for product in order.products
+            #     ],
+            #     "created_at": order.created_at.isoformat()  # Ensuring timestamp is serializable
+            # }
+            # order_data.append(order_info)
+
+            for order_item in order_items:
+                product = Product.query.get(order_item.product_id)
+                if product:
+                    products_with_quantity.append({
+                        "id": product.id,
+                        "name": product.name,
+                        "price": product.price,
+                        "quantity": order_item.order_quantity,
+                        "image": product.image
+                    })
+            
             order_info = {
                 "id": order.id,
                 "user_id": order.user_id,
                 "total": order.total,
                 "status": order.status,
-                "products": [
-                    {
-                        "id": product.id,
-                        "name": product.name,
-                        "price": product.price,
-                    } for product in order.products
-                ],
-                "created_at": order.created_at.isoformat()  # Ensuring timestamp is serializable
+                "products": products_with_quantity,
+                "created_at": order.created_at.isoformat(),
+                "arrive_by": order.arrive_by
             }
             order_data.append(order_info)
+
 
         return jsonify({
             'success': True,
@@ -73,21 +98,46 @@ def get_employee_dashboard(employee_id):
         # Convert orders to a list of dictionaries with product details
         order_data = []
         for order in claimed_orders:
+            order_items = OrderProduct.query.filter_by(order_id=order.id).all()
+            products_with_quantity = []
+            for order_item in order_items:
+                product = Product.query.get(order_item.product_id)
+                if product:
+                    products_with_quantity.append({
+                        "id": product.id,
+                        "name": product.name,
+                        "price": product.price,
+                        "quantity": order_item.order_quantity,
+                        "product_stock": product.product_stock,
+                        "image": product.image
+                    })
+            
             order_info = {
                 "id": order.id,
                 "user_id": order.user_id,
                 "total": order.total,
                 "status": order.status,
-                "products": [
-                    {
-                        "id": product.id,
-                        "name": product.name,
-                        "price": product.price,
-                    } for product in order.products
-                ],
-                "created_at": order.created_at.isoformat()
+                "products": products_with_quantity,
+                "created_at": order.created_at.isoformat(),
+                "arrive_by": order.arrive_by
             }
             order_data.append(order_info)
+            # order_info = {
+            #     "id": order.id,
+            #     "user_id": order.user_id,
+            #     "total": order.total,
+            #     "status": order.status,
+            #     "products": [
+            #         {
+            #             "id": item.product.id,
+            #             "name": item.name,
+            #             "price": item.price,
+            #             "product_stock": item.product_stock
+            #         } for item in order.order_items
+            #     ],
+            #     "created_at": order.created_at.isoformat()
+            # }
+            # order_data.append(order_info)
        
         # Always return a successful response with an empty array if no orders are found
         return jsonify({
@@ -110,6 +160,12 @@ def claim_order():
     order_id = request.json.get('order_id')
     # The ID of the employee claiming the order
     employee_id = request.json.get('employee_id')
+
+    if not order_id or not employee_id:
+            return jsonify({
+                'success': False,
+                'error': 'Missing order_id or employee_id'
+            }), 400
     
     # Fetch the order from the database
     order = Order.query.get(order_id)
@@ -188,20 +244,48 @@ def get_order_details(order_id):
                 'error': 'Order not found'
             }), 404
 
+        # # Build the order info dictionary
+        # order_info = {
+        #     "id": order.id,
+        #     "user_id": order.user_id,
+        #     "total": order.total,
+        #     "status": order.status,
+        #     "products": [
+        #         {
+        #             "id": product.id,
+        #             "name": product.name,
+        #             "price": product.price,
+        #         } for product in order.products
+        #     ],
+        #     "created_at": order.created_at.isoformat()
+        # }
+        # Get order items with quantities
+        order_items = OrderProduct.query.filter_by(order_id=order.id).all()
+        
+        products_with_quantity = []
+        for order_item in order_items:
+            product = Product.query.get(order_item.product_id)
+            if product:
+                products_with_quantity.append({
+                    "id": product.id,
+                    "name": product.name,
+                    "price": product.price,
+                    "quantity": order_item.order_quantity,
+                    "image": product.image,
+                    "description": product.description,
+                    "brand": product.brand
+                })
+        
         # Build the order info dictionary
         order_info = {
             "id": order.id,
             "user_id": order.user_id,
             "total": order.total,
             "status": order.status,
-            "products": [
-                {
-                    "id": product.id,
-                    "name": product.name,
-                    "price": product.price,
-                } for product in order.products
-            ],
-            "created_at": order.created_at.isoformat()
+            "products": products_with_quantity,
+            "created_at": order.created_at.isoformat(),
+            "arrive_by": order.arrive_by,
+            "claimed_by_employee_id": order.claimed_by_employee_id
         }
 
         # Return the order details
@@ -224,11 +308,20 @@ def confirm_order():
     order_id = request.json.get('order_id')
     # The ID of the employee confirming the order
     employee_id = request.json.get('employee_id')
+
+    if not order_id or not employee_id:
+            return jsonify({
+                'success': False,
+                'error': 'Missing order_id or employee_id'
+            }), 400
     
     # Fetch the order from the database
     order = Order.query.get(order_id)
     if not order:
-        return jsonify({"error": "Order not found"}), 404
+        return jsonify({
+                        'success': False,
+                        'error': 'Order not found'
+                    }), 404    
     
     # Ensure the order is in the claimed state before confirming
     if order.status != 'working':
@@ -247,6 +340,12 @@ def working_order():
     order_id = request.json.get('order_id')
     # The ID of the employee processing the order
     employee_id = request.json.get('employee_id')
+
+    if not order_id or not employee_id:
+            return jsonify({
+                'success': False,
+                'error': 'Missing order_id or employee_id'
+            }), 400
     
     # Fetch the order from the database
     order = Order.query.get(order_id)
@@ -262,3 +361,5 @@ def working_order():
     db.session.commit()
     
     return jsonify(order.to_dict()), 200
+
+

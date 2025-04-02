@@ -1,14 +1,8 @@
 from flask import Blueprint, request, jsonify
 from flask_app.extensions import db
-from flask_app.models import Product, Order, User
-
-
-
+from flask_app.models import Product, Order, User, OrderProduct
 
 order_bp = Blueprint('orders', __name__)
-
-
-
 
 # CODES USE:
 # 200: OK - Request succeeded normally
@@ -17,9 +11,6 @@ order_bp = Blueprint('orders', __name__)
 # 401: Unauthorized - Authentication is required and has failed or not been provided
 # 500: Internal Server Error - Server encountered an unexpected condition (used in catch blocks)
 
-
-
-
 @order_bp.route('/add_order', methods=['POST'])
 def add_order():
     try:
@@ -27,42 +18,70 @@ def add_order():
 
 
         # Checks for Missing Data
-        if not data or 'product_ids' not in data or 'total' not in data:
+        if not data or 'user_id' not in data or 'items' not in data:
             return jsonify({
                 'success': False,
                 'error': 'Missing Order Data'
             }), 400
+        
+        user_id = data.get('user_id')
+        items = data.get('items')
+        # Get total from request instead of calculating it
+        total = data.get('total')  
+    #calculate check inventory
 
+        for item in items:
+            product = Product.query.get(item['product_id'])
+            if not product:
+                return jsonify({
+                    'success': False,
+                    'error': 'Product not found'
+                }), 404
+        
+            #checks if there is enough inventory
 
-        # Link Product Ids
-        products = Product.query.filter(Product.id.in_(data['product_ids'])).all()
-
-
-        if not products:
-            return jsonify({
-                'success': False,
-                'error': 'Selected Products Are Not In the Database'
-            }), 404
+            if product.product_stock < item['quantity']:
+                return jsonify({
+                    'success': False,
+                    'error': 'Not enough inventory for {product.name}'
+                }), 400
+            
+            # Reduce inventory
+            product.product_stock -= item['quantity']
 
 
         # Create a new Order
         new_order = Order(
-            user_id=data['user_id'],
-            products=products,
-            total=data['total'],
-            status=data['status']
+            user_id= user_id,
+            total = total,
+            status=data.get('status', 'Pending'),
+            #set a default shipping estimate
+            arrive_by = "5-7 business days"
         )
 
 
         # Add to the Database
         db.session.add(new_order)
+        # To get the order ID
+        db.session.flush()  
+
+        for item in items:
+            order_product = OrderProduct(
+                order_id = new_order.id, 
+                product_id = item['product_id'],
+                order_quantity = item['quantity']
+            )
+            db.session.add(order_product)
+
         db.session.commit()
 
 
         # Return a Confirmation Message
         return jsonify({
             'success': True,
-            'message': 'Order Added'
+            'message': 'Order Added',
+            'order_id': new_order.id
+
         }), 201
 
 
@@ -78,8 +97,6 @@ def add_order():
 
 # remove_order route
 # goal: remove order via order id
-
-
 
 
 @order_bp.route('/get_all_orders', methods=['POST'])
@@ -109,19 +126,30 @@ def get_all_orders():
         # Convert orders to a list of dictionaries with product details
         order_data = []
         for order in past_orders:
+            # Get order items with quantities
+            order_items = OrderProduct.query.filter_by(order_id=order.id).all()
+
+            products_with_quantity = []
+            for order_item in order_items:
+                product = Product.query.get(order_item.product_id)
+                if product:
+                    products_with_quantity.append({
+                        "id": product.id,
+                        "name": product.name,
+                        "price": product.price,
+                        "quantity": order_item.order_quantity,
+                        "image": product.image
+                    })
+            
             order_info = {
                 "id": order.id,
                 "user_id": order.user_id,
                 "total": order.total,
                 "status": order.status,
-                "products": [
-                    {
-                        "id": product.id,
-                        "name": product.name,
-                        "price": product.price,
-                    } for product in order.products
-                ],
-                "created_at": order.created_at.isoformat()  # Ensure timestamp is serializable
+                "arrive_by": order.arrive_by,
+                "products": products_with_quantity,
+                "created_at": order.created_at.isoformat(),
+                "claimed_by_employee_id": order.claimed_by_employee_id
             }
             order_data.append(order_info)
 
