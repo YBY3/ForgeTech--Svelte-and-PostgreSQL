@@ -20,7 +20,7 @@
       <!-- Ensure consistent image size -->
       <img 
         class="w-full h-full object-cover rounded-md" 
-        src={product.image} 
+        src={product.images[0]} 
         alt={product.name}
       />
     </button>  
@@ -38,14 +38,14 @@
         
         <img 
             class="w-full h-full object-cover rounded-md" 
-            src={product.image} 
+            src={product.images[0]} 
             alt={product.name}
         />
       </div>
-      <h3 class="text-xl font-semibold">Components:</h3>
+      <h3 class="text-xl font-semibold">Product Options:</h3>
       <ul class="list-disc list-inside">
-        {#each product.components as component}
-          <li>{component}</li>
+        {#each product.options as option}
+          <li>{option}</li>
         {/each}
       </ul>
     {/if}

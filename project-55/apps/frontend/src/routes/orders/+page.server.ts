@@ -43,6 +43,9 @@ export const actions = {
 
                 if (!flaskResponse.ok) {
                     console.error('Confirming Order Failed:', responseData.error );
+                    if (responseData.message) {
+                        console.error('Error:', responseData.message );
+                    }
                     return fail(flaskResponse.status, responseData);
                 }
 

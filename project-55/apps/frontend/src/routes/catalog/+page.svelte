@@ -64,7 +64,7 @@
      <br>
     <div class="flex flex-col items-center justify-center about-me w-full h-full overflow-y-auto">
       <div class="w-1/3 mx-auto text-center p-6">
-        <ProductCard product={selectedProduct} detailedView={true} />
+        <ProductCard product={selectedProduct} detailedView={true} isLoggedIn={isLoggedIn} />
         
         <!-- Back to Catalog Button -->
         <button 

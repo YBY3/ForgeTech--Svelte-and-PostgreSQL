@@ -197,6 +197,8 @@ from flask_app.extensions import db
 from flask_app.models import User
 from email_validator import validate_email, EmailNotValidError
 import re
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 
 user_bp = Blueprint('user', __name__)
@@ -283,7 +285,9 @@ def signup():
             username=data['username'],
             email=validated_email,  # Use validated email
             password=generate_password_hash(data['password'], method='pbkdf2:sha256'),
-            user_type='customer'
+            user_type='customer',
+            registered_by=datetime.now(ZoneInfo("UTC")),
+            active_by=datetime.now(ZoneInfo("UTC"))
         )
 
 
@@ -332,7 +336,6 @@ def login():
 
         # Find user by validated email
         user = User.query.filter_by(email=validated_email).first()
-
 
         ##########################################
         # EMPLOYEE USER
@@ -405,7 +408,7 @@ def login():
 
         if user and check_password_hash(user.password, data['password']):
             #added to check the last time the user logged in
-            user.active_by = datetime.utcnow()
+            user.active_by = datetime.now(ZoneInfo("UTC"))
             db.session.commit()
 
 

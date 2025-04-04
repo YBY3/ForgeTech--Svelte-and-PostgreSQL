@@ -30,6 +30,7 @@ class User(db.Model):
     name = db.Column(db.String(128), nullable=True)
     profile_pic = db.Column(db.String(128), nullable=True)
     user_type = db.Column(db.String(128), nullable=False)
+    registered_by = db.Column(db.DateTime, default=datetime.utcnow)
     active_by = db.Column(db.DateTime, default=datetime.utcnow)
     def __repr__(self):
         return f'<User {self.name}>'
@@ -42,6 +43,7 @@ class User(db.Model):
             'name': self.name,
             'user_type': self.user_type,
             'profile_pic': self.profile_pic,
+            'registered_by': self.active_by,
             'active_by': self.active_by
         }
 
@@ -70,9 +72,7 @@ class Product(db.Model):
     price = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(550), nullable=False)
     brand = db.Column(db.String(64), nullable=False)
-    color_options = db.Column(db.String(64), nullable=False)
-    image = db.Column(db.String(120), nullable=False)
-
+    options = db.Column(db.ARRAY(db.String(256)), nullable = True)
     #for multiple images 
     images = db.Column(db.ARRAY(db.String(256)), nullable = False)
     #product type e.b GPU, CPU, RAM...
@@ -110,11 +110,10 @@ class Product(db.Model):
             'price': self.price,
             'description': self.description,
             'brand': self.brand,
-            'image': self.image,
             'images': self.images,
             'product_type': self.product_type,
             'product_stock': self.product_stock,
-            'color_options': self.color_options        }
+            'options': self.options        }
 
 
 # Order Model
@@ -130,8 +129,7 @@ class Order(db.Model):
     claimed_by_employee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  
     # Timestamp for ordering
     created_at = db.Column(db.DateTime, default=datetime.utcnow) 
-
-    arrive_by = db.Column(db.String(50), nullable=False)
+    arrive_by = db.Column(db.DateTime, default=datetime.utcnow) 
 
 
     #relationship with OrderProduct
@@ -150,7 +148,8 @@ class Order(db.Model):
             # To show claim status
             'claimed_by_employee_id': self.claimed_by_employee_id,  
              # To show creation timestamp
-            'created_at': self.created_at
+            'created_at': self.created_at,
+            'arrive_by': self.arrive_by
         }
     
 #created a OrderProduct Model 

@@ -1,6 +1,12 @@
 from flask import Blueprint, request, jsonify
 from flask_app.extensions import db
 from flask_app.models import Product, Order, User, OrderProduct
+from collections import Counter
+
+#Temp Imports
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import sys
 
 order_bp = Blueprint('orders', __name__)
 
@@ -16,47 +22,42 @@ def add_order():
     try:
         data = request.get_json()
 
-
-        # Checks for Missing Data
-        if not data or 'user_id' not in data or 'items' not in data:
-            return jsonify({
-                'success': False,
-                'error': 'Missing Order Data'
-            }), 400
+        # # Checks for Missing Data
+        # if (not data) or ('user_id' not in data) or ('items' not in data):
+        #     return jsonify({
+        #         'success': False,
+        #         'error': 'Missing Order Data'
+        #     }), 400
         
         user_id = data.get('user_id')
-        items = data.get('items')
-        # Get total from request instead of calculating it
+        items = data.get('product_ids')
         total = data.get('total')  
-    #calculate check inventory
 
         for item in items:
-            product = Product.query.get(item['product_id'])
+            product = Product.query.get(item)
             if not product:
+                print(f"Product not found for ID: {item}")
                 return jsonify({
                     'success': False,
-                    'error': 'Product not found'
+                    'error': f'Product not found for ID: {item}'
                 }), 404
         
-            #checks if there is enough inventory
-
-            if product.product_stock < item['quantity']:
-                return jsonify({
-                    'success': False,
-                    'error': 'Not enough inventory for {product.name}'
-                }), 400
-            
-            # Reduce inventory
-            product.product_stock -= item['quantity']
-
+        #checks if there is enough inventory
+        # if product.product_stock < item['quantity']:
+        #     return jsonify({
+        #         'success': False,
+        #         'error': 'Not enough inventory for {product.name}'
+        #     }), 400
+        
+        # # Reduce inventory
+        # product.product_stock -= item['quantity']
 
         # Create a new Order
         new_order = Order(
             user_id= user_id,
             total = total,
             status=data.get('status', 'Pending'),
-            #set a default shipping estimate
-            arrive_by = "5-7 business days"
+            arrive_by=datetime.now(ZoneInfo("UTC")) #Temp, should get this datetime from frontend
         )
 
 
@@ -65,16 +66,19 @@ def add_order():
         # To get the order ID
         db.session.flush()  
 
-        for item in items:
+        item_counts = Counter(items)
+        print(f"Item counts: {item_counts}")
+
+        # Create OrderProduct per product_id
+        for product_id, quantity in item_counts.items():
             order_product = OrderProduct(
-                order_id = new_order.id, 
-                product_id = item['product_id'],
-                order_quantity = item['quantity']
+                order_id=new_order.id,
+                product_id=product_id,
+                order_quantity=quantity
             )
             db.session.add(order_product)
 
         db.session.commit()
-
 
         # Return a Confirmation Message
         return jsonify({
@@ -83,7 +87,6 @@ def add_order():
             'order_id': new_order.id
 
         }), 201
-
 
     except Exception as e:
         db.session.rollback()
@@ -138,7 +141,7 @@ def get_all_orders():
                         "name": product.name,
                         "price": product.price,
                         "quantity": order_item.order_quantity,
-                        "image": product.image
+                        "images": product.images
                     })
             
             order_info = {

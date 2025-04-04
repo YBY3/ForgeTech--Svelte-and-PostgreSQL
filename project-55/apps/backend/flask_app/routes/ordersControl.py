@@ -56,7 +56,7 @@ def get_unclaimed_orders():
                         "name": product.name,
                         "price": product.price,
                         "quantity": order_item.order_quantity,
-                        "image": product.image
+                        "images": product.images
                     })
             
             order_info = {
@@ -109,7 +109,7 @@ def get_employee_dashboard(employee_id):
                         "price": product.price,
                         "quantity": order_item.order_quantity,
                         "product_stock": product.product_stock,
-                        "image": product.image
+                        "images": product.images
                     })
             
             order_info = {
@@ -271,7 +271,7 @@ def get_order_details(order_id):
                     "name": product.name,
                     "price": product.price,
                     "quantity": order_item.order_quantity,
-                    "image": product.image,
+                    "images": product.images,
                     "description": product.description,
                     "brand": product.brand
                 })
