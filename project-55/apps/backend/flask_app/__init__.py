@@ -12,6 +12,9 @@ def create_app():
     app.secret_key = os.getenv('FLASK_SECRET_KEY')
     app.config.from_prefixed_env()
     db.init_app(app)
+
+
+
     app.register_blueprint(user_bp, url_prefix='/api/users')
     app.register_blueprint(product_bp, url_prefix='/api/products')
     app.register_blueprint(order_bp, url_prefix='/api/orders')
