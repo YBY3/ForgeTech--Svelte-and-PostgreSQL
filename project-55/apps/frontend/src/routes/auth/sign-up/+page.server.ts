@@ -12,7 +12,6 @@ export const actions = {
                 email: formData.get('email'),
                 password: formData.get('password')
             };
-
             const flaskResponse = await fetch(`${getFlaskURL()}/api/users/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
