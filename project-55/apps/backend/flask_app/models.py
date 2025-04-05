@@ -131,7 +131,7 @@ class Order(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow) 
     arrive_by = db.Column(db.DateTime, default=datetime.utcnow) 
 
-
+ 
     #relationship with OrderProduct
     order_items = db.relationship('OrderProduct', back_populates='order')
     def __repr__(self):

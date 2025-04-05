@@ -511,9 +511,11 @@ def createUser():
         username=data['username'],
         email=validated_email,  # Use validated email
         password=generate_password_hash(data['password'], method='pbkdf2:sha256'),
-        user_type=data['usertype']
+        user_type=data['usertype'],
+        registered_by=datetime.now(ZoneInfo("UTC")),
+        active_by=datetime.now(ZoneInfo("UTC"))
     )
-
+ 
 
         # Add to database
     db.session.add(new_user)
