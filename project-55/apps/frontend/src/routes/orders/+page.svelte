@@ -18,7 +18,7 @@
 		}
 	});
 
-    async function confirmOrder() {
+    async function placeOrder() {
         if (submitting) {
             toastStore.trigger({
                 message: 'Already Confirming Order, Please Wait',
@@ -40,7 +40,7 @@
             const formData = new FormData();
             formData.append('product_ids', JSON.stringify($ordersStore.map(item => item.id)));
             formData.append('total', $ordersStore.reduce((sum, item) => sum + item.price, 0).toFixed(2));
-            formData.append('status', 'pending'); //(3/19/25) Changed status to pending for testing purposes on route in orders
+            formData.append('status', 'pending');
 
             const response = await fetch('?/add_order', {
                 method: 'POST',
@@ -115,7 +115,7 @@
                             <!-- Product Image (Left) -->
                             <img 
                             class="w-16 h-16 object-contain rounded-md bg-gray-100" 
-                            src={product.image} 
+                            src={product.images[0]} 
                             alt={product.name}
                             />
 
@@ -142,7 +142,7 @@
                     <p class="text-xl font-semibold">Total: ${$ordersStore.reduce((sum, item) => sum + item.price, 0).toFixed(2)}</p>
                 </div>
                 <br>
-                <div class="text-center"><button type="button" on:click={confirmOrder} class="btn border-2 border-primary-500 text-white rounded-lg bg-primary-500 px-8 py-3 hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]">Confirm Order</button></div>
+                <div class="text-center"><button type="button" on:click={placeOrder} class="btn border-2 border-primary-500 text-white rounded-lg bg-primary-500 px-8 py-3 hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]">Confirm Order</button></div>
                 <br>
                 <br>
                 <br>

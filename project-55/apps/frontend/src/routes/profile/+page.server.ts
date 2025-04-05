@@ -15,7 +15,7 @@ export const load = async ({ locals, fetch }) => {
 
     // Fetch claimed orders for the employee
     try {
-      const claimedEndpoint = `${getFlaskURL()}/api/orders/employeeDashboard/${locals.user.id}`;
+      const claimedEndpoint = `${getFlaskURL()}/api/ordersControl/employeeDashboard/${locals.user.id}`;
       console.log("Requesting claimed orders from:", claimedEndpoint);
       const claimedRes = await fetch(claimedEndpoint, {
         method: 'GET',

@@ -6,8 +6,11 @@ export type ProductType = {
     name: string;
     price: number;
     description: string;
-    components: string[];
-    image: string;
+    brand: string;
+    options: string[];
+    images: string[];
+    product_type: string;
+    product_stock: number;
 };
 
 
@@ -15,5 +18,5 @@ export type ProductPreviewType = {
     id: number;
     name: string;
     price: number;
-    quantity?: number;
+    quantity: number;
 }

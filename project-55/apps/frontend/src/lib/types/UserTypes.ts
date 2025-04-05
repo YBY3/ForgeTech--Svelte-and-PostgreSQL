@@ -5,4 +5,6 @@ export type UserType = {
     name: string | null;        
     profile_pic: string | null;
     user_type: string;
+    registered_by: string;
+    active_by: string;
 };

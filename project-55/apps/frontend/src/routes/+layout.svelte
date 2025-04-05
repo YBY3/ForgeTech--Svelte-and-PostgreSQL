@@ -89,17 +89,29 @@
 					</button>
   
 					<!-- Shopping Cart Button -->
-					<a 
-						href="/orders" 
-						class="relative ml-4 w-10 h-10 border-2 border-black dark:border-white flex items-center justify-center rounded-full hover:bg-primary-500 hover:text-white transition-colors duration-300 hover:border-none hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
-					>
+					<a class="relative group" href="/orders" >
+						<button 
+						  class="w-10 h-10 border border-2 border-black dark:border-white rounded-md flex items-center justify-center hover:bg-primary-500 transition hover:border-none hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)] disabled:opacity-50 disabled:cursor-not-allowed"
+						  disabled={!isLoggedIn}
+						>
 						<i class="fa-solid fa-cart-shopping"></i>
-						<!-- Cart Counter Badge -->
+						</button>
+
+						<!-- Counter -->
 						{#if $ordersStore.length > 0}
 							<span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
 								{$ordersStore.length}
 							</span>
 						{/if}
+				
+						<!-- Tooltip Below -->
+						<span class="absolute left-1/2 -translate-x-1/2 translate-y-1/3 bg-black text-white text-sm px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+						  {#if isLoggedIn}
+							  Add to Cart
+						  {:else}
+							  Login 
+						  {/if}
+						</span>
 					</a>
 				</div>
   

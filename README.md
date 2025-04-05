@@ -20,6 +20,10 @@
 - **Stop Docker**:
   docker-compose down
 
+## Adminer Commands
+- **Drop All Tables**: 
+  DROP TABLE "user", "product", "order_product", "order" CASCADE; 
+
 ## Useful Docker Commands
 - **List active and stopped containers**:
   docker ps -a
@@ -35,6 +39,10 @@
    exit()
 5. Exit Flask app:
    exit
+
+## Print from Flask App to Docker Debug Console
+- **Use this Print Statement and "import sys"**
+  print('message', file=sys.stderr)
 
 ## RESET DOCKER ENVIROMENT
   docker system prune -af --volumes
