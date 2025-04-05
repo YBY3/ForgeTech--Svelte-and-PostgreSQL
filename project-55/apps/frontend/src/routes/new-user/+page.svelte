@@ -1,6 +1,72 @@
 <script lang="ts">
+    import { invalidate } from '$app/navigation';
+	import { getToastStore } from '@skeletonlabs/skeleton';
+
+	//Form Data
+	let form: HTMLFormElement;
+
+
     let showPassword = false;
 	let submitting = false;
+
+
+    const toastStore = getToastStore();
+
+	async function handleSignUp(event: SubmitEvent) {
+        //Prevent Default Submission
+        event.preventDefault();
+        //If Already Submitting, Exit
+        if (submitting) {
+            toastStore.trigger({
+                message: 'Already creating user, Please Wait',
+                background: 'variant-filled-error'
+            });
+            return;
+        }
+        //Checks if Form is Valid / Filled Out Required Items
+        else if (!form.checkValidity()) return;
+
+        //Try Submitting
+        try {
+            submitting = true;
+            const formData = new FormData(form);
+
+			// Log the form data entries for debugging
+			// for (const [key, value] of formData.entries()) {
+			// 	console.log(`${key}: ${value}`);
+			// }
+            
+            //Post New Form Data
+            const response = await fetch('?/createUser', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+			const parsedResultData = JSON.parse(result.data);
+            const success = parsedResultData[parsedResultData[0].success];
+
+            if (success) {
+				//Reload App
+				invalidate('app:load');
+				//Go to Catalog
+                window.location.href = '/user-manager';
+            }
+            else {
+				const errorMessage = parsedResultData[parsedResultData[0].error];
+                throw new Error(errorMessage);
+            }
+
+        } catch (error) {
+			const errorMessage: string = `${error}`;
+			toastStore.trigger({
+                message: errorMessage,
+                background: 'variant-filled-error'
+            });
+        } finally {
+            submitting = false;
+        }
+    }
 </script>
 
 
@@ -10,7 +76,7 @@
 	<div class="mx-4 md:mx-auto max-w-lg -mt-48 bg-surface-200 dark:bg-surface-700 shadow-lg rounded-lg">
 		<div class="py-8 px-6 md:px-10">
 			<h2 class="text-3xl font-bold mb-5 text-on-surface text-center">Create New User</h2>
-            <form method="POST" autocomplete="off" class="space-y-6">
+            <form method="POST" bind:this={form} on:submit={handleSignUp} autocomplete="off" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="max-w-md mx-auto">
                         <label for="firstName" class="block text-sm font-medium text-on-surface">First Name</label>
@@ -70,7 +136,11 @@
                         {/if}
                         <button type="button" on:click={() => showPassword = !showPassword}
                             class="ml-2 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition">
-                            {showPassword ? "Hide Password" : "Show Password"}
+                            {#if showPassword}
+                                <i class="fa-solid fa-eye-slash"></i>
+                            {:else}
+                                <i class="fa-solid fa-eye"></i>
+                            {/if}
                         </button>
                     </div>
                 </div>
@@ -93,12 +163,20 @@
                     </div>
                 </div>
 
-                <div class="mx-auto text-center">
-                    <button type="submit"
-                        class="bg-gray-800 text-white px-10 py-2 rounded-lg shadow-md hover:bg-red-600 transition-all duration-300 transform hover:scale-105 text-center">
-                        Create
-                    </button>
+                <div class="flex gap-10px justify-between gap-x-10">
+                    <div>
+                        <a href="/user-manager"><button class="px-10 py-2 rounded-lg border-2 border-primary-700 hover:bg-primary-700 transition-all duration-300 transform hover:scale-105 text-center hover:text-white">
+                            <i class="fa-solid fa-x"></i> Cancel
+                        </button></a>
+                    </div>
+                    <div>
+                        <button type="submit"
+                            class="px-10 py-2 rounded-lg border-2 border-secondary-500 hover:bg-secondary-500 transition-all duration-300 transform hover:scale-105 text-center hover:text-white">
+                            <i class="fa-solid fa-user-plus"></i> Create
+                        </button>
+                    </div>
                 </div>
+
             </form>
         </div>
     </div>

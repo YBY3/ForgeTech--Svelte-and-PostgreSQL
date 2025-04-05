@@ -14,6 +14,7 @@
 
     function filterUsersfunc() {
         filterUsers = userData.filter(user => {
+
             const isCustomer = showCustomers && user.user_type === 'customer';
             const isEmployee = showEmployees && user.user_type === 'employee';
             const isAdmin = showAdmins && user.user_type === 'admin';
