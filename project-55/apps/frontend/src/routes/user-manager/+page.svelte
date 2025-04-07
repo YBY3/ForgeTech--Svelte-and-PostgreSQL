@@ -13,24 +13,26 @@
     
 
     function filterUsersfunc() {
-        filterUsers = userData.filter(user => {
-
+    filterUsers = userData
+        .filter(user => user.id !== data.localUser?.id) 
+        .filter(user => {
             const isCustomer = showCustomers && user.user_type === 'customer';
             const isEmployee = showEmployees && user.user_type === 'employee';
             const isAdmin = showAdmins && user.user_type === 'admin';
             
             return isCustomer || isEmployee || isAdmin;
         });
-        console.log("filtered:", filterUsers);
     }
+
     
     onMount(() => {
 
         if (data.users) {
         userData = [...data.users].reverse(); 
         filterUsers = userData;
+        filterUsers = userData.filter(user => user.id !== data.localUser?.id);
         }
-    });
+    })
 
     function handleChange() {
         filterUsersfunc();

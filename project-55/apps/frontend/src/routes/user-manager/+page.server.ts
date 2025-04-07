@@ -16,8 +16,10 @@ export const load = async ({ locals, fetch }) => {
             throw new Error('Failed to fetch users');
         }
         const users: UserType[] = await response.json();
+        const localUser: UserType = locals.user;
         
         return {
+            localUser: localUser,
             user: locals.user ?? null,
             users: users 
         };
