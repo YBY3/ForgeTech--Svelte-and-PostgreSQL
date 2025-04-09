@@ -10,24 +10,31 @@
     export let product: ProductType | null = null;
     let file: File;
     
-    let id = -1; //this is temp, this should be the highest index in the table
+    let id = -1; //ID will be assigned on backend
     let name: string;
     let price: number;
     let description: string;
-    let components: string;
-    let image: string;
+    let brand: string;
+    let options: string;
+    let images: string[] = [];
+    let product_type: string;
+    let product_stock: number;
 
     if (product != null) {
         id = product.id;
         name = product.name;
         price = product.price;
         description = product.description;
-        components = product.components?.join(", ") || "No components";
-        image = product.image;
+        brand = product.brand;
+        options = product.options?.join(", ") || "No components";
+        images = product.images;
+        product_type = product.product_type;
+        product_stock = product.product_stock;
     }
 
     const dispatch = createEventDispatcher();
     let imageChanged: boolean = false;
+    let imageCount = 0;
 
     function handleFile(event: Event) {
         //Save File
@@ -37,10 +44,12 @@
         }
 
         imageChanged = true;
+        imageCount += 1;
 
         //Get Image Path
         const fileExtension = file.name.split('.').pop()?.toLowerCase();
-        const image = `/static/images/products/product_${id}.${fileExtension}`;
+        const image = `/static/images/products/product_${id}_image_${imageCount}.${fileExtension}`;
+        images.push(image);
     }
 
     function handleSubmit() {     
@@ -50,8 +59,11 @@
                 name: name,
                 price: price,
                 description: description,
-                components: components.split(','),
-                image: image
+                brand: brand,
+                options: options.split(','),
+                images: images,
+                product_type: product_type,
+                product_stock: product_stock
             },
             file: file
         });
@@ -64,10 +76,10 @@
     class="flex flex-col gap-[1.5vh] w-full rounded-lg justify-center items-center text-base-content"  
 >   
     <!-- Image -->
-    {#if image && !imageChanged}
+    {#if images[0] && !imageChanged}
         <img 
             class="w-full md:w-3/4 rounded-lg" 
-            src={image} 
+            src={images[0]} 
             alt={name}
         />
     {/if}
@@ -112,13 +124,45 @@
         required 
     />
 
-    <!-- Components -->
+    <!-- Brand -->
     <input
-        id="components-field" 
+        id="brand-field" 
         class="{inputClass}" 
         type="text" 
-        placeholder="Product Components"
-        bind:value={components} 
+        placeholder="Product Brand"
+        bind:value={brand} 
+        required 
+    />
+
+    <!-- Options -->
+    <input
+        id="options-field" 
+        class="{inputClass}" 
+        type="text" 
+        placeholder="Product Options (example: color, size options, spec options, etc)"
+        bind:value={options} 
+        required 
+    />
+
+    <!-- Product Type -->
+    <input
+        id="product-type-field" 
+        class="{inputClass}" 
+        type="text" 
+        placeholder="Product Type"
+        bind:value={product_type} 
+        required 
+    />
+
+    <!-- Product Stock -->
+    <input
+        id="price-field" 
+        class="{inputClass}" 
+        type="number" 
+        placeholder="Product Stock"
+        step="1"
+        min="0"
+        bind:value={product_stock} 
         required 
     />
 

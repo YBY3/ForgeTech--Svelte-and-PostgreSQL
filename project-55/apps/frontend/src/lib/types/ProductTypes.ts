@@ -18,5 +18,4 @@ export type ProductPreviewType = {
     id: number;
     name: string;
     price: number;
-    quantity: number;
 }
