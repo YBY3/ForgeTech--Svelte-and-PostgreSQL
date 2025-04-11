@@ -32,7 +32,7 @@
   }
 
   async function claimOrder(orderId: number) {
-    //If Already Submitting, Exit
+    // If Already Submitting, Exit
     if (submitting) {
       toastStore.trigger({
         message: 'Already Managing Order Claim, Please Wait',
@@ -41,19 +41,12 @@
       return;
     }
 
-    //Try Submitting
     try {
       submitting = true;
       const formData = new FormData();
       formData.append("order_id", JSON.stringify(orderId));
       formData.append("employee_id", JSON.stringify(userData.id)); 
 
-      // Log the form data entries for debugging
-      // for (const [key, value] of formData.entries()) {
-      // 	console.log(`${key}: ${value}`);
-      // }
-
-      //Post Form Data
       const response = await fetch('?/claimOrder', {
         method: 'POST',
         body: formData
@@ -64,26 +57,22 @@
       const success = parsedResultData[parsedResultData[0].success];
 
       if (success) {
-        // Success Message
         const successMessage = parsedResultData[parsedResultData[0].message];
         toastStore.trigger({
           message: successMessage,
           background: 'variant-filled-success'
         });
 
-        // Update UI
         const orderToMove = unclaimedOrders.find((o) => o.id === orderId);
         if (orderToMove) {
           unclaimedOrders = unclaimedOrders.filter((o) => o.id !== orderId);
           orderToMove.status = "claimed";
           claimedOrders = [{ ...orderToMove, claimed_by_employee_id: userData.id }, ...claimedOrders];
         }
-      }
-      else {
+      } else {
         const errorMessage = parsedResultData[parsedResultData[0].error];
         throw new Error(errorMessage);
       }
-
     } catch (error) {
       const errorMessage: string = `${error}`;
       toastStore.trigger({
@@ -96,7 +85,7 @@
   }
 
   async function unclaimOrder(orderId: number) {
-    //If Already Submitting, Exit
+    // If Already Submitting, Exit
     if (submitting) {
       toastStore.trigger({
         message: 'Already Managing Order Claim, Please Wait',
@@ -105,18 +94,11 @@
       return;
     }
 
-    //Try Submitting
     try {
       submitting = true;
       const formData = new FormData();
       formData.append("order_id", JSON.stringify(orderId));
 
-      // Log the form data entries for debugging
-      // for (const [key, value] of formData.entries()) {
-      // 	console.log(`${key}: ${value}`);
-      // }
-
-      //Post Form Data
       const response = await fetch('?/unclaimOrder', {
         method: 'POST',
         body: formData
@@ -127,26 +109,22 @@
       const success = parsedResultData[parsedResultData[0].success];
 
       if (success) {
-        // Success Message
         const successMessage = parsedResultData[parsedResultData[0].message];
         toastStore.trigger({
           message: successMessage,
           background: 'variant-filled-success'
         });
 
-        // Update UI
         const orderToMove = claimedOrders.find((o) => o.id === orderId);
         if (orderToMove) {
           claimedOrders = claimedOrders.filter((o) => o.id !== orderId);
           orderToMove.status = "pending";
           unclaimedOrders = [{ ...orderToMove, claimed_by_employee_id: undefined }, ...unclaimedOrders];
         }
-      }
-      else {
+      } else {
         const errorMessage = parsedResultData[parsedResultData[0].error];
         throw new Error(errorMessage);
       }
-
     } catch (error) {
       const errorMessage: string = `${error}`;
       toastStore.trigger({
@@ -157,9 +135,7 @@
       submitting = false;
     }
   }
-
 </script>
-
 
 <div class="max-w-5xl mx-auto p-6">
   <h1 class="text-center text-4xl font-bold mb-6">Order Control</h1>
@@ -171,27 +147,24 @@
       {#if unclaimedOrders.length > 0}
         <ul class="space-y-4">
           {#each unclaimedOrders as order (order.id)}
-            <li
-              class="group border rounded-lg p-4 transition-transform duration-300 transform hover:scale-105 cursor-pointer"
-            >
-              <div>
-                <strong>Order ID:</strong> {order.id} <br />
-                <strong>Status:</strong> {order.status} <br />
-                <strong>Time Placed:</strong> {new Date(order.created_at).toLocaleString()} 
-                <!-- <strong>Total:</strong> $ -->
-                <!-- {order.products
-                  .reduce((sum, p) => sum + p.price * (p.quantity ?? 1), 0)
-                  .toFixed(2)} -->
-                <br />
-                <strong>Products:</strong>
-                <ul class="space-y-2 mt-2">
-                  {#each order.products as product}
-                    <li>
-                      <OrderSmallPreview product={product} orderDisplay={true} />
-                    </li>
-                  {/each}
-                </ul>
-              </div>
+            <li class="group border rounded-lg p-4 transition-transform duration-300 transform hover:scale-105 cursor-pointer">
+              <!-- Wrap the order summary in an anchor for navigation -->
+              <!-- <a href={`/profile/expandedOrderViewEmployee?orderId=${order.id}`} class="order-link block"> -->
+                <div>
+                  <strong>Order ID:</strong> {order.id} <br />
+                  <strong>Status:</strong> {order.status} <br />
+                  <strong>Time Placed:</strong> {new Date(order.created_at).toLocaleString()}<br />
+                  <strong>Products:</strong>
+                  <ul class="space-y-2 mt-2">
+                    {#each order.products as product (product.id)}
+                      <li class="flex items-center gap-2">
+                        <OrderSmallPreview product={product} orderDisplay={true} />
+                        <span class="font-semibold text-black-800">x{product.quantity}</span>
+                      </li>
+                    {/each}
+                  </ul>
+                </div>
+              <!-- </a> -->
               <button
                 on:click|stopPropagation={() => claimOrder(order.id)}
                 class="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
@@ -212,28 +185,24 @@
       {#if claimedOrders.length > 0}
         <ul class="space-y-4">
           {#each claimedOrders as order (order.id)}
-            <li
-              class="group border rounded-lg p-4 transition-transform duration-300 transform hover:scale-105 cursor-pointer"
-            >
-              <div>
-                <strong>Order ID:</strong> {order.id} <br />
-                <strong>Status:</strong> {order.status} <br />
-                <!-- <strong>Claimed By:</strong> {order.claimed_by_employee_id} <br /> -->
-                <strong>Time Placed:</strong> {new Date(order.created_at).toLocaleString()} 
-                <!-- <strong>Total:</strong> $ -->
-                <!-- {order.products
-                  .reduce((sum, p) => sum + p.price * (p.quantity ?? 1), 0)
-                  .toFixed(2)} -->
-                <br />
-                <strong>Products:</strong>
-                <ul class="space-y-2 mt-2">
-                  {#each order.products as product}
-                    <li>
-                      <OrderSmallPreview product={product} orderDisplay={true} />
-                    </li>
-                  {/each}
-                </ul>
-              </div>
+            <li class="group border rounded-lg p-4 transition-transform duration-300 transform hover:scale-105 cursor-pointer">
+              <!-- Wrap the order summary in an anchor for navigation -->
+              <a href={`/auth/order-control/expandedOrderView?orderId=${order.id}`} class="order-link block">
+                <div>
+                  <strong>Order ID:</strong> {order.id} <br />
+                  <strong>Status:</strong> {order.status} <br />
+                  <strong>Time Placed:</strong> {new Date(order.created_at).toLocaleString()}<br />
+                  <strong>Products:</strong>
+                  <ul class="space-y-2 mt-2">
+                    {#each order.products as product (product.id)}
+                      <li class="flex items-center gap-2">
+                        <OrderSmallPreview product={product} orderDisplay={true} />
+                        <span class="font-semibold text-black-800">x{product.quantity}</span>
+                      </li>
+                    {/each}
+                  </ul>
+                </div>
+              </a>
               <button
                 on:click|stopPropagation={() => unclaimOrder(order.id)}
                 class="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
@@ -249,4 +218,3 @@
     </section>
   </div>
 </div>
-

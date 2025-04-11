@@ -169,5 +169,5 @@ class OrderProduct(db.Model):
 
     def __repr__(self):
         return f'<OrderProduct OrderID: {self.order_id}, ProductID: {self.product_id}>'
-
     
+
