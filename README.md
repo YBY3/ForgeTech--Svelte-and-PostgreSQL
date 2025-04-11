@@ -35,6 +35,8 @@
    flask shell
 3. Create Tables:
    db.create_all()
+Drop tables:
+db.drop_all()
 4. Exit Flask shell:
    exit()
 5. Exit Flask app:
