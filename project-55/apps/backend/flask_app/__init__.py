@@ -6,6 +6,7 @@ from flask_app.routes.users import user_bp;
 from flask_app.routes.products import product_bp;
 from flask_app.routes.orders import order_bp;
 from flask_app.routes.ordersControl import order_control_bp;
+from flask_app.routes.images import image_bp;
 
 
 def create_app():
@@ -17,5 +18,6 @@ def create_app():
     app.register_blueprint(product_bp, url_prefix='/api/products')
     app.register_blueprint(order_bp, url_prefix='/api/orders')
     app.register_blueprint(order_control_bp, url_prefix='/api/ordersControl')
+    app.register_blueprint(image_bp, url_prefix='/api/images')
     CORS(app)
     return app

@@ -1,10 +1,9 @@
-from flask import Blueprint, request, jsonify, session
-import sys
-import json
-from flask_app.models import Product
+from flask import Blueprint, request, jsonify
+import sys, json, base64
+from werkzeug.utils import secure_filename
+from sqlalchemy.orm import joinedload
+from flask_app.models import Product, Img, ImgProduct, OrderProduct
 from flask_app.extensions import db
-
-product_bp = Blueprint('products', __name__)
 
 
 # CODES USE:
@@ -13,6 +12,9 @@ product_bp = Blueprint('products', __name__)
 # 400: Bad Request - Server couldn't understand the request (used when required fields are missing)
 # 401: Unauthorized - Authentication is required and has failed or not been provided
 # 500: Internal Server Error - Server encountered an unexpected condition (used in catch blocks)
+
+
+product_bp = Blueprint('products', __name__)
 
 
 @product_bp.route('/edit_product', methods=['POST'])
@@ -99,13 +101,13 @@ def edit_product():
 def add_product():
     try:
         data = request.get_json()
-        # print(f"Received data: {data}", file=sys.stderr)
-        required_fields = ['name', 'price', 'description', 'brand', 'options', 'images', 'product_type', 'product_stock']
+
+        required_fields = ['name', 'price', 'description', 'brand', 'options', 'product_type', 'product_stock']
         missing_fields = [field for field in required_fields if field not in data or data[field] is None]
         if missing_fields:
             return jsonify({
                 'success': False,
-                'error': 'Missing required fields',
+                'error': 'Missing Product Info',
                 'message': f"Fields missing: {', '.join(missing_fields)}"
             }), 400
         
@@ -114,10 +116,28 @@ def add_product():
         options_list = json.loads(options_str)  
         cleaned_options = [opt.strip() for opt in options_list] 
 
-        # Convert stringified images back to a list
-        images_str = data['images'] 
-        images_list = json.loads(images_str)  
-        cleaned_images = [img.strip() for img in images_list] 
+        # Handle Files (base64 images)
+        files = data.get('files', [])
+        image_ids = []
+        for file_data in files:
+            try:
+                # Decode base64 image
+                img_data = base64.b64decode(file_data['data'])
+                img = Img(
+                    img=img_data,
+                    mimetype=file_data['type'],
+                    name=file_data['name']
+                )
+                db.session.add(img)
+                db.session.flush()
+                image_ids.append(img.id)
+            except (KeyError, ValueError) as e:
+                db.session.rollback()
+                return jsonify({
+                    'success': False,
+                    'error': 'Invalid image data',
+                    'message': f"Image processing failed: {str(e)}"
+                }), 400
 
         # Create new Product instance
         new_product = Product(
@@ -126,7 +146,6 @@ def add_product():
             description=data['description'],
             brand=data['brand'],
             options=cleaned_options,
-            images=cleaned_images,
             product_type=data['product_type'],
             product_stock=int(data['product_stock'])
         )
@@ -135,9 +154,14 @@ def add_product():
         db.session.add(new_product)
         db.session.commit()
 
-        # Update image paths with product_id
-        updated_images = [img.replace('product_-1', f'product_{new_product.id}') for img in cleaned_images]
-        new_product.images = updated_images
+        # Link images via ImgProduct
+        for img_id in image_ids:
+            img_product = ImgProduct(
+                img_id=img_id,
+                product_id=new_product.id
+            )
+            db.session.add(img_product)
+
         db.session.commit()
 
         return jsonify({
@@ -168,7 +192,6 @@ def add_product():
 def delete_product():
     try:
         data = request.get_json()
-        # print(f"Received data: {data}", file=sys.stderr)
 
         if 'id' not in data or data['id'] is None:
             return jsonify({
@@ -186,6 +209,25 @@ def delete_product():
                 'success': False,
                 'error': 'Product Not Found'
             }), 404
+        
+        # Get associated ImgProduct records
+        img_products = ImgProduct.query.filter_by(product_id=product_id).all()
+        img_ids = [ip.img_id for ip in img_products]
+
+        # Delete ImgProduct records
+        for img_product in img_products:
+            db.session.delete(img_product)
+
+        # Delete Linked Img records
+        for img_id in img_ids:
+            other_links = ImgProduct.query.filter_by(img_id=img_id).count()
+            if other_links == 0:
+                img = Img.query.get(img_id)
+                if img:
+                    db.session.delete(img)
+        
+        # Delete associated OrderProduct records
+        OrderProduct.query.filter_by(product_id=product_id).delete()
 
         # Delete Product
         db.session.delete(product)
@@ -214,56 +256,32 @@ def delete_product():
         }), 500
 
 
-# get_single_product route
-# goal: return a single product via product id
-
-
-@product_bp.route('/get_all_products')
+@product_bp.route('/get_all_products', methods=['GET'])
 def get_all_products():
     try:
-        products = Product.query.all()
+        # Eagerly load ImgProduct and Img
+        products = Product.query.options(
+            joinedload(Product.images).joinedload(ImgProduct.img)
+        ).all()
         
         # Check for Missing Data
         if not products:
             return jsonify({
-                'success': False,
-                'error': 'No products found'
-            }), 404
+                'success': True,
+                'data': []
+            }), 200
         
-        # Serialize the products to a dictionary format for response
+        # Serialize products
         productData = [product.to_dict() for product in products]
-        
-        # Return Product Data
-        return jsonify(productData)
-
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': 'Failed to fetch products',
-            'message': str(e)
-        }), 500
-    
-
-@product_bp.route('/get_next_product_id')
-def get_next_product_id():
-    try:
-        # Query the maximum id from the Product table
-        max_product = db.session.query(db.func.max(Product.id)).scalar()
-        
-        # If no products exist, start at 1
-        if max_product is None:
-            next_id = 1
-        else:
-            next_id = max_product + 1
         
         return jsonify({
             'success': True,
-            'next_id': next_id
+            'data': productData
         }), 200
 
     except Exception as e:
         return jsonify({
             'success': False,
-            'error': 'Failed to fetch next product ID',
+            'error': 'Failed to Fetch Products',
             'message': str(e)
         }), 500

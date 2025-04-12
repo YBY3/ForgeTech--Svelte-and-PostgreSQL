@@ -1,22 +1,31 @@
 <script lang="ts">
-    import { FileButton } from '@skeletonlabs/skeleton';
+    import { onDestroy } from 'svelte';
+    import { FileDropzone } from '@skeletonlabs/skeleton';
     import type { ProductType } from "$lib/types/ProductTypes"
     import { createEventDispatcher } from "svelte";
+    import { getToastStore } from '@skeletonlabs/skeleton';
 
     //Tailwind Classes
     let inputClass = " input w-full md:w-3/4 h-[50px] min-h-[30px] focus:outline-none p-2 rounded-lg shadow-lg ";
 
     //Product Data
     export let product: ProductType | null = null;
-    let file: File;
-    
+
+    //Image Elements
+    let imageFiles: File[] = []; 
+    let imagePreviews: string[] = []; 
+    let existingImages: string[] = [];
+
+    //Form Elements
+    const dispatch = createEventDispatcher();
+    const toastStore = getToastStore();
     let id = -1; //ID will be assigned on backend
     let name: string;
     let price: number;
     let description: string;
     let brand: string;
     let options: string;
-    let images: string[] = [];
+    let images: number[] = [];
     let product_type: string;
     let product_stock: number;
 
@@ -32,42 +41,79 @@
         product_stock = product.product_stock;
     }
 
-    const dispatch = createEventDispatcher();
-    let imageChanged: boolean = false;
-    let imageCount = 0;
-
     function handleFile(event: Event) {
-        //Save File
         const input = event.target as HTMLInputElement;
-        if (input.files && input.files[0]) {
-            file = input.files[0];
+        const files = input.files ? Array.from(input.files) : [];
+
+        if (files.length === 0) return;
+
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        const validFiles: File[] = [];
+        const newPreviews: string[] = [];
+
+        files.forEach((file) => {
+            if (allowedTypes.includes(file.type)) {
+                validFiles.push(file);
+                newPreviews.push(URL.createObjectURL(file));
+            } else {
+
+                toastStore.trigger({
+                    message: `${file.name} is Not a Allowed Type`,
+                    background: 'variant-filled-error',
+                });
+            }
+        });
+
+        if (validFiles.length > 0) {
+            imageFiles = [...imageFiles, ...validFiles];
+            imagePreviews = [...imagePreviews, ...newPreviews];
+        }
+    }
+
+    function removeImage(index: number) {
+        // Revoke Preview URL
+        URL.revokeObjectURL(imagePreviews[index]);
+        // Remove from Arrays
+        imageFiles = imageFiles.filter((_, i) => i !== index);
+        imagePreviews = imagePreviews.filter((_, i) => i !== index);
+    }
+
+    function handleSubmit() {
+        if (!name || !price || !description || !brand || !options || !product_type || !product_stock) {
+            toastStore.trigger({
+                message: 'Required Fields Missing',
+                background: 'variant-filled-error',
+            });
+            return;
         }
 
-        imageChanged = true;
-        imageCount += 1;
+        if (imageFiles.length === 0 && existingImages.length === 0) {
+            toastStore.trigger({
+                message: 'At Least One Image is Required',
+                background: 'variant-filled-error',
+            });
+            return;
+        }
 
-        //Get Image Path
-        const fileExtension = file.name.split('.').pop()?.toLowerCase();
-        const image = `/static/images/products/product_${id}_image_${imageCount}.${fileExtension}`;
-        images.push(image);
-    }
-
-    function handleSubmit() {     
-        dispatch("submit", { 
+        dispatch('submit', {
             product: {
-                id: id,
-                name: name,
-                price: price,
-                description: description,
-                brand: brand,
-                options: options.split(','),
-                images: images,
-                product_type: product_type,
-                product_stock: product_stock
+                id,
+                name,
+                price,
+                description,
+                brand,
+                options: options.split(',').map((opt) => opt.trim()),
+                images: existingImages,
+                product_type,
+                product_stock,
             },
-            file: file
+            files: imageFiles
         });
     }
+
+    onDestroy(() => {
+        imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
+    });
 </script>
 
 
@@ -75,22 +121,55 @@
     on:submit|preventDefault={handleSubmit}
     class="flex flex-col gap-[1.5vh] w-full rounded-lg justify-center items-center text-base-content"  
 >   
-    <!-- Image -->
-    {#if images[0] && !imageChanged}
-        <img 
-            class="w-full md:w-3/4 rounded-lg" 
-            src={images[0]} 
-            alt={name}
-        />
-    {/if}
-    <div class="{inputClass}">
-        <input
-            id="image-field" 
-            class="" 
-            type="file" 
-            on:change={handleFile}
-            required 
-        />
+    <!-- Images -->
+    <div class="flex gap-4 w-full md:w-3/4 overflow-x-auto">
+        <div class="{imageFiles.length > 0 || existingImages.length > 0 ? 'flex-none w-[350px]' : 'flex-1 w-full'} h-[300px] card variant-soft rounded-lg">
+            <FileDropzone name="files" rounded="rounded-lg" class="h-full flex flex-col justify-center items-center" multiple on:change={handleFile}>
+                <svelte:fragment slot="lead">
+                    <i class="fa-solid fa-plus text-8xl"></i>
+                </svelte:fragment>
+                <svelte:fragment slot="message">
+                    <h2 class="text-2xl">Add Image</h2>
+                </svelte:fragment>
+                <svelte:fragment slot="meta">
+                    <h3 class="text-xl">JPG / JPEG, PNG, and GIF Only</h3>
+                </svelte:fragment>
+            </FileDropzone>
+        </div>
+
+        <!-- Existing Images -->
+        {#each existingImages as image}
+            <div class="flex-none relative h-[300px] rounded-lg">
+                <img 
+                    class="h-[300px] object-contain rounded-lg" 
+                    src={image} 
+                    alt={name || 'Existing Image'}
+                />
+                <button 
+                    class="absolute top-2 right-2 btn btn-sm variant-filled-error" 
+                    on:click={() => existingImages = existingImages.filter((_, i) => i !== existingImages.indexOf(image))}
+                >
+                    X
+                </button>
+            </div>
+        {/each}
+
+        <!-- New Uploaded Images -->
+        {#each imagePreviews as preview, index}
+            <div class="flex-none relative h-[300px] rounded-lg">
+                <img 
+                    class="h-[300px] object-contain rounded-lg" 
+                    src={preview} 
+                    alt={name || 'Uploaded Image'}
+                />
+                <button 
+                    class="absolute top-2 right-2 btn btn-sm variant-filled-error" 
+                    on:click={() => removeImage(index)}
+                >
+                    X
+                </button>
+            </div>
+        {/each}
     </div>
 
     <!-- Name -->

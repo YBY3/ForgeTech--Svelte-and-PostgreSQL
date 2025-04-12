@@ -22,7 +22,7 @@
 
 ## Adminer Commands
 - **Drop All Tables**: 
-  DROP TABLE "user", "product", "order_product", "order" CASCADE; 
+  DROP TABLE "user", "product", "order_product", "order", "img" CASCADE; 
 
 ## Useful Docker Commands
 - **List active and stopped containers**:

@@ -4,7 +4,6 @@
     import ProductSmallPreview from "$lib/components/product/ProductSmallPreview.svelte";
     import ProductForm from "$lib/components/product/ProductForm.svelte";
 	import type { ProductType } from "$lib/types/ProductTypes";
-    //import * as imageUtils from "$lib/utils/imageUtils";
 
     //Tailwind Classes
     let navButtonClass = "w-full h-full btn variant-ringed text-xl hover:text-primary-500 font-bold uppercase rounded-lg";
@@ -15,7 +14,6 @@
 
     //Product Data
     export let data;
-    console.log(data);
     let products: ProductType[];
     let selectedProduct: ProductType;
 
@@ -118,7 +116,7 @@
         }
     }
 
-    async function addProduct(product: ProductType) {
+    async function addProduct(product: ProductType, files: File[]) {
         //If Already Submitting, Exit
         if (submitting) {
             toastStore.trigger({
@@ -137,9 +135,11 @@
             formData.append('description', product.description);
             formData.append('brand', product.brand);
             formData.append('options', JSON.stringify(product.options));
-            formData.append('images', JSON.stringify(product.images));
             formData.append('product_type', product.product_type);
             formData.append('product_stock', JSON.stringify(product.product_stock));
+            files.forEach((file, index) => {
+                formData.append(`files[${index}]`, file);
+            });
 
 			// Log the form data entries for debugging
 			// for (const [key, value] of formData.entries()) {
@@ -248,23 +248,25 @@
         {#if productsView}
         
             <div class="w-full h-auto flex flex-col gap-4 items-center">
-                {#each products as product}
-                    <div class="w-full h-auto md:w-3/4">
-                        <ProductSmallPreview product={product} showOverlay={true}
-                            on:edit={(event) => showEditProductFormView(event.detail.product)}
-                            on:delete={(event) => deleteProduct(event.detail.product)}
-                        />
-                    </div>
-                {/each}
+                {#if products.length > 0}
+                    {#each products as product}
+                        <div class="w-full h-auto md:w-3/4">
+                            <ProductSmallPreview product={product} showOverlay={true}
+                                on:edit={(event) => showEditProductFormView(event.detail.product)}
+                                on:delete={(event) => deleteProduct(event.detail.product)}
+                            />
+                        </div>
+                    {/each}
+                {/if}
             </div>
 
         {:else if addProductFormView}
 
-            <ProductForm on:submit={(event) => addProduct(event.detail.product)}/> 
+            <ProductForm on:submit={(event) => addProduct(event.detail.product, event.detail.files)}/> 
 
         {:else if editProductFormView}
 
-            <ProductForm product={selectedProduct} on:submit={(event) => editProduct(event.detail.product, event.detail.file)}/> 
+            <ProductForm product={selectedProduct} on:submit={(event) => editProduct(event.detail.product, event.detail.files)}/> 
 
         {/if}
 
