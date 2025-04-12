@@ -1,15 +1,13 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import { getFlaskURL } from '$lib/api';
 import type { PastOrderType } from '$lib/types/OrderTypes';
 import type { UserType } from '$lib/types/UserTypes';
-
 
 export const load = async ({ locals, fetch }) => {
   // Redirect if the user is not logged in
   if (!locals.user) {
     throw redirect(302, '/auth/login');
   }
-
   
   if (locals.user && locals.user.user_type === 'admin') {
 
@@ -56,6 +54,7 @@ export const load = async ({ locals, fetch }) => {
     
   } else if (locals.user.user_type === 'employee') {
     let claimedOrders: PastOrderType[] = [];
+    
     // Fetch claimed orders for the employee
     try {
       const claimedEndpoint = `${getFlaskURL()}/api/ordersControl/employeeDashboard/${locals.user.id}`;

@@ -91,7 +91,6 @@
 </script>
 
 {#if userData} 
-
 	<div class="h-full overflow-y-auto">
 		<!-- Profile Section -->
 		<div class="flex flex-col items-center justify-center space-y-3 md:space-x-6">
