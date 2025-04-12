@@ -1,0 +1,203 @@
+<script lang="ts">
+    import { onMount } from 'svelte';
+    import { productsStore } from "$lib/stores/ProductsStore";
+    import type { ProductType } from "$lib/types/ProductTypes"
+
+    //Product Data
+    export let data;
+    let featuredProduct: ProductType;
+
+    // These variables are only used locally, no need for writeable 
+    let visible = false;
+    let message = "Login functionality coming soon!"; 
+    let title = "Notice"; 
+
+    onMount(() => {
+      if (data.products) {
+        featuredProduct = data.products[0];
+      }
+    });
+
+     // Function to handle login
+    function handleLogin() {
+        // Show the alert with the message when login is clicked
+        visible = true;
+    }
+
+  </script>
+
+  
+  <!-- this is being rendered as a component to the layout, use div instead of main for best practice -->
+  <div class="h-full bg-background flex flex-col items-center overflow-y-auto overflow-x-hidden scroll-smooth">
+    
+    <div class="relative w-full h-full"> 
+    <img class="absolute top-0 left-0 w-full h-full object-contain object-[85%] z-[-1] hidden xl:block" src="LandingPage-pic/gpu.png" alt="GPU Image">
+    <div class="z-[-2] absolute top-[47%] left-[70%] -translate-x-1/2 -translate-y-1/2 w-[30rem] h-[30rem] bg-primary-500 rounded-full blur-3xl opacity-30 animate-pulse hidden xl:block"></div>
+
+
+    <div class="flex flex-col items-center md:text-left md:items-start space-x-4 sm:space-x-6 md:space-x-8 space-y-2 px-0 md:px-16 xl:px-32 mt-8 md:mt-32 mb-32">
+        <img src="LandingPage-pic/Logo Icon.png" class="w-24 sm:w-24 md:w-32">
+        <h1 class="[@media(max-width:430px)]:text-3xl text-5xl sm:text-6xl md:text-6xl font-bold">
+            <span class="text-primary-500">Forge</span> power.
+        </h1>
+        <h1 class="[@media(max-width:430px)]:text-3xl text-5xl sm:text-6xl md:text-6xl font-bold">
+            <span class="text-primary-500">Fuel</span> performance.
+        </h1>
+        
+        <p class="text-base text-center md:text-left md:text-lg max-w-xs sm:max-w-sm md:max-w-lg">
+            Whether you're building a custom rig or upgrading your current setup,
+            we offer a wide range of components—ranging from the latest hardware to
+            reliable, refurbished parts.
+        </p>
+        
+        <div class="flex space-x-4 mt-6">
+            <a href="/catalog"><button type="button" class="btn border-2 border-primary-500 text-white rounded-lg bg-primary-500 px-8 py-3 hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]">
+                Shop <i class="fa-solid fa-arrow-right ml-1"></i>
+            </button></a>
+            <a href="#second_tab"><button type="button" class="btn rounded-lg border-2 border-white px-8 py-3 hover:bg-white transition-all duration-300 ease-in-out hover:text-black">
+                Learn More 
+            </button></a>
+        </div>
+    </div>
+    </div>
+
+<div class="sticky top-0 w-full variant-glass-surface md:text-center md:flex md:justify-evenly py-6 z-[2] text-secondary-600 dark:text-white" id="second_tab">
+    <!--<button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out block md:hidden px-8"><a href="#products">PRODUCTS</a></button>-->
+    <select class="select w-32 block md:hidden ml-4">
+        <option value="1">Featured</option>
+        <option value="2">Partners</option>
+        <option value="3">Contact</option>
+        <option value="4">About</option>
+    </select>
+    <button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out hidden md:block"><a href="#products">FEATURED</a></button>
+    <button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out hidden md:block"><a href="#partnersID">PARTNERS</a></button>
+    <button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out hidden md:block"><a href="#AboutID">CONTACT</a></button>
+    <button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out hidden md:block"><a href="#AboutID">ABOUT</a></button>
+</div>
+    
+    <!-- Main Content -->
+    <!--<h1 class="text-4xl font-bold" id="products">Featured</h1> p-4 was below!-->
+    <div class="container mx-auto flex flex-col items-center">
+        {#if featuredProduct}
+    <div id="products" class="bg-black w-screen">
+        <br>
+        <h2 class="text-2xl font-semibold text-white-900 font-bold text-center text-white">NVIDIA GeForce RTX 3090 Ti</h2>
+        <br>
+        <h1 class="text-2xl sm:text-4xl font-bold text-center text-white">Unleash powerful graphics for gamers and creators.</h1>
+        <br>
+        <div class="flex lg:flex-row flex-col items-center justify-center gap-x-6">
+            <div class="w-full lg:w-1/2 [@media(min-width:2000px)]:ml-32 [@media(min-width:2400px)]:ml-96">
+            <img 
+            class="rounded-lg"
+            src="catalog-images/gpu.jpg"
+            alt="NVIDIA GeForce RTX 3090 Ti"
+            />
+            </div>
+            <div class="flex-1 p-6 rounded-lg w-full [@media(min-width:2000px)]:-ml-32 [@media(min-width:2400px)]:-ml-64 text-white">
+                <!-- The image is not working right now in the backend, will fix this later -->
+                <!-- <img src="{featuredProduct.image}" alt="{featuredProduct.name}" class="max-w-full h-auto rounded-lg shadow-md mt-3" /> -->
+                <p class="mt-2"><span class="text-primary-500 text-3xl font-bold">Unmatched Performance</span><br>
+                    Experience smooth, lifelike visuals with cutting-edge ray tracing technology.</p>
+                <br>
+                <p class="mt-2"><span class="text-primary-500 text-3xl font-bold">Effortless Rendering</span><br>
+                    Seamlessly bring your world to life with unmatched graphics power and optimization.</p>
+                <br>
+                <p class="mt-2"><span class="text-primary-500 text-3xl font-bold">Gaming at the Edge</span><br>
+                    Elevate your experience with blazing-fast cores and AI-driven performance.</p>
+                <br>
+                <div class="border-2 border-white py-2 px-6 rounded-lg inline-block"><p class="text-lg font-bold">$1,780</p></div>
+                <!--<h3 class="text-xl font-semibold mt-2 text-white-800">Components:</h3>
+
+                <ul class="list-disc list-inside text-white-700">
+                    {#each featuredProduct.components as component}
+                        <li>{component}</li>
+                    {/each}
+                </ul>-->
+            </div>
+        </div>
+    </div>
+        {:else}
+            <!-- Instead of Temperary Product, Use a Error Message -->
+             <br>
+            <div class="w-auto h-auto card variant-ghost-error rounded-lg p-4">
+                <div class="text-2xl font-bold">The Product Information Failed to Load :/</div>
+                <div class="text-xl">if refreshing fails, we are working on fix</div>
+            </div>
+        {/if}
+        
+        <!-- Alert Message -->
+        {#if visible}
+            <aside class="alert variant-ghost p-4 rounded-md shadow-md mb-4 bg-yellow-200">
+                <!-- Icon -->
+                <div class="icon">
+                    <!-- You can replace this with an actual icon if needed -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+
+                <!-- Message -->
+                <div class="alert-message">
+                    <h3 class="h3 font-semibold text-red-700">{ title }</h3>
+                    <p>{ message }</p>
+                </div>
+
+                <!-- Actions -->
+                <div class="alert-actions">
+                    <!-- Add button(s) or action(s) here if necessary -->
+                    <button on:click={() => visible = false} class="bg-red-700 text-white px-4 py-2 rounded-md mt-2">
+                        Close
+                    </button>
+                </div>
+            </aside>
+        {/if}
+        
+        <!-- we want this for logged in users only, would consider removing this logic -->
+        <!-- Buttons & Cart Display -->
+        <!--<div class="container mx-auto p-4 flex flex-col items-center text-center pb-20"></div>-->
+
+<br>
+<br>
+<br>
+
+<h1 class="text-4xl sm:text-6xl md:text-6xl font-bold text-center" id="partnersID">Our hardware partners</h1>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 items-center">
+    <div class="w-64"><img src="LandingPage-pic/nv.webp"></div>
+    <div class="w-64"><img src="LandingPage-pic/evga-logo.png"></div>
+    <div class="w-64"><img src="LandingPage-pic/AMDNORM.webp"></div>
+    <div class="w-64"><img src="LandingPage-pic/MSI-Logo.png"></div>
+    <div class="w-64"><img src="LandingPage-pic/GIGA.png"></div>
+    <div class="w-64"><img src="LandingPage-pic/intel.png"></div>
+    </div>
+<br>
+<br>
+<br>
+
+        <!-- About Us -->
+        <div class="lg:py-16 bg-primary-500 w-screen flex flex-col lg:flex-row items-center lg:items-start justify-center gap-8">
+        
+        <div class="p-6 px-4 rounded-lg w-full max-w-xl">
+            <h1 class="text-4xl font-bold text-white [@media(max-width:430px)]:text-3xl text-4xl sm:text-6xl md:text-6xl" id="AboutID">About Forge Tech</h1> <br>
+            <p class="text-gray-200 text-sm sm:text-lg">We are a group of college students with a 
+            passion for technology, dedicated to providing high-quality 
+            computer parts for both new and old systems. Whether you're 
+            building a custom rig or upgrading your current setup, we 
+            offer a wide range of components—ranging from the latest hardware 
+            to reliable, refurbished parts. Our mission is to make technology 
+            more accessible, affordable, and sustainable, all while supporting 
+            the growth of young entrepreneurs. Join us in shaping the future, 
+            one part at a time!
+            </p>
+            <br>
+            <a href="/about-us"><button class="text-black font-bold p-2 border-2 border-black rounded-lg hover:bg-white transition-all duration-300 ease-in-out hover:border-white">Meet the Team <i class="fa-solid fa-arrow-right ml-1"></i></button></a>
+        </div> 
+        
+            <div class="p-2">
+            <img class ="w-96 rounded-full"src="leo-pics/leo-cropped.png">
+            </div>
+
+        </div>
+
+    </div>
+</div>
