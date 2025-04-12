@@ -137,9 +137,9 @@
                         <button type="button" on:click={() => showPassword = !showPassword}
                             class="ml-2 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition">
                             {#if showPassword}
-                                <i class="fa-solid fa-eye-slash"></i>
-                            {:else}
                                 <i class="fa-solid fa-eye"></i>
+                            {:else}
+                                <i class="fa-solid fa-eye-slash"></i>
                             {/if}
                         </button>
                     </div>
