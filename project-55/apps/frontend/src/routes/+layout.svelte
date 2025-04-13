@@ -107,7 +107,7 @@
 						<!-- Tooltip Below -->
 						<span class="absolute left-1/2 -translate-x-1/2 translate-y-1/3 bg-black text-white text-sm px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
 						  {#if isLoggedIn}
-							  Add to Cart
+							  View Cart
 						  {:else}
 							  Login 
 						  {/if}
@@ -139,6 +139,14 @@
 									<a href="/auth/product-control" class="w-full block">
 										<button class="btn hover:bg-primary-500 w-full">Product Control</button>
 									</a>
+								{/if}
+								{#if data.user.user_type === 'admin'}
+									<a href="/auth/user-control" class="w-full block">
+										<button class="btn hover:bg-primary-500 w-full">User Control</button>
+									</a>
+									<!-- <a href="/auth/product-control" class="w-full block">
+										<button class="btn hover:bg-primary-500 w-full">Product Control</button>
+									</a> -->
 								{/if}
 							{/if}
 							<!-- Always show About Us -->

@@ -50,7 +50,7 @@
 				//Reload App
 				invalidate('app:load');
 				//Go to Catalog
-                window.location.href = '/user-manager';
+                window.location.href = '/auth/user-control';
             }
             else {
 				const errorMessage = parsedResultData[parsedResultData[0].error];
