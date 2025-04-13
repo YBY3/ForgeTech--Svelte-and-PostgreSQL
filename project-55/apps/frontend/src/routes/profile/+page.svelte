@@ -72,22 +72,6 @@
 		}
 	});
 
-	/**
-	 * Groups duplicate products and adds a quantity field.
-	 * @param products Array of product objects from an order.
-	 * @returns Array of unique products, each with a quantity field.
-	 */
-	function groupProducts(products: any[]): any[] {
-		const grouped: Record<string, any> = {};
-		for (const product of products) {
-			if (grouped[product.id]) {
-				grouped[product.id].quantity++;
-			} else {
-				grouped[product.id] = { ...product, quantity: 1 };
-			}
-		}
-		return Object.values(grouped);
-	}
 </script>
 
 {#if userData} 
@@ -119,7 +103,7 @@
 
 		<!-- (Optional) Extra Profile Settings -->
 		<div class="flex flex-col items-center justify-center space-y-7 text-center">
-			<!-- Additional settings or selections can be added here -->
+			<!-- Additional settings can be added here -->
 		</div>
 
 
@@ -197,9 +181,9 @@
 				{#if pastOrders && pastOrders.length > 0}
 					<ul>
 						{#each pastOrders as order (order.id)}
-							<!-- Wrap each order in a clickable anchor -->
 							<li>
-								<a href={`/profile/expandedOrderViewEmployee?orderId=${order.id}`} class="order-link">									<div class="flex flex-col gap-2 items-center card variant-ringed p-4 cursor-pointer">
+								<a href={`/auth/order-control/expandedOrderView?orderId=${order.id}`} class="order-link">
+									<div class="flex flex-col gap-2 items-center card variant-ringed p-4 cursor-pointer">
 										<div class="group border rounded-lg p-4 transition-transform duration-300 transform hover:scale-105 cursor-pointer">
 											<strong>Order ID:</strong> {order.id} <br>
 											<strong>Total:</strong> ${order.total.toFixed(2)} <br>
@@ -207,10 +191,10 @@
 											<strong>Time Placed:</strong> {new Date(order.created_at).toLocaleString()} <br>
 											<strong>Products:</strong>
 											<ul class="mt-2">
-												{#each groupProducts(order.products) as product}
+												{#each order.products as product (product.id)}
 													<li class="flex items-center gap-2">
 														<ProductSmallPreview product={product} />
-														<!-- <span class="font-semibold text-black-800">x{product.quantity}</span> -->
+														<span class="font-semibold text-black-800">x{product.quantity}</span>
 													</li>
 												{/each}
 											</ul>
@@ -246,10 +230,10 @@
 								<strong>Time Placed:</strong> {new Date(order.created_at).toLocaleString()} <br>
 								<strong>Products:</strong>
 								<ul class="mt-2">
-									{#each groupProducts(order.products) as product}
+									{#each order.products as product (product.id)}
 										<li class="flex items-center gap-2">
 											<ProductSmallPreview product={product} />
-											<!-- <span class="font-semibold text-black-800">x{product.quantity}</span> -->
+											<span class="font-semibold text-black-800">x{product.quantity}</span>
 										</li>
 									{/each}
 								</ul>
