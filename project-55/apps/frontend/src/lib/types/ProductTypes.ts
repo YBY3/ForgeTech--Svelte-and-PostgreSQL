@@ -8,7 +8,7 @@ export type ProductType = {
     description: string;
     brand: string;
     options: string[];
-    images: string[];
+    images: number[];
     product_type: string;
     product_stock: number;
 };
@@ -18,5 +18,4 @@ export type ProductPreviewType = {
     id: number;
     name: string;
     price: number;
-    quantity: number;
 }
