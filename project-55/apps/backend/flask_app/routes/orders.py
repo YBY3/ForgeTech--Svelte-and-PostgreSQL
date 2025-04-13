@@ -141,7 +141,7 @@ def get_all_orders():
                         "name": product.name,
                         "price": product.price,
                         "quantity": order_item.order_quantity,
-                        "images": product.images
+                        "image_ids": product.image_ids
                     })
             
             order_info = {
@@ -197,7 +197,7 @@ def get_orders():
                         "name": product.name,
                         "price": product.price,
                         "quantity": order_item.order_quantity,
-                        "images": product.images
+                        "image_ids": product.image_ids
                     })
             
             order_info = {

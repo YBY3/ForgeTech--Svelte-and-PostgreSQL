@@ -20,7 +20,7 @@
       if (data.products) {
         productData = data.products;
       }
-      console.log("data products stuff: ",data.products)
+      //console.log("data products stuff: ",data.products)
     });
 
     function showCatalogView() {

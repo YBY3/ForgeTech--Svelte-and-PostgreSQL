@@ -1,26 +1,37 @@
-import { redirect } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import { getFlaskURL } from '$lib/api';
-import type { ProductType } from '$lib/types/ProductTypes.js';
+import type { RawProductType, ProductType } from '$lib/types/ProductTypes.js';
 
 
 export const load = async ({ locals, fetch }) => {
     try {
-        const response = await fetch(`${getFlaskURL()}/api/products/get_all_products`);
+        //Fetch All Products
+        const flaskResponse = await fetch(`${getFlaskURL()}/api/products/get_all_products`);
+        
+        const responseData = await flaskResponse.json();
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch products');
+        if (!flaskResponse.ok) {
+            console.error('Editing Product Failed:', responseData.error );
+            if (responseData.message) {
+                console.error('Error:', responseData.message );
+            }
+            return fail(flaskResponse.status, responseData);
         }
-        const products: ProductType[] = await response.json();
 
-        if (locals.user) {
-            return { user: locals.user, products: products };
-        } else {
-            return { products: products };
+        let productData: ProductType[] = [];
+
+        if (responseData.data.length > 0) {
+            //Convert Image IDs to Image URLs
+            productData = responseData.data.map((product: RawProductType) => ({
+                ...product,
+                image_urls: product.image_ids.map(id => `${getFlaskURL()}/api/images/${id}`)
+            }));
         }
+
+        return { products: productData };
     } 
-    
     catch (error) {
-        console.error('Error fetching products:', error);
+        console.error('Error Fetching Products:', error);
         return { products: [] as ProductType[] };
     }
 };

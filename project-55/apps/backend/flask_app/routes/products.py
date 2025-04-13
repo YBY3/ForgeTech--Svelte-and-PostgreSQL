@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 import sys, json, base64
 from werkzeug.utils import secure_filename
 from sqlalchemy.orm import joinedload
-from flask_app.models import Product, Img, ImgProduct, OrderProduct
+from flask_app.models import Product, Image, ImageProduct, OrderProduct
 from flask_app.extensions import db
 
 
@@ -15,6 +15,7 @@ from flask_app.extensions import db
 
 
 product_bp = Blueprint('products', __name__)
+ALLOWED_MIMETYPES = {'image/jpeg', 'image/png', 'image/gif'}
 
 
 @product_bp.route('/edit_product', methods=['POST'])
@@ -116,31 +117,59 @@ def add_product():
         options_list = json.loads(options_str)  
         cleaned_options = [opt.strip() for opt in options_list] 
 
-        # Handle Files (base64 images)
+        # Handle Images (base64 images)
         files = data.get('files', [])
         image_ids = []
+        max_image_size = 10 * 1024 * 1024  # 10MB in bytes
+
+        if len(files) > 5:
+            return jsonify({
+                'success': False,
+                'error': 'More Than 5 Images Found'
+            }), 400
+
         for file_data in files:
             try:
+                # Check MIME type
+                if file_data['type'] not in ALLOWED_MIMETYPES:
+                    db.session.rollback()
+                    return jsonify({
+                        'success': False,
+                        'error': 'Invalid Image Type Found',
+                        'message': f"Image '{file_data['name']}' has unsupported type '{file_data['type']}'. Allowed types: {', '.join(ALLOWED_MIMETYPES)}"
+                    }), 400
+
                 # Decode base64 image
-                img_data = base64.b64decode(file_data['data'])
-                img = Img(
-                    img=img_data,
+                image_data = base64.b64decode(file_data['data'])
+
+                # Check image size
+                if len(image_data) > max_image_size:
+                    db.session.rollback()
+                    return jsonify({
+                        'success': False,
+                        'error': 'Large Image Found (Exceeds 10MB)',
+                        'message': f"Image '{file_data['name']}' Exceeds 10MB limit"
+                    }), 400
+
+                # Create New Image Instance
+                image = Image(
+                    image=image_data,
                     mimetype=file_data['type'],
                     name=file_data['name']
                 )
-                db.session.add(img)
+                db.session.add(image)
                 db.session.flush()
-                image_ids.append(img.id)
+                image_ids.append(image.id)
             except (KeyError, ValueError) as e:
                 db.session.rollback()
                 return jsonify({
                     'success': False,
-                    'error': 'Invalid image data',
-                    'message': f"Image processing failed: {str(e)}"
+                    'error': 'Invalid Image Data',
+                    'message': f"Image Processing Failed: {str(e)}"
                 }), 400
 
-        # Create new Product instance
-        new_product = Product(
+        # Create New Product Instance
+        product = Product(
             name=data['name'],
             price=float(data['price']), 
             description=data['description'],
@@ -150,23 +179,24 @@ def add_product():
             product_stock=int(data['product_stock'])
         )
 
-        # Add to database
-        db.session.add(new_product)
+        # Add to Database
+        db.session.add(product)
         db.session.commit()
 
-        # Link images via ImgProduct
-        for img_id in image_ids:
-            img_product = ImgProduct(
-                img_id=img_id,
-                product_id=new_product.id
+        # Link Images via ImageProduct Relationship
+        for image_id in image_ids:
+            # Create New ImageProduct Instance
+            image_product = ImageProduct(
+                image_id=image_id,
+                product_id=product.id
             )
-            db.session.add(img_product)
+            db.session.add(image_product)
 
+        #Commit Changes
         db.session.commit()
 
         return jsonify({
-            'success': True,
-            'product_id': new_product.id
+            'success': True
         }), 201
 
     except ValueError as ve:
@@ -199,7 +229,7 @@ def delete_product():
                 'error': 'Product Not Found'
             }), 400
 
-        # Convert id to integer
+        # Convert ID to Integer
         product_id = int(data['id'])
 
         # Locate Product via Product ID
@@ -210,32 +240,33 @@ def delete_product():
                 'error': 'Product Not Found'
             }), 404
         
-        # Get associated ImgProduct records
-        img_products = ImgProduct.query.filter_by(product_id=product_id).all()
-        img_ids = [ip.img_id for ip in img_products]
+        # Get Associated ImageProduct Records
+        image_products = ImageProduct.query.filter_by(product_id=product_id).all()
+        image_ids = [image_product.image_id for image_product in image_products]
 
-        # Delete ImgProduct records
-        for img_product in img_products:
-            db.session.delete(img_product)
+        # Delete ImageProduct Records
+        for image_product in image_products:
+            db.session.delete(image_product)
 
-        # Delete Linked Img records
-        for img_id in img_ids:
-            other_links = ImgProduct.query.filter_by(img_id=img_id).count()
+        # Delete Linked Image Records
+        for image_id in image_ids:
+            other_links = ImageProduct.query.filter_by(image_id=image_id).count()
             if other_links == 0:
-                img = Img.query.get(img_id)
-                if img:
-                    db.session.delete(img)
+                image = Image.query.get(image_id)
+                if image:
+                    db.session.delete(image)
         
-        # Delete associated OrderProduct records
+        # Delete Associated OrderProduct Records
         OrderProduct.query.filter_by(product_id=product_id).delete()
 
         # Delete Product
         db.session.delete(product)
+
+        # Commit Changes
         db.session.commit()
 
         return jsonify({
-            'success': True,
-            'product_id': product_id
+            'success': True
         }), 200
 
     except ValueError as ve:
@@ -256,22 +287,23 @@ def delete_product():
         }), 500
 
 
+# Replace with Pagination Approach
 @product_bp.route('/get_all_products', methods=['GET'])
 def get_all_products():
     try:
-        # Eagerly load ImgProduct and Img
+        # Load All Products with image_ids
         products = Product.query.options(
-            joinedload(Product.images).joinedload(ImgProduct.img)
+            joinedload(Product.image_ids).joinedload(ImageProduct.image)
         ).all()
         
-        # Check for Missing Data
+        # If No Products Exist, Return Empty List
         if not products:
             return jsonify({
                 'success': True,
                 'data': []
             }), 200
         
-        # Serialize products
+        # Serialize Products
         productData = [product.to_dict() for product in products]
         
         return jsonify({

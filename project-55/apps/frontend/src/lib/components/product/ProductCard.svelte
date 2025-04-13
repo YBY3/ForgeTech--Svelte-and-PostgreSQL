@@ -13,7 +13,7 @@
 <div class="w-full max-w-md bg-white text-black border border-gray-300 rounded-lg shadow-lg p-4 hover:shadow-xl transition duration-200">
   <!-- Product Image -->
   <div class="w-full h-64 bg-gray-100 rounded-lg overflow-hidden mb-4 cursor-pointer" on:click={() => onProductSelect && onProductSelect(product)}>
-    <img src={product.images[0]} alt={product.name} class="w-full h-full object-cover transition duration-200 hover:scale-105" />
+    <img src={product.image_urls[0]} alt={product.name} class="w-full h-full object-cover transition duration-200 hover:scale-105" />
   </div>
 
   <!-- Product Details -->

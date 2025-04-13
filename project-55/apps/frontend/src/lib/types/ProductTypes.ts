@@ -1,6 +1,16 @@
-//This file will store types related to products
+export type RawProductType = {
+    id: number;
+    name: string;
+    price: number;
+    description: string;
+    brand: string;
+    options: string[];
+    product_type: string;
+    product_stock: number;
+    image_ids: number[];
+};
 
-//Named it ProductType to Avoid Naming Conflicts
+
 export type ProductType = {
     id: number;
     name: string;
@@ -8,9 +18,10 @@ export type ProductType = {
     description: string;
     brand: string;
     options: string[];
-    images: number[];
     product_type: string;
     product_stock: number;
+    image_ids: number[];
+    image_urls: string[];
 };
 
 

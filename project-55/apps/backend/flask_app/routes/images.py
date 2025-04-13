@@ -1,128 +1,25 @@
-from flask import Blueprint, request, jsonify
-from flask_app.extensions import db
-from flask_app.models import Product, Order, User, OrderProduct
-from collections import Counter
-from datetime import datetime
-from zoneinfo import ZoneInfo
-import sys
-from werkzeug.utils import secure_filename
-from flask_app.models import Img
+from flask import Blueprint, Response, jsonify
+from flask_app.models import Image
+
+# CODES USE:
+# 200: OK - Request succeeded normally
+# 201: Created - Request succeeded and a new resource was created (used in signup when a new user is created)
+# 400: Bad Request - Server couldn't understand the request (used when required fields are missing)
+# 401: Unauthorized - Authentication is required and has failed or not been provided
+# 500: Internal Server Error - Server encountered an unexpected condition (used in catch blocks)
+
 
 image_bp = Blueprint('images', __name__)
-
 ALLOWED_MIMETYPES = {'image/jpeg', 'image/png', 'image/gif'}
 
-@image_bp.route('/upload_single_file', methods=['POST'])
-def upload_single_file():
-    try:
-        file = request.files['file']
 
-        # Check if File Exsists
-        if 'file' not in request.files or request.files['file'].filename == '':
-            return jsonify({
-                'success': False,
-                'error': 'No Image Uploaded'
-            }), 400
-        
-        # Validate Minetype
-        if file.mimetype not in ALLOWED_MIMETYPES:
-            return jsonify({
-                'success': False,
-                'error': 'Invalid File Type. Only JPEG, PNG, and GIF are Allowed'
-            }), 400
-        
-        # Validate file size (e.g., max 5MB)
-        file.seek(0, 2)
-        file_size = file.tell()
-        max_size = 5 * 1024 * 1024  # 5MB
-        if file_size > max_size:
-            return jsonify({
-                'success': False,
-                'error': 'File Too Large. Maximum Size is 5MB'
-            }), 413
-        file.seek(0) 
-        
-        img = Img(
-            img=file.read(), 
-            mimetype=file.mimetype, 
-            name=file.filename
-        )
-
-        db.session.add(img)
-        db.session.commit()
-
-        return jsonify({
-                'success': True,
-                'message': 'Image Uploaded Successfully',
-            }), 200
-
-    except Exception as e:
-        db.session.rollback()
+@image_bp.route('/<int:id>')
+def fetch_image(id):
+    image = Image.query.filter_by(id=id).first()
+    if not image:
         return jsonify({
             'success': False,
-            'error': 'Failed to Upload',
-            'message': str(e)
-        }), 500
+            'error': 'Failed to Fetch Image'
+        }), 404
     
-
-@image_bp.route('/upload_multible_files', methods=['POST'])
-def upload_multible_files():
-    try:
-        # Check if File Exsists
-        if 'files' not in request.files:
-            return jsonify({
-                'success': False,
-                'error': 'No Images Uploaded'
-            }), 400
-        
-        files = request.files.getlist('files')
-        image_ids = []
-        max_size = 5 * 1024 * 1024  # 5MB
-
-        if not files or all(file.filename == '' for file in files):
-            return jsonify({
-                'success': False,
-                'error': 'Invalid File Uploaded'
-            }), 400
-        
-        for file in files:
-            if file.mimetype not in ALLOWED_MIMETYPES:
-                return jsonify({
-                    'success': False,
-                    'error': f'Invalid File Type for {file.filename}. Only JPEG, PNG, and GIF are Allowed'
-                }), 400
-
-            file.seek(0, 2)
-            file_size = file.tell()
-            if file_size > max_size:
-                return jsonify({
-                    'success': False,
-                    'error': f'File {file.filename} Too Large. Maximum Size is 5MB'
-                }), 413
-            file.seek(0)
-
-            img = Img(
-                img=file.read(),
-                mimetype=file.mimetype,
-                name=file.filename
-            )
-            
-            db.session.add(img)
-            db.session.flush()
-            image_ids.append(img.id)
-
-        db.session.commit()
-
-        return jsonify({
-            'success': True,
-            'message': 'Images Uploaded Successfully',
-            'imageIds': image_ids
-        }), 200
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            'success': False,
-            'error': 'Failed to Upload',
-            'message': str(e)
-        }), 500
+    return Response(image.image, mimetype=image.mimetype)

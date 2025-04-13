@@ -1,13 +1,13 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { getFlaskURL } from '$lib/api';
-import type { ProductType } from '$lib/types/ProductTypes.js';
+import type { RawProductType, ProductType } from '$lib/types/ProductTypes.js';
 
 
 export const load = async ({ locals, fetch }) => {
     //Checks if User is Logged in
     if (!locals.user) {throw redirect(302, '/auth/login');}
-    //Checks if User is a "employee"
-    else if (locals.user.user_type != "employee") {throw redirect(302, '/catalog')}
+    //Checks if User is a "employee" or "admin"
+    else if (locals.user.user_type != "employee" && locals.user.user_type != "admin") {throw redirect(302, '/catalog')}
 
     try {
         //Fetch All Products
@@ -23,7 +23,17 @@ export const load = async ({ locals, fetch }) => {
             return fail(flaskResponse.status, responseData);
         }
 
-        return { products: responseData.data };
+        let productData: ProductType[] = [];
+
+        if (responseData.data.length > 0) {
+            //Convert Image IDs to Image URLs
+            productData = responseData.data.map((product: RawProductType) => ({
+                ...product,
+                image_urls: product.image_ids.map(id => `${getFlaskURL()}/api/images/${id}`)
+            }));
+        }
+
+        return { products: productData };
     } 
     catch (error) {
         console.error('Error Fetching Products:', error);

@@ -6,8 +6,6 @@
 	import type { UserType } from '$lib/types/UserTypes';
 	import type { PastOrderType } from '$lib/types/OrderTypes';
 
-	console.log('Admin Dashboard component loaded');
-
 	// User Data from the load function
 	export let data;
 	let userData: UserType;

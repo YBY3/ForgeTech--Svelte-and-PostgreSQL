@@ -115,7 +115,7 @@
                             <!-- Product Image (Left) -->
                             <img 
                             class="w-16 h-16 object-contain rounded-md bg-gray-100" 
-                            src={product.images[0]} 
+                            src={product.image_urls[0]} 
                             alt={product.name}
                             />
 

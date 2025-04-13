@@ -1,9 +1,10 @@
 <script lang="ts">
     import { onDestroy } from 'svelte';
     import { FileDropzone } from '@skeletonlabs/skeleton';
-    import type { ProductType } from "$lib/types/ProductTypes"
     import { createEventDispatcher } from "svelte";
     import { getToastStore } from '@skeletonlabs/skeleton';
+    import type { ProductType } from "$lib/types/ProductTypes"
+    import type { ImageType } from "$lib/types/ImageTypes"
 
     //Tailwind Classes
     let inputClass = " input w-full md:w-3/4 h-[50px] min-h-[30px] focus:outline-none p-2 rounded-lg shadow-lg ";
@@ -14,7 +15,6 @@
     //Image Elements
     let imageFiles: File[] = []; 
     let imagePreviews: string[] = []; 
-    let existingImages: string[] = [];
 
     //Form Elements
     const dispatch = createEventDispatcher();
@@ -25,9 +25,10 @@
     let description: string;
     let brand: string;
     let options: string;
-    let images: number[] = [];
     let product_type: string;
     let product_stock: number;
+    let image_ids: number[] = [];
+    let image_urls: string[] = [];
 
     if (product != null) {
         id = product.id;
@@ -36,9 +37,10 @@
         description = product.description;
         brand = product.brand;
         options = product.options?.join(", ") || "No components";
-        images = product.images;
         product_type = product.product_type;
         product_stock = product.product_stock;
+        image_ids = product.image_ids;
+        image_urls = product.image_urls;
     }
 
     function handleFile(event: Event) {
@@ -47,18 +49,25 @@
 
         if (files.length === 0) return;
 
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if ((image_ids.length + imageFiles.length) === 5) {
+            toastStore.trigger({
+                message: `Only 5 Images Allowed`,
+                background: 'variant-filled-error',
+            });
+            return;
+        }
+
+        const ALLOWED_MIMETYPES = ['image/jpeg', 'image/png', 'image/gif'];
         const validFiles: File[] = [];
         const newPreviews: string[] = [];
 
         files.forEach((file) => {
-            if (allowedTypes.includes(file.type)) {
+            if (ALLOWED_MIMETYPES.includes(file.type)) {
                 validFiles.push(file);
                 newPreviews.push(URL.createObjectURL(file));
             } else {
-
                 toastStore.trigger({
-                    message: `${file.name} is Not a Allowed Type`,
+                    message: `File Type Not Allowed`,
                     background: 'variant-filled-error',
                 });
             }
@@ -87,7 +96,7 @@
             return;
         }
 
-        if (imageFiles.length === 0 && existingImages.length === 0) {
+        if (imageFiles.length === 0 && image_ids.length === 0) {
             toastStore.trigger({
                 message: 'At Least One Image is Required',
                 background: 'variant-filled-error',
@@ -103,7 +112,7 @@
                 description,
                 brand,
                 options: options.split(',').map((opt) => opt.trim()),
-                images: existingImages,
+                image_ids: image_ids,
                 product_type,
                 product_stock,
             },
@@ -123,7 +132,8 @@
 >   
     <!-- Images -->
     <div class="flex gap-4 w-full md:w-3/4 overflow-x-auto">
-        <div class="{imageFiles.length > 0 || existingImages.length > 0 ? 'flex-none w-[350px]' : 'flex-1 w-full'} h-[300px] card variant-soft rounded-lg">
+
+        <div class="{imageFiles.length > 0 || image_ids.length > 0 ? 'flex-none w-[350px]' : 'flex-1 w-full'} h-[300px] card variant-soft rounded-lg">
             <FileDropzone name="files" rounded="rounded-lg" class="h-full flex flex-col justify-center items-center" multiple on:change={handleFile}>
                 <svelte:fragment slot="lead">
                     <i class="fa-solid fa-plus text-8xl"></i>
@@ -138,38 +148,46 @@
         </div>
 
         <!-- Existing Images -->
-        {#each existingImages as image}
-            <div class="flex-none relative h-[300px] rounded-lg">
-                <img 
-                    class="h-[300px] object-contain rounded-lg" 
-                    src={image} 
-                    alt={name || 'Existing Image'}
-                />
-                <button 
-                    class="absolute top-2 right-2 btn btn-sm variant-filled-error" 
-                    on:click={() => existingImages = existingImages.filter((_, i) => i !== existingImages.indexOf(image))}
-                >
-                    X
-                </button>
-            </div>
-        {/each}
+        {#if image_urls.length > 0}
+            {#each image_urls as image_url, i}
+                <div class="flex-none relative h-[300px] rounded-lg">
+                    {#if image_url}
+                        <img
+                            class="h-[300px] object-contain rounded-lg"
+                            src={image_url}
+                            alt={'Existing Image'}
+                        />
+                    {/if}
+                    <!-- <button
+                        class="absolute top-2 right-2 btn btn-sm variant-filled-error"
+                        on:click={() => {
+                        existingImages = existingImages.filter((_, i) => i !== index);
+                        }}
+                    >
+                        X
+                    </button> -->
+                </div>
+            {/each}
+        {/if}
 
-        <!-- New Uploaded Images -->
-        {#each imagePreviews as preview, index}
-            <div class="flex-none relative h-[300px] rounded-lg">
-                <img 
-                    class="h-[300px] object-contain rounded-lg" 
-                    src={preview} 
-                    alt={name || 'Uploaded Image'}
-                />
-                <button 
-                    class="absolute top-2 right-2 btn btn-sm variant-filled-error" 
-                    on:click={() => removeImage(index)}
-                >
-                    X
-                </button>
-            </div>
-        {/each}
+        <!-- New Images -->
+        {#if imagePreviews.length > 0}
+            {#each imagePreviews as preview, index}
+                <div class="flex-none relative h-[300px] rounded-lg">
+                    <img 
+                        class="h-[300px] object-contain rounded-lg" 
+                        src={preview} 
+                        alt={name || 'Uploaded Image'}
+                    />
+                    <button 
+                        class="absolute top-2 right-2 btn btn-sm variant-filled-error" 
+                        on:click={() => removeImage(index)}
+                    >
+                        X
+                    </button>
+                </div>
+            {/each}
+        {/if}
     </div>
 
     <!-- Name -->

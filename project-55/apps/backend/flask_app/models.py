@@ -60,7 +60,7 @@ class Product(db.Model):
     product_type = db.Column(db.String(50), nullable=False)
     product_stock = db.Column(db.Integer, nullable=False, default=100000)
 
-    images = db.relationship('ImgProduct', back_populates='product')
+    image_ids = db.relationship('ImageProduct', back_populates='product')
     orders = db.relationship('OrderProduct', back_populates='product')
 
     def __repr__(self):
@@ -73,7 +73,7 @@ class Product(db.Model):
             'price': self.price,
             'description': self.description,
             'brand': self.brand,
-            'images': [img_product.img.id for img_product in self.images],
+            'image_ids': [image_product.image.id for image_product in self.image_ids],
             'product_type': self.product_type,
             'product_stock': self.product_stock,
             'options': self.options
@@ -109,16 +109,16 @@ class Order(db.Model):
         }
     
 
-# Img Model
-class Img(db.Model):
-    __tablename__ = 'img'
+# Image Model
+class Image(db.Model):
+    __tablename__ = 'image'
     id = db.Column(db.Integer, primary_key=True)
-    img = db.Column(db.LargeBinary, nullable=False)
+    image = db.Column(db.LargeBinary, nullable=False)
     mimetype = db.Column(db.String(100), nullable=False)
     name = db.Column(db.String(255), nullable=False)
 
     def __repr__(self):
-        return f'<Img {self.name}>'
+        return f'<Image {self.name}>'
 
     
 # Order Product Relationship
@@ -136,14 +136,14 @@ class OrderProduct(db.Model):
         return f'<OrderProduct OrderID: {self.order_id}, ProductID: {self.product_id}>'
     
 
-# Img Product Relationship
-class ImgProduct(db.Model):
-    __tablename__ = 'img_product'
-    img_id = db.Column(db.Integer, db.ForeignKey('img.id'), primary_key=True)
+# Image Product Relationship
+class ImageProduct(db.Model):
+    __tablename__ = 'image_product'
+    image_id = db.Column(db.Integer, db.ForeignKey('image.id'), primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), primary_key=True)
 
-    img = db.relationship('Img', backref='img_products')
-    product = db.relationship('Product', back_populates='images')
+    image = db.relationship('Image', backref='image_products')
+    product = db.relationship('Product', back_populates='image_ids')
 
     def __repr__(self):
-        return f'<ImgProduct ImgID: {self.img_id}, ProductID: {self.product_id}>'
+        return f'<ImageProduct ImageID: {self.image_id}, ProductID: {self.product_id}>'

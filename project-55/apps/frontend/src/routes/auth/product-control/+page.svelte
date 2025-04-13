@@ -38,7 +38,7 @@
         addProductFormView = true;
     }
 
-    function showEditProductFormView(product: ProductType) {
+    async function showEditProductFormView(product: ProductType) {
         selectedProduct = product;
 
         addProductFormView = false;
@@ -72,7 +72,7 @@
             formData.append('description', product.description);
             formData.append('brand', product.brand);
             formData.append('options', JSON.stringify(product.options));
-            formData.append('images', JSON.stringify(product.images));
+            formData.append('images', JSON.stringify(product.image_ids));
             formData.append('product_type', product.product_type);
             formData.append('product_stock', JSON.stringify(product.product_stock));
 
@@ -257,6 +257,15 @@
                             />
                         </div>
                     {/each}
+                {:else}
+                    <div class="w-full md:w-3/4 h-auto card variant-ghost-error text-center rounded-lg p-4">
+                        <div class="text-2xl font-bold">No Products Found!</div>
+                        <div class="text-xl">if refreshing fails, we are working on fix</div>
+                    </div>
+                    <div class="w-full md:w-3/4 h-auto card variant-ghost-success text-center rounded-lg p-4">
+                        <div class="text-2xl font-bold">No Products Added?</div>
+                        <div class="text-xl">if products have not been added yet, start by adding one</div>
+                    </div>
                 {/if}
             </div>
 
