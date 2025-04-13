@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ url, fetch, locals }) => {
   console.log("locals.user:", locals.user);
 
   // Only allow employee users and admins
-  if (!locals.user || locals.user.user_type !== 'employee' || locals.user.user_type !== 'employee') {
+  if (!locals.user || locals.user.user_type !== 'employee' && locals.user.user_type !== 'admin') {
     console.error("Access denied: User not authenticated or not an employee");
     throw redirect(302, '/auth/login');
   }
