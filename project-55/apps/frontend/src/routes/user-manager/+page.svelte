@@ -28,17 +28,7 @@
     onMount(() => {
 
         if (data.users) {
-        //userData = [...data.users].reverse(); 
-        //userData = [...data.users]; 
-        
-        userData = [...data.users].sort((a, b) => {
-            console.log("This is b: ",new Date(b.registered_by).getTime());
-            console.log("This is a: ",new Date(a.registered_by).getTime());
-            console.log("Subracted a and b: ",new Date(b.registered_by).getTime() - new Date(a.registered_by).getTime());
-            return new Date(b.registered_by).getTime() - new Date(a.registered_by).getTime();
-        });
-        
-
+        userData = [...data.users].reverse(); 
         filterUsers = userData;
         filterUsers = userData.filter(user => user.id !== data.localUser?.id);
         }

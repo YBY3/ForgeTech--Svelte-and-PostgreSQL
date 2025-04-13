@@ -43,7 +43,7 @@ class User(db.Model):
             'name': self.name,
             'user_type': self.user_type,
             'profile_pic': self.profile_pic,
-            'registered_by': self.active_by,
+            'registered_by': self.registered_by,
             'active_by': self.active_by
         }
 
