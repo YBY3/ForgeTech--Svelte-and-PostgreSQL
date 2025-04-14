@@ -1,5 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { invalidateAll } from '$app/navigation';
+    import type { ActionResult } from '@sveltejs/kit';
+    import { deserialize } from '$app/forms';
     import { getToastStore } from '@skeletonlabs/skeleton';
     import ProductSmallPreview from "$lib/components/product/ProductSmallPreview.svelte";
     import ProductForm from "$lib/components/product/ProductForm.svelte";
@@ -52,7 +55,7 @@
         }
     });
 
-    async function editProduct(product: ProductType, file: File) {
+    async function editProduct(product: ProductType, files: File[]) {
         //If Already Submitting, Exit
         if (submitting) {
             toastStore.trigger({
@@ -72,9 +75,12 @@
             formData.append('description', product.description);
             formData.append('brand', product.brand);
             formData.append('options', JSON.stringify(product.options));
-            formData.append('images', JSON.stringify(product.image_ids));
             formData.append('product_type', product.product_type);
             formData.append('product_stock', JSON.stringify(product.product_stock));
+            formData.append('image_ids', JSON.stringify(product.image_ids));
+            files.forEach((file, index) => {
+                formData.append(`files[${index}]`, file);
+            });
 
 			// Log the form data entries for debugging
 			// for (const [key, value] of formData.entries()) {
@@ -87,22 +93,29 @@
                 body: formData
             });
 
-            const result = await response.json();
-            const parsedResultData = JSON.parse(result.data);
-            const success = parsedResultData[parsedResultData[0].success];
+            const result: ActionResult = deserialize(await response.text());
 
-            if (success) {
+            if (result.type === 'success') {
+                // Update Product Locally
+                if (result.data) {
+                    product.image_ids = result.data.image_ids
+                    product.image_urls = result.data.image_urls
+                }
+                products = products.filter(p => p.id !== product.id);
+                products.push(product)
+
                 toastStore.trigger({
                     message: "Product Edited Successfully",
                     background: 'variant-filled-success'
                 });
-                products = products.filter(p => p.id !== product.id);
-                products.push(product)
 				showProductView();
-            }
-            else {
-				const errorMessage = parsedResultData[parsedResultData[0].error];
-                throw new Error(errorMessage);
+            } 
+            else if (result.type === 'failure') {
+                if (result.data) {
+                    const errorMessage = result.data.error;
+                    throw new Error(errorMessage);
+                }
+                throw new Error("Server Error, Try Again Later");
             }
         
         } catch (error) {
@@ -152,23 +165,31 @@
                 body: formData
             });
 
-            const result = await response.json();
-            const parsedResultData = JSON.parse(result.data);
-            const success = parsedResultData[parsedResultData[0].success];
+            const result: ActionResult = deserialize(await response.text());
 
-            if (success) {
+            if (result.type === 'success') {
+                // Update Product Locally
+                if (result.data) {
+                    product.id = result.data.product_id;
+                    product.image_ids = result.data.image_ids;
+                    product.image_urls = result.data.image_urls;
+                }
+                products.push(product)
+
                 toastStore.trigger({
                     message: "Product Added Successfully",
                     background: 'variant-filled-success'
                 });
-                products.push(product)
 				showProductView();
+            } 
+            else if (result.type === 'failure') {
+                if (result.data) {
+                    const errorMessage = result.data.error;
+                    throw new Error(errorMessage);
+                }
+                throw new Error("Server Error, Try Again Later");
             }
-            else {
-				const errorMessage = parsedResultData[parsedResultData[0].error];
-                throw new Error(errorMessage);
-            }
-        
+
         } catch (error) {
             const errorMessage: string = `${error}`;
 			toastStore.trigger({

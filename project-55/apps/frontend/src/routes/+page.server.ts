@@ -3,7 +3,7 @@ import { getFlaskURL } from '$lib/api';
 import type { RawProductType, ProductType } from '$lib/types/ProductTypes.js';
 
 
-export const load = async ({ fetch }) => {
+export const load = async ({ locals, fetch }) => {
     try {
         //Fetch All Products
         const flaskResponse = await fetch(`${getFlaskURL()}/api/products/get_all_products`);
@@ -28,10 +28,15 @@ export const load = async ({ fetch }) => {
             }));
         }
 
-        return { products: productData };
+        let isLoggedIn = false;
+        if (locals.user) {
+            isLoggedIn = true;
+        }
+
+        return { products: productData, isLoggedIn: isLoggedIn };
     } 
     catch (error) {
         console.error('Error Fetching Products:', error);
-        return { products: [] as ProductType[] };
+        return { products: [] as ProductType[], isLoggedIn: false };
     }
 };

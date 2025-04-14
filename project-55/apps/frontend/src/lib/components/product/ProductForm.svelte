@@ -112,9 +112,10 @@
                 description,
                 brand,
                 options: options.split(',').map((opt) => opt.trim()),
-                image_ids: image_ids,
                 product_type,
                 product_stock,
+                image_ids: image_ids,
+                image_urls: image_urls,
             },
             files: imageFiles
         });
@@ -158,14 +159,16 @@
                             alt={'Existing Image'}
                         />
                     {/if}
-                    <!-- <button
+                    <button
+                        type="button"
                         class="absolute top-2 right-2 btn btn-sm variant-filled-error"
                         on:click={() => {
-                        existingImages = existingImages.filter((_, i) => i !== index);
+                            image_ids = image_ids.filter((_, idx) => idx !== i);
+                            image_urls = image_urls.filter((_, idx) => idx !== i);
                         }}
                     >
                         X
-                    </button> -->
+                    </button>
                 </div>
             {/each}
         {/if}
@@ -180,6 +183,7 @@
                         alt={name || 'Uploaded Image'}
                     />
                     <button 
+                        type="button"
                         class="absolute top-2 right-2 btn btn-sm variant-filled-error" 
                         on:click={() => removeImage(index)}
                     >

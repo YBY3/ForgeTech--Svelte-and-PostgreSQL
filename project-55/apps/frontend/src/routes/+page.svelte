@@ -1,11 +1,12 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { productsStore } from "$lib/stores/ProductsStore";
     import type { ProductType } from "$lib/types/ProductTypes"
+    import { addToOrder } from "$lib/stores/OrdersStore";
 
-    //Product Data
+    //Data
     export let data;
     let featuredProduct: ProductType;
+    let isLoggedIn = false;
 
     // These variables are only used locally, no need for writeable 
     let visible = false;
@@ -13,9 +14,12 @@
     let title = "Notice"; 
 
     onMount(() => {
-      if (data.products) {
-        featuredProduct = data.products[0];
-      }
+        if (data.products) {
+            featuredProduct = data.products[0];
+        }
+        if (data.isLoggedIn) {
+            isLoggedIn = data.isLoggedIn;
+        }
     });
 
      // Function to handle login
@@ -79,45 +83,60 @@
     <!--<h1 class="text-4xl font-bold" id="products">Featured</h1> p-4 was below!-->
     <div class="container mx-auto flex flex-col items-center">
         {#if featuredProduct}
-    <div id="products" class="bg-black w-screen">
-        <br>
-        <h2 class="text-2xl font-semibold text-white-900 font-bold text-center text-white">NVIDIA GeForce RTX 3090 Ti</h2>
-        <br>
-        <h1 class="text-2xl sm:text-4xl font-bold text-center text-white">Unleash powerful graphics for gamers and creators.</h1>
-        <br>
-        <div class="flex lg:flex-row flex-col items-center justify-center gap-x-6">
-            <div class="w-full lg:w-1/2 [@media(min-width:2000px)]:ml-32 [@media(min-width:2400px)]:ml-96">
-            <img 
-            class="rounded-lg"
-            src="catalog-images/gpu.jpg"
-            alt="NVIDIA GeForce RTX 3090 Ti"
-            />
-            </div>
-            <div class="flex-1 p-6 rounded-lg w-full [@media(min-width:2000px)]:-ml-32 [@media(min-width:2400px)]:-ml-64 text-white">
-                <!-- The image is not working right now in the backend, will fix this later -->
-                <!-- <img src="{featuredProduct.image}" alt="{featuredProduct.name}" class="max-w-full h-auto rounded-lg shadow-md mt-3" /> -->
-                <p class="mt-2"><span class="text-primary-500 text-3xl font-bold">Unmatched Performance</span><br>
-                    Experience smooth, lifelike visuals with cutting-edge ray tracing technology.</p>
+            <div id="products" class="bg-black w-screen">
                 <br>
-                <p class="mt-2"><span class="text-primary-500 text-3xl font-bold">Effortless Rendering</span><br>
-                    Seamlessly bring your world to life with unmatched graphics power and optimization.</p>
+                <h2 class="text-2xl font-semibold text-white-900 font-bold text-center text-white">{featuredProduct.name}</h2>
                 <br>
-                <p class="mt-2"><span class="text-primary-500 text-3xl font-bold">Gaming at the Edge</span><br>
-                    Elevate your experience with blazing-fast cores and AI-driven performance.</p>
+                <!-- <h1 class="text-2xl sm:text-4xl font-bold text-center text-white">Unleash powerful graphics for gamers and creators.</h1> -->
                 <br>
-                <div class="border-2 border-white py-2 px-6 rounded-lg inline-block"><p class="text-lg font-bold">$1,780</p></div>
-                <!--<h3 class="text-xl font-semibold mt-2 text-white-800">Components:</h3>
+                <div class="flex lg:flex-row flex-col items-center justify-center gap-x-6">
+                    <div class="w-full lg:w-1/2 [@media(min-width:2000px)]:ml-32 [@media(min-width:2400px)]:ml-96">
+                    <img 
+                    class="rounded-lg"
+                    src={featuredProduct.image_urls[0]}
+                    alt="NVIDIA GeForce RTX 3090 Ti"
+                    />
+                    </div>
+                    <div class="flex-1 p-6 rounded-lg w-full [@media(min-width:2000px)]:-ml-32 [@media(min-width:2400px)]:-ml-64 text-white">
+                        <!-- The image is not working right now in the backend, will fix this later -->
+                        <!-- <img src="{featuredProduct.image}" alt="{featuredProduct.name}" class="max-w-full h-auto rounded-lg shadow-md mt-3" /> -->
+                        <p class="mt-2"><br>
+                            {featuredProduct.description}</p>
+                        <br>
+                        <div class="flex gap-2 items-center">
+                            <div class="border-2 border-white py-2 px-6 rounded-lg inline-block"><p class="text-lg font-bold">${featuredProduct.price}</p></div>
 
-                <ul class="list-disc list-inside text-white-700">
-                    {#each featuredProduct.components as component}
-                        <li>{component}</li>
-                    {/each}
-                </ul>-->
+                            <!-- Shopping Cart Button -->
+                            <a class="relative group" href="/orders" >
+                                <button 
+                                class="w-12 h-12 border border-2 border-black dark:border-white rounded-md flex items-center justify-center hover:bg-primary-500 transition hover:border-none hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)] disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={!isLoggedIn}
+                                on:click={() => addToOrder(featuredProduct)}
+                                >
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                </button>
+                                
+                                <!-- Tooltip Below -->
+                                <span class="absolute left-1/2 -translate-x-1/2 translate-y-1/3 bg-black text-white text-sm px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                {#if isLoggedIn}
+                                    Add to Cart
+                                {:else}
+                                    Login 
+                                {/if}
+                                </span>
+                            </a>
+                        </div>
+                        <!--<h3 class="text-xl font-semibold mt-2 text-white-800">Components:</h3>
+
+                        <ul class="list-disc list-inside text-white-700">
+                            {#each featuredProduct.components as component}
+                                <li>{component}</li>
+                            {/each}
+                        </ul>-->
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
         {:else}
-            <!-- Instead of Temperary Product, Use a Error Message -->
              <br>
             <div class="w-auto h-auto card variant-ghost-error rounded-lg p-4">
                 <div class="text-2xl font-bold">The Product Information Failed to Load :/</div>

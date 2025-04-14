@@ -1,9 +1,15 @@
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { getFlaskURL } from '$lib/api';
 import type { RawProductType, ProductType } from '$lib/types/ProductTypes.js';
 
 
 export const load = async ({ locals, fetch }) => {
+    if (locals.user) {
+        if (locals.user.user_type == "employee") {
+            throw redirect(302, '/');
+        }
+    }
+
     try {
         //Fetch All Products
         const flaskResponse = await fetch(`${getFlaskURL()}/api/products/get_all_products`);

@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_app.extensions import db
-from flask_app.models import Product, Order, User, OrderProduct
+from flask_app.models import Product, Order, OrderProduct, ImageProduct
 from collections import Counter
 
 #Temp Imports
@@ -136,12 +136,15 @@ def get_all_orders():
             for order_item in order_items:
                 product = Product.query.get(order_item.product_id)
                 if product:
+                    # Fetch image_ids from ImageProduct
+                    image_ids = [ip.image_id for ip in ImageProduct.query.filter_by(product_id=product.id).all()]
+                    
                     products_with_quantity.append({
                         "id": product.id,
                         "name": product.name,
                         "price": product.price,
                         "quantity": order_item.order_quantity,
-                        "image_ids": product.image_ids
+                        "image_ids": image_ids
                     })
             
             order_info = {
@@ -162,11 +165,77 @@ def get_all_orders():
         }), 200
 
     except Exception as e:
+        print(f"Error fetching orders: {str(e)}", file=sys.stderr)
         return jsonify({
             'success': False,
             'error': 'Failed to fetch orders',
             'message': str(e)
         }), 500
+    
+# def get_all_orders():
+#     try:
+#         data = request.get_json()
+
+#         # Validate Request Body
+#         if not data or 'user_id' not in data:
+#             return jsonify({
+#                 'success': False,
+#                 'error': 'Missing user_id in request'
+#             }), 400
+
+#         user_id = data['user_id']
+
+#         # Query all orders for the given user ID, including products
+#         past_orders = Order.query.filter_by(user_id=user_id).order_by(Order.id.desc()).all()
+
+#         # Check if any orders exist
+#         if not past_orders:
+#             return jsonify({
+#                 'success': False,
+#                 'error': 'No orders found for this user'
+#             }), 404
+
+#         # Convert orders to a list of dictionaries with product details
+#         order_data = []
+#         for order in past_orders:
+#             # Get order items with quantities
+#             order_items = OrderProduct.query.filter_by(order_id=order.id).all()
+
+#             products_with_quantity = []
+#             for order_item in order_items:
+#                 product = Product.query.get(order_item.product_id)
+#                 if product:
+#                     products_with_quantity.append({
+#                         "id": product.id,
+#                         "name": product.name,
+#                         "price": product.price,
+#                         "quantity": order_item.order_quantity,
+#                         "image_ids": product.image_ids
+#                     })
+            
+#             order_info = {
+#                 "id": order.id,
+#                 "user_id": order.user_id,
+#                 "total": order.total,
+#                 "status": order.status,
+#                 "arrive_by": order.arrive_by,
+#                 "products": products_with_quantity,
+#                 "created_at": order.created_at.isoformat(),
+#                 "claimed_by_employee_id": order.claimed_by_employee_id
+#             }
+#             order_data.append(order_info)
+
+#         return jsonify({
+#             'success': True,
+#             'orders': order_data
+#         }), 200
+
+#     except Exception as e:
+#         return jsonify({
+#             'success': False,
+#             'error': 'Failed to fetch orders',
+#             'message': str(e)
+#         }), 500
     
 # gets orders from all customers
 @order_bp.route('/getOrders', methods=['GET'])

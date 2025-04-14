@@ -24,12 +24,12 @@
     claimedOrders = data.claimedOrders;
   });
 
-  $: {
-    console.log('Unclaimed Orders changed:', unclaimedOrders);
-  }
-  $: {
-    console.log('Claimed Orders changed:', claimedOrders);
-  }
+  // $: {
+  //   console.log('Unclaimed Orders changed:', unclaimedOrders);
+  // }
+  // $: {
+  //   console.log('Claimed Orders changed:', claimedOrders);
+  // }
 
   async function claimOrder(orderId: number) {
     // If Already Submitting, Exit

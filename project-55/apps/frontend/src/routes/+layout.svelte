@@ -128,11 +128,12 @@
 							</a>
 							<!-- Conditional link based on user_type -->
 							{#if data.user}
-								{#if data.user.user_type === 'customer'}
+								{#if data.user.user_type === 'customer' || data.user.user_type === 'admin'}
 									<a href="/catalog" class="w-full block">
 										<button class="btn hover:bg-primary-500 w-full">Catalog</button>
 									</a>
-								{:else if data.user.user_type === 'employee' || data.user.user_type === 'admin'}
+								{/if}
+								{#if data.user.user_type === 'employee' || data.user.user_type === 'admin'}
 									<a href="/auth/order-control" class="w-full block">
 										<button class="btn hover:bg-primary-500 w-full">Order Control</button>
 									</a>

@@ -6,8 +6,11 @@ import type { UserType } from '$lib/types/UserTypes';
 
 export const load = async ({ locals, fetch }) => {
   // Only allow employee users and admin
-  if (!locals.user || (locals.user.user_type !== 'employee' && locals.user.user_type !== 'admin')) {
+  if (!locals.user) {
     throw redirect(302, '/auth/login');
+  }
+  if (locals.user.user_type !== 'employee' && locals.user.user_type !== 'admin') {
+    throw redirect(302, '/');
   }
 
   let unclaimedOrders: PastOrderType[] = [];

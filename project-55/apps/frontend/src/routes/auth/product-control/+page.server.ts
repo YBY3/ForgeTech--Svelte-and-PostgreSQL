@@ -7,7 +7,7 @@ export const load = async ({ locals, fetch }) => {
     //Checks if User is Logged in
     if (!locals.user) {throw redirect(302, '/auth/login');}
     //Checks if User is a "employee" or "admin"
-    else if (locals.user.user_type != "employee" && locals.user.user_type != "admin") {throw redirect(302, '/catalog')}
+    else if (locals.user.user_type != "employee" && locals.user.user_type != "admin") {throw redirect(302, '/')}
 
     try {
         //Fetch All Products
@@ -46,6 +46,7 @@ export const actions = {
     edit_product: async ({ request }) => {
         try {
             const formData = await request.formData();
+
             const jsonData = {
                 id: formData.get('id'),
                 name: formData.get('name'),
@@ -53,10 +54,25 @@ export const actions = {
                 description: formData.get('description'),
                 brand: formData.get('brand'),
                 options: formData.get('options'),
-                images: formData.get('images'),
                 product_type: formData.get('product_type'),
-                product_stock: formData.get('product_stock')
+                product_stock: formData.get('product_stock'),
+                image_ids: formData.get('image_ids'),
+                files: [] as { data: string; name: string; type: string }[]
             };
+
+            // Add Images to jsonData
+            for (const [key, value] of formData.entries()) {
+                if (key.startsWith('files[')) {
+                    const file = value as File;
+                    const arrayBuffer = await file.arrayBuffer();
+                    const base64Data = Buffer.from(arrayBuffer).toString('base64');
+                    jsonData.files.push({
+                        data: base64Data,
+                        name: file.name,
+                        type: file.type
+                    });
+                }
+            }
 
             const flaskResponse = await fetch(`${getFlaskURL()}/api/products/edit_product`, {
                 method: 'POST',
@@ -74,7 +90,13 @@ export const actions = {
                 return fail(flaskResponse.status, responseData);
             }
 
-            return { success: true };
+            // Get Updated Image URLs
+            let image_urls: string[] = [];
+            if (responseData.image_ids && responseData.image_ids.length > 0) {
+                image_urls = responseData.image_ids.map((id: number) => `${getFlaskURL()}/api/images/${id}`);
+            }
+
+            return { success: true, image_ids: responseData.image_ids, image_urls: image_urls };
         } 
         
         catch (error) {
@@ -128,7 +150,16 @@ export const actions = {
                 return fail(flaskResponse.status, responseData);
             }
 
-            return { success: true };
+            // Get Updated Product ID
+            const product_id = responseData.product_id
+
+            // Get Updated Image URLs
+            let image_urls: string[] = [];
+            if (responseData.image_ids && responseData.image_ids.length > 0) {
+                image_urls = responseData.image_ids.map((id: number) => `${getFlaskURL()}/api/images/${id}`);
+            }
+
+            return { success: true, product_id: product_id, image_ids: responseData.image_ids, image_urls: image_urls };
         } 
         
         catch (error) {

@@ -24,13 +24,12 @@ def edit_product():
         data = request.get_json()
         # print(f"Received data: {data}", file=sys.stderr)
 
-        required_fields = ['id', 'name', 'price', 'description', 'brand', 'options', 'images', 'product_type', 'product_stock']
+        required_fields = ['id', 'name', 'price', 'description', 'brand', 'options', 'product_type', 'product_stock']
         missing_fields = [field for field in required_fields if field not in data or data[field] is None]
         if missing_fields:
-            print(f"Missing fields: {missing_fields}", file=sys.stderr)
             return jsonify({
                 'success': False,
-                'error': 'Missing required fields',
+                'error': 'Missing Product Info',
                 'message': f"Fields missing: {', '.join(missing_fields)}"
             }), 400
 
@@ -46,39 +45,133 @@ def edit_product():
             }), 404
 
         # Convert stringified options back to a list
-        options_str = data['options']
-        options_list = json.loads(options_str)  
-        cleaned_options = [opt.strip() for opt in options_list] 
+        try:
+            options_str = data['options']
+            options_list = json.loads(options_str)  
+            cleaned_options = [opt.strip() for opt in options_list] 
+        except json.JSONDecodeError as e:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid Options Format',
+                'message': f"Options must be a valid JSON array: {str(e)}"
+            }), 400
+        
+        # Convert stringified image_ids back to a list
+        try:
+            image_ids_str = data['image_ids']
+            image_ids_list = json.loads(image_ids_str)  
+        except json.JSONDecodeError as e:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid Image ID Format',
+                'message': f"Options must be a valid JSON array: {str(e)}"
+            }), 400
+        
+        # Handle Images (base64 images)
+        files = data.get('files', [])
+        image_ids = image_ids_list
+        print(f"Received data: {image_ids}", file=sys.stderr)
+        max_image_size = 10 * 1024 * 1024  # 10MB in bytes
 
-        # Convert stringified images back to a list
-        images_str = data['images'] 
-        images_list = json.loads(images_str)  
-        cleaned_images = [img.strip() for img in images_list] 
+        if len(files) > 5:
+            return jsonify({
+                'success': False,
+                'error': 'More Than 5 Images Found'
+            }), 400
+        
+        if len(files) > 0:
+            for file_data in files:
+                try:
+                    # Check MIME type
+                    if file_data['type'] not in ALLOWED_MIMETYPES:
+                        db.session.rollback()
+                        return jsonify({
+                            'success': False,
+                            'error': 'Invalid Image Type Found',
+                            'message': f"Image '{file_data['name']}' has unsupported type '{file_data['type']}'. Allowed types: {', '.join(ALLOWED_MIMETYPES)}"
+                        }), 400
 
+                    # Decode base64 image
+                    image_data = base64.b64decode(file_data['data'])
+
+                    # Check image size
+                    if len(image_data) > max_image_size:
+                        db.session.rollback()
+                        return jsonify({
+                            'success': False,
+                            'error': 'Large Image Found (Exceeds 10MB)',
+                            'message': f"Image '{file_data['name']}' Exceeds 10MB limit"
+                        }), 400
+
+                    # Create New Image Instance
+                    image = Image(
+                        image=image_data,
+                        mimetype=file_data['type'],
+                        name=file_data['name']
+                    )
+                    db.session.add(image)
+                    db.session.flush()
+                    image_ids.append(image.id)
+
+                except (KeyError, ValueError) as e:
+                    db.session.rollback()
+                    return jsonify({
+                        'success': False,
+                        'error': 'Invalid Image Data',
+                        'message': f"Image Processing Failed: {str(e)}"
+                    }), 400
+                
         # Update product fields
         product.name = data['name']
         product.price = float(data['price'])
         product.description = data['description']
         product.brand = data['brand']
         product.options = cleaned_options  
-        product.images = cleaned_images    
         product.product_type = data['product_type']
         product.product_stock = int(data['product_stock'])
 
+        # Sync ImageProduct relationships
+        existing_links = ImageProduct.query.filter_by(product_id=product_id).all()
+        existing_image_ids = {link.image_id for link in existing_links}
+
+        # Determine images to remove and add
+        new_image_ids_set = set(image_ids)
+        to_remove = existing_image_ids - new_image_ids_set
+        to_add = new_image_ids_set - existing_image_ids
+
+        # Remove old ImageProduct links
+        for link in existing_links:
+            if link.image_id in to_remove:
+                db.session.delete(link)
+
+        # Add new ImageProduct links
+        for image_id in to_add:
+            if Image.query.get(image_id):  # Verify image exists
+                image_product = ImageProduct(image_id=image_id, product_id=product_id)
+                db.session.add(image_product)
+            else:
+                db.session.rollback()
+                return jsonify({
+                    'success': False,
+                    'error': 'Invalid Image ID',
+                    'message': f"Image ID {image_id} does not exist"
+                }), 400
+            
+        # Clean up orphaned images (optional)
+        for image_id in to_remove:
+            other_links = ImageProduct.query.filter_by(image_id=image_id).count()
+            if other_links == 0:
+                image = Image.query.get(image_id)
+                if image:
+                    db.session.delete(image)
+
+        #Commit Changes
         db.session.commit()
 
         return jsonify({
             'success': True,
-            'product_id': product_id
+            'image_ids': image_ids
         }), 200
-
-    except json.JSONDecodeError as jde:
-        print(f"JSON decode error: {str(jde)}", file=sys.stderr)
-        return jsonify({
-            'success': False,
-            'error': 'Invalid List Format for Options or Images',
-            'message': str(jde)
-        }), 400
 
     except ValueError as ve:
         print(f"ValueError: {str(ve)}", file=sys.stderr)
@@ -113,9 +206,16 @@ def add_product():
             }), 400
         
         # Convert stringified options back to a list
-        options_str = data['options']
-        options_list = json.loads(options_str)  
-        cleaned_options = [opt.strip() for opt in options_list] 
+        try:
+            options_str = data['options']
+            options_list = json.loads(options_str)  
+            cleaned_options = [opt.strip() for opt in options_list] 
+        except json.JSONDecodeError as e:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid Options Format',
+                'message': f"Options must be a valid JSON array: {str(e)}"
+            }), 400
 
         # Handle Images (base64 images)
         files = data.get('files', [])
@@ -160,6 +260,7 @@ def add_product():
                 db.session.add(image)
                 db.session.flush()
                 image_ids.append(image.id)
+
             except (KeyError, ValueError) as e:
                 db.session.rollback()
                 return jsonify({
@@ -196,7 +297,9 @@ def add_product():
         db.session.commit()
 
         return jsonify({
-            'success': True
+            'success': True,
+            'product_id': product.id,
+            'image_ids': image_ids
         }), 201
 
     except ValueError as ve:

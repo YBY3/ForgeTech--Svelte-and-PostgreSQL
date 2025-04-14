@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
+import sys
 from flask_app.extensions import db
-from flask_app.models import Product, Order, User, OrderProduct
+from flask_app.models import Product, Order, OrderProduct, ImageProduct
 
 order_control_bp = Blueprint('ordersControl', __name__)
 
@@ -20,7 +21,7 @@ def get_unclaimed_orders():
         # Query all unclaimed orders (status 'pending' and no employee assigned)
         unclaimed_orders = Order.query.filter_by(status='pending', claimed_by_employee_id=None).order_by(Order.id.asc()).all()
 
-        # If no orders are found, return an error or empty list (here we mimic get_all_orders)
+        # If no orders are found, return an error
         if not unclaimed_orders:
             return jsonify({
                 'success': False,
@@ -32,31 +33,19 @@ def get_unclaimed_orders():
         for order in unclaimed_orders:
             order_items = OrderProduct.query.filter_by(order_id=order.id).all()
             products_with_quantity = []
-            # order_info = {
-            #     "id": order.id,
-            #     "user_id": order.user_id,
-            #     "total": order.total,
-            #     "status": order.status,
-            #     "products": [
-            #         {
-            #             "id": product.id,
-            #             "name": product.name,
-            #             "price": product.price,
-            #         } for product in order.products
-            #     ],
-            #     "created_at": order.created_at.isoformat()  # Ensuring timestamp is serializable
-            # }
-            # order_data.append(order_info)
 
             for order_item in order_items:
                 product = Product.query.get(order_item.product_id)
                 if product:
+                    # Fetch image_ids from ImageProduct
+                    image_ids = [ip.image_id for ip in ImageProduct.query.filter_by(product_id=product.id).all()]
+                    
                     products_with_quantity.append({
                         "id": product.id,
                         "name": product.name,
                         "price": product.price,
                         "quantity": order_item.order_quantity,
-                        "images": product.images
+                        "image_ids": image_ids
                     })
             
             order_info = {
@@ -64,12 +53,12 @@ def get_unclaimed_orders():
                 "user_id": order.user_id,
                 "total": order.total,
                 "status": order.status,
+                "arrive_by": order.arrive_by.isoformat() if order.arrive_by else None,
                 "products": products_with_quantity,
                 "created_at": order.created_at.isoformat(),
-                "arrive_by": order.arrive_by
+                "claimed_by_employee_id": order.claimed_by_employee_id
             }
             order_data.append(order_info)
-
 
         return jsonify({
             'success': True,
@@ -77,11 +66,80 @@ def get_unclaimed_orders():
         }), 200
 
     except Exception as e:
+        print(f"Error fetching unclaimed orders: {str(e)}", file=sys.stderr)
         return jsonify({
             'success': False,
             'error': 'Failed to fetch unclaimed orders',
             'message': str(e)
         }), 500
+    
+# def get_unclaimed_orders():
+#     try:
+#         # Query all unclaimed orders (status 'pending' and no employee assigned)
+#         unclaimed_orders = Order.query.filter_by(status='pending', claimed_by_employee_id=None).order_by(Order.id.asc()).all()
+
+#         # If no orders are found, return an error or empty list (here we mimic get_all_orders)
+#         if not unclaimed_orders:
+#             return jsonify({
+#                 'success': False,
+#                 'error': 'No unclaimed orders found'
+#             }), 404
+
+#         # Convert orders to a list of dictionaries with product details
+#         order_data = []
+#         for order in unclaimed_orders:
+#             order_items = OrderProduct.query.filter_by(order_id=order.id).all()
+#             products_with_quantity = []
+#             # order_info = {
+#             #     "id": order.id,
+#             #     "user_id": order.user_id,
+#             #     "total": order.total,
+#             #     "status": order.status,
+#             #     "products": [
+#             #         {
+#             #             "id": product.id,
+#             #             "name": product.name,
+#             #             "price": product.price,
+#             #         } for product in order.products
+#             #     ],
+#             #     "created_at": order.created_at.isoformat()  # Ensuring timestamp is serializable
+#             # }
+#             # order_data.append(order_info)
+
+#             for order_item in order_items:
+#                 product = Product.query.get(order_item.product_id)
+#                 if product:
+#                     products_with_quantity.append({
+#                         "id": product.id,
+#                         "name": product.name,
+#                         "price": product.price,
+#                         "quantity": order_item.order_quantity,
+#                         "images": product.images
+#                     })
+            
+#             order_info = {
+#                 "id": order.id,
+#                 "user_id": order.user_id,
+#                 "total": order.total,
+#                 "status": order.status,
+#                 "products": products_with_quantity,
+#                 "created_at": order.created_at.isoformat(),
+#                 "arrive_by": order.arrive_by
+#             }
+#             order_data.append(order_info)
+
+
+#         return jsonify({
+#             'success': True,
+#             'orders': order_data
+#         }), 200
+
+#     except Exception as e:
+#         return jsonify({
+#             'success': False,
+#             'error': 'Failed to fetch unclaimed orders',
+#             'message': str(e)
+#         }), 500
 
 
 
@@ -92,7 +150,7 @@ def get_unclaimed_orders():
 @order_control_bp.route('/employeeDashboard/<int:employee_id>', methods=['GET'])
 def get_employee_dashboard(employee_id):
     try:
-        # Fetch all orders claimed by this employee (using the correct field name)
+        # Fetch all orders claimed by this employee
         claimed_orders = Order.query.filter_by(claimed_by_employee_id=employee_id).order_by(Order.id.desc()).all()
        
         # Convert orders to a list of dictionaries with product details
@@ -103,13 +161,16 @@ def get_employee_dashboard(employee_id):
             for order_item in order_items:
                 product = Product.query.get(order_item.product_id)
                 if product:
+                    # Fetch image_ids from ImageProduct
+                    image_ids = [ip.image_id for ip in ImageProduct.query.filter_by(product_id=product.id).all()]
+                    
                     products_with_quantity.append({
                         "id": product.id,
                         "name": product.name,
                         "price": product.price,
                         "quantity": order_item.order_quantity,
                         "product_stock": product.product_stock,
-                        "images": product.images
+                        "image_ids": image_ids
                     })
             
             order_info = {
@@ -119,25 +180,9 @@ def get_employee_dashboard(employee_id):
                 "status": order.status,
                 "products": products_with_quantity,
                 "created_at": order.created_at.isoformat(),
-                "arrive_by": order.arrive_by
+                "arrive_by": order.arrive_by.isoformat() if order.arrive_by else None
             }
             order_data.append(order_info)
-            # order_info = {
-            #     "id": order.id,
-            #     "user_id": order.user_id,
-            #     "total": order.total,
-            #     "status": order.status,
-            #     "products": [
-            #         {
-            #             "id": item.product.id,
-            #             "name": item.name,
-            #             "price": item.price,
-            #             "product_stock": item.product_stock
-            #         } for item in order.order_items
-            #     ],
-            #     "created_at": order.created_at.isoformat()
-            # }
-            # order_data.append(order_info)
        
         # Always return a successful response with an empty array if no orders are found
         return jsonify({
@@ -145,13 +190,76 @@ def get_employee_dashboard(employee_id):
             'orders': order_data
         }), 200
 
-
     except Exception as e:
+        print(f"Error fetching claimed orders for employee {employee_id}: {str(e)}", file=sys.stderr)
         return jsonify({
             'success': False,
             'error': 'Failed to fetch claimed orders for employee',
             'message': str(e)
         }), 500
+
+# def get_employee_dashboard(employee_id):
+#     try:
+#         # Fetch all orders claimed by this employee (using the correct field name)
+#         claimed_orders = Order.query.filter_by(claimed_by_employee_id=employee_id).order_by(Order.id.desc()).all()
+       
+#         # Convert orders to a list of dictionaries with product details
+#         order_data = []
+#         for order in claimed_orders:
+#             order_items = OrderProduct.query.filter_by(order_id=order.id).all()
+#             products_with_quantity = []
+#             for order_item in order_items:
+#                 product = Product.query.get(order_item.product_id)
+#                 if product:
+#                     products_with_quantity.append({
+#                         "id": product.id,
+#                         "name": product.name,
+#                         "price": product.price,
+#                         "quantity": order_item.order_quantity,
+#                         "product_stock": product.product_stock,
+#                         "images": product.images
+#                     })
+            
+#             order_info = {
+#                 "id": order.id,
+#                 "user_id": order.user_id,
+#                 "total": order.total,
+#                 "status": order.status,
+#                 "products": products_with_quantity,
+#                 "created_at": order.created_at.isoformat(),
+#                 "arrive_by": order.arrive_by
+#             }
+#             order_data.append(order_info)
+#             # order_info = {
+#             #     "id": order.id,
+#             #     "user_id": order.user_id,
+#             #     "total": order.total,
+#             #     "status": order.status,
+#             #     "products": [
+#             #         {
+#             #             "id": item.product.id,
+#             #             "name": item.name,
+#             #             "price": item.price,
+#             #             "product_stock": item.product_stock
+#             #         } for item in order.order_items
+#             #     ],
+#             #     "created_at": order.created_at.isoformat()
+#             # }
+#             # order_data.append(order_info)
+       
+#         # Always return a successful response with an empty array if no orders are found
+#         return jsonify({
+#             'success': True,
+#             'orders': order_data
+#         }), 200
+
+
+#     except Exception as e:
+#         return jsonify({
+#             'success': False,
+#             'error': 'Failed to fetch claimed orders for employee',
+#             'message': str(e)
+#         }), 500
 
 
 @order_control_bp.route('/claim', methods=['POST'])
@@ -244,21 +352,6 @@ def get_order_details(order_id):
                 'error': 'Order not found'
             }), 404
 
-        # # Build the order info dictionary
-        # order_info = {
-        #     "id": order.id,
-        #     "user_id": order.user_id,
-        #     "total": order.total,
-        #     "status": order.status,
-        #     "products": [
-        #         {
-        #             "id": product.id,
-        #             "name": product.name,
-        #             "price": product.price,
-        #         } for product in order.products
-        #     ],
-        #     "created_at": order.created_at.isoformat()
-        # }
         # Get order items with quantities
         order_items = OrderProduct.query.filter_by(order_id=order.id).all()
         
@@ -266,12 +359,15 @@ def get_order_details(order_id):
         for order_item in order_items:
             product = Product.query.get(order_item.product_id)
             if product:
+                # Fetch image_ids from ImageProduct
+                image_ids = [ip.image_id for ip in ImageProduct.query.filter_by(product_id=product.id).all()]
+                
                 products_with_quantity.append({
                     "id": product.id,
                     "name": product.name,
                     "price": product.price,
                     "quantity": order_item.order_quantity,
-                    "images": product.images,
+                    "image_ids": image_ids,
                     "description": product.description,
                     "brand": product.brand
                 })
@@ -284,7 +380,7 @@ def get_order_details(order_id):
             "status": order.status,
             "products": products_with_quantity,
             "created_at": order.created_at.isoformat(),
-            "arrive_by": order.arrive_by,
+            "arrive_by": order.arrive_by.isoformat() if order.arrive_by else None,
             "claimed_by_employee_id": order.claimed_by_employee_id
         }
 
@@ -294,13 +390,81 @@ def get_order_details(order_id):
             'order': order_info
         }), 200
 
-
     except Exception as e:
+        print(f"Error fetching order details for order {order_id}: {str(e)}", file=sys.stderr)
         return jsonify({
             'success': False,
             'error': 'Failed to fetch order details',
             'message': str(e)
         }), 500
+
+# def get_order_details(order_id):
+#     try:
+#         # Fetch the order by its ID
+#         order = Order.query.get(order_id)
+#         if not order:
+#             return jsonify({
+#                 'success': False,
+#                 'error': 'Order not found'
+#             }), 404
+
+#         # # Build the order info dictionary
+#         # order_info = {
+#         #     "id": order.id,
+#         #     "user_id": order.user_id,
+#         #     "total": order.total,
+#         #     "status": order.status,
+#         #     "products": [
+#         #         {
+#         #             "id": product.id,
+#         #             "name": product.name,
+#         #             "price": product.price,
+#         #         } for product in order.products
+#         #     ],
+#         #     "created_at": order.created_at.isoformat()
+#         # }
+#         # Get order items with quantities
+#         order_items = OrderProduct.query.filter_by(order_id=order.id).all()
+        
+#         products_with_quantity = []
+#         for order_item in order_items:
+#             product = Product.query.get(order_item.product_id)
+#             if product:
+#                 products_with_quantity.append({
+#                     "id": product.id,
+#                     "name": product.name,
+#                     "price": product.price,
+#                     "quantity": order_item.order_quantity,
+#                     "images": product.images,
+#                     "description": product.description,
+#                     "brand": product.brand
+#                 })
+        
+#         # Build the order info dictionary
+#         order_info = {
+#             "id": order.id,
+#             "user_id": order.user_id,
+#             "total": order.total,
+#             "status": order.status,
+#             "products": products_with_quantity,
+#             "created_at": order.created_at.isoformat(),
+#             "arrive_by": order.arrive_by,
+#             "claimed_by_employee_id": order.claimed_by_employee_id
+#         }
+
+#         # Return the order details
+#         return jsonify({
+#             'success': True,
+#             'order': order_info
+#         }), 200
+
+
+#     except Exception as e:
+#         return jsonify({
+#             'success': False,
+#             'error': 'Failed to fetch order details',
+#             'message': str(e)
+#         }), 500
 
 @order_control_bp.route('/confirm', methods=['POST'])
 def confirm_order():
@@ -324,7 +488,7 @@ def confirm_order():
                     }), 404    
     
     # Ensure the order is in the claimed state before confirming
-    if order.status != 'working':
+    if (order.status == 'unclaimed'):
         return jsonify({"error": "Order is not in a claimed state"}), 400
     
     # Update the order status to 'confirmed'

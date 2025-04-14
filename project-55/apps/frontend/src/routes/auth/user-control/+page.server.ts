@@ -5,7 +5,10 @@ import type { UserType } from '$lib/types/UserTypes.js';
 
 export const load = async ({ locals, fetch }) => {
 
-    if (!locals.user || locals.user.user_type !== 'admin') {
+    //Checks if User is Logged in
+    if (!locals.user) {throw redirect(302, '/auth/login');}
+
+    if (locals.user.user_type !== 'admin') {
         throw redirect(302, '/'); 
     }
 
