@@ -57,7 +57,7 @@
 		<!-- Winter Sale Banner: Only shows if not dismissed -->
 		{#if showClickable}
 			<div class="w-full bg-primary-500 text-white flex justify-between items-center py-1 text-lg">
-				<span class="flex-grow text-center">Save up to 25% on our winter sale!</span>
+				<span class="flex-grow text-center">Save up to 25% on our spring sale!</span>
 				<button class="text-white mr-4 z-[3]" on:click={dismissWinterSale}>
 					<i class="fa-regular fa-x"></i>
 				</button>

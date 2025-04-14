@@ -10,7 +10,7 @@
   const isInStock = product.product_stock > 0;
 </script>
 
-<div class="w-full max-w-md bg-white text-black border border-gray-300 rounded-lg shadow-lg p-4 hover:shadow-xl transition duration-200">
+<div class="w-full max-w-md bg-white dark:bg-black rounded-lg shadow-lg p-4 hover:shadow-xl transition duration-200">
   <!-- Product Image -->
   <div class="w-full h-64 bg-gray-100 rounded-lg overflow-hidden mb-4 cursor-pointer" on:click={() => onProductSelect && onProductSelect(product)}>
     <img src={product.image_urls[0]} alt={product.name} class="w-full h-full object-cover transition duration-200 hover:scale-105" />
@@ -19,8 +19,8 @@
   <!-- Product Details -->
   <div class="flex flex-col space-y-1">
     <h2 class="text-xl font-semibold">{product.name}</h2>
-    <p class="text-sm text-gray-600">by <span class="font-medium">{product.brand}</span> · <span class="italic">{product.product_type}</span></p>
-    <p class="text-sm text-gray-700 truncate">{product.description}</p>
+    <p class="text-sm dark:text-gray-400 text-gray-600">by <span class="font-medium">{product.brand}</span> · <span class="italic">{product.product_type}</span></p>
+    <p class="text-sm dark:text-gray-500 text-gray-500 truncate">{product.description}</p>
 
     <!-- Options -->
     {#if product.options && product.options.length > 0}
@@ -28,7 +28,7 @@
         <p class="text-sm font-semibold mb-1">Options:</p>
         <div class="flex flex-wrap gap-2">
           {#each product.options as option}
-            <span class="px-2 py-1 bg-gray-200 rounded text-xs">{option}</span>
+            <span class="px-2 py-1 bg-gray-200 dark:bg-gray-800 rounded text-xs">{option}</span>
           {/each}
         </div>
       </div>
@@ -45,7 +45,7 @@
 <!-- Add to Cart Button -->
 <div class="mt-4">
   <button 
-    class="w-full bg-red-600 text-white font-semibold py-2 rounded hover:bg-red-700 transition"
+    class="w-full bg-primary-500 text-white font-semibold py-2 rounded hover:bg-primary-600 transition"
     on:click={() => addToOrder(product)}
     disabled={!isLoggedIn || !isInStock}
   >

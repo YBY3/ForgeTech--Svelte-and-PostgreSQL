@@ -15,7 +15,7 @@
 
     onMount(() => {
         if (data.products) {
-            featuredProduct = data.products[0];
+            featuredProduct = data.products.find(p => p.name.includes("3090")) ?? data.products[0];
         }
         if (data.isLoggedIn) {
             isLoggedIn = data.isLoggedIn;
@@ -87,7 +87,7 @@
                 <br>
                 <h2 class="text-2xl font-semibold text-white-900 font-bold text-center text-white">{featuredProduct.name}</h2>
                 <br>
-                <!-- <h1 class="text-2xl sm:text-4xl font-bold text-center text-white">Unleash powerful graphics for gamers and creators.</h1> -->
+                <h1 class="text-2xl sm:text-4xl font-bold text-center text-white">Unleash powerful graphics for gamers and creators.</h1> 
                 <br>
                 <div class="flex lg:flex-row flex-col items-center justify-center gap-x-6">
                     <div class="w-full lg:w-1/2 [@media(min-width:2000px)]:ml-32 [@media(min-width:2400px)]:ml-96">
@@ -100,8 +100,17 @@
                     <div class="flex-1 p-6 rounded-lg w-full [@media(min-width:2000px)]:-ml-32 [@media(min-width:2400px)]:-ml-64 text-white">
                         <!-- The image is not working right now in the backend, will fix this later -->
                         <!-- <img src="{featuredProduct.image}" alt="{featuredProduct.name}" class="max-w-full h-auto rounded-lg shadow-md mt-3" /> -->
+                        <p class="mt-2"><span class="text-primary-500 text-3xl font-bold">Unmatched Performance</span><br>
+                            Experience smooth, lifelike visuals with cutting-edge ray tracing technology.</p>
+                        <br>
+                        <p class="mt-2"><span class="text-primary-500 text-3xl font-bold">Effortless Rendering</span><br>
+                            Seamlessly bring your world to life with unmatched graphics power and optimization.</p>
+                        <br>
+                        <p class="mt-2"><span class="text-primary-500 text-3xl font-bold">Gaming at the Edge</span><br>
+                            Elevate your experience with blazing-fast cores and AI-driven performance.</p>
+                        <!--<br>
                         <p class="mt-2"><br>
-                            {featuredProduct.description}</p>
+                            {featuredProduct.description}</p>-->
                         <br>
                         <div class="flex gap-2 items-center">
                             <div class="border-2 border-white py-2 px-6 rounded-lg inline-block"><p class="text-lg font-bold">${featuredProduct.price}</p></div>
