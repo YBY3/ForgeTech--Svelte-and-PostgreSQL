@@ -6,7 +6,7 @@ import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ url, fetch, locals }) => {
   // Only allow employee users.
-  if (!locals.user || locals.user.user_type !== 'employee') {
+  if (!locals.user || locals.user.user_type !== 'employee' && locals.user.user_type !== 'admin') {
     throw redirect(302, '/auth/login');
   }
 

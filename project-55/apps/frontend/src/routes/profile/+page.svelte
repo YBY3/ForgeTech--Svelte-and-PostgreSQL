@@ -21,7 +21,7 @@
 	let activeEmployees: any[] = [];
 	let allRecentOrders: PastOrderType[] = [];
 
-	
+
 	// Page Elements (Toast Notifications)
 	const toastStore = getToastStore();
 
@@ -30,36 +30,40 @@
 			userData = data.user;
 			isEmployee = userData.user_type === 'employee'; // Check if user is employee
 			isAdmin = userData.user_type === 'admin';
-			isCustomer = userData.user_type == 'customer'
-		}
-		// If employee/Admin, use claimedOrders; otherwise, use pastOrders
-		if ((isEmployee || isAdmin) && data.claimedOrders) {
-			pastOrders = data.claimedOrders.sort((a, b) => b.id - a.id);
-		} else if (data.pastOrders) {
-			pastOrders = data.pastOrders.sort((a, b) => b.id - a.id);
+			isCustomer = userData.user_type == 'customer';
 		}
 
-		// Shows 3 most recent registered users and 2 most recent active employees
+		// For employees/Admin, use claimedOrders sorted from earliest to latest
+		if ((isEmployee || isAdmin) && data.claimedOrders) {
+			pastOrders = data.claimedOrders.sort(
+				(a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+			);
+		} else if (data.pastOrders) {
+			// For customers, sort pastOrders similarly (earliest to latest)
+			pastOrders = data.pastOrders.sort(
+				(a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+			);
+		}
+
+		// For admin dashboard, if desired: sort recentUsers and activeEmployees by the desired date property.
 		if (isAdmin && (data as any).recentUsers) {
 			recentUsers = (data as any).recentUsers
-			.sort((a: any, b: any) => new Date(b.registered_by).getTime() - new Date(a.registered_by).getTime())
-			.slice(0, 3);
-			console.log('Recent users after sorting and slicing:', recentUsers);
-
-			// Filter from the same array but for only employees, then sort by active_by and take the top two.
+				.sort((a: any, b: any) => new Date(a.registered_by).getTime() - new Date(b.registered_by).getTime())
+				.slice(0, 3);
+			// For activeEmployees, sort by active_by in descending order (most recent active first)
 			activeEmployees = (data as any).recentUsers
 				.filter((user: any) => user.user_type === 'employee')
 				.sort((a: any, b: any) => new Date(b.active_by).getTime() - new Date(a.active_by).getTime())
 				.slice(0, 2);
-			console.log('Active employees after filtering, sorting, slicing:', activeEmployees);
+			//console.log('Active employees after filtering, sorting, slicing:', activeEmployees);
 		}
 
-		// Process all orders and take the five most recent ones
+		// For the admin section showing recent orders, you might want to show the earliest of the recent ones:
 		if (isAdmin && (data as any).orders) {
 			allRecentOrders = ((data as any).orders as PastOrderType[])
-				.sort((a: PastOrderType, b: PastOrderType) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+				.sort((a: PastOrderType, b: PastOrderType) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
 				.slice(0, 5);
-			console.log('Recent orders:', allRecentOrders);
+			//console.log('Recent orders:', allRecentOrders);
 		}
 
 		if (data.error) {
@@ -69,7 +73,7 @@
 			});
 		}
 	});
-
+	
 </script>
 
 {#if userData} 
@@ -108,7 +112,7 @@
 		{#if isAdmin} 
 		<!-- this section would have the three most recent registered users, 
 		two most recently active employees, and five most recently placed orders -->
-		
+
 		<div class="flex flex-col items-center mt-8">
 			<h1 class="text-2xl font-semibold">Administrator Dashboard</h1>
 			<p class="text-lg text-gray-700">Additional Administrative Information:</p>
@@ -170,7 +174,7 @@
 		{#if isEmployee || isAdmin}
 		<div class="flex flex-col items-center">
 			<h1 class="text-2xl font-semibold">Orders Dashboard</h1>
-			<p class="text-lg text-gray-700">Welcome, {userData.name}! You can see your claimed orders here.</p>
+			<p class="text-lg text-gray-700">Welcome, {userData.name}! Here are your claimed orders, sorted from earliest to latest.</p>
 
 			<!-- Display claimed orders -->
 			<div class="mt-4 p-4 border border-gray-300 rounded-lg w-full max-w-lg">
