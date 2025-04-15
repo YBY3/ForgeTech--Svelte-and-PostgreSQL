@@ -1,5 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { getFlaskURL } from '$lib/api';
+import { getFlaskURL, getImageURL } from '$lib/api';
 import type { RawProductType, ProductType } from '$lib/types/ProductTypes.js';
 
 export const load = async ({ locals, fetch }) => {
@@ -30,7 +30,7 @@ export const load = async ({ locals, fetch }) => {
                 .filter((product: RawProductType) => product.product_type === "STORAGE")
                 .map((product: RawProductType) => ({
                     ...product,
-                    image_urls: product.image_ids.map(id => `${getFlaskURL()}/api/images/${id}`)
+                    image_urls: product.image_ids.map(id => `${getImageURL()}/api/images/${id}`)
                 }));
         }
 
