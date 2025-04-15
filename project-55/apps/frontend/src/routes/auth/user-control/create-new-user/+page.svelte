@@ -70,7 +70,7 @@
 </script>
 
 
-<div class="p-5 bg-cover bg-center h-[300px]" style="background-image: url('/login-pics/loginBack.jpg');"></div>
+<div class="p-5 bg-cover bg-center h-[300px]" style="background-image: url('/misc/backdrop.jpg');"></div>
 
 <div class="p-4">
 	<div class="mx-4 md:mx-auto max-w-lg -mt-48 bg-surface-200 dark:bg-surface-700 shadow-lg rounded-lg">
@@ -116,7 +116,6 @@
                     <label for="email" class="block text-sm font-medium text-on-surface">Email address</label>
                     <input 
                         type="text"
-                        pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
                         id="email" 
                         name="email"
                         required
@@ -165,7 +164,7 @@
 
                 <div class="flex gap-10px justify-between gap-x-10">
                     <div>
-                        <a href="/user-manager"><button class="px-10 py-2 rounded-lg border-2 border-primary-700 hover:bg-primary-700 transition-all duration-300 transform hover:scale-105 text-center hover:text-white">
+                        <a href="/auth/user-control"><button class="px-10 py-2 rounded-lg border-2 border-primary-700 hover:bg-primary-700 transition-all duration-300 transform hover:scale-105 text-center hover:text-white">
                             <i class="fa-solid fa-x"></i> Cancel
                         </button></a>
                     </div>
