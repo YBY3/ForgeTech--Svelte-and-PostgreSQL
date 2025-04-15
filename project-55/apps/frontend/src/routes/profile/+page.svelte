@@ -61,10 +61,11 @@
 		// For the admin section showing recent orders, you might want to show the earliest of the recent ones:
 		if (isAdmin && (data as any).orders) {
 			allRecentOrders = ((data as any).orders as PastOrderType[])
-				.sort((a: PastOrderType, b: PastOrderType) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-				.slice(0, 5);
-			//console.log('Recent orders:', allRecentOrders);
+			.sort((a: PastOrderType, b: PastOrderType) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+			.slice(0, 5);
+			// console.log('Recent orders:', allRecentOrders);
 		}
+
 
 		if (data.error) {
 			toastStore.trigger({

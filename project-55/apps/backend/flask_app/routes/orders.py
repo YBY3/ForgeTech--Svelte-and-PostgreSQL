@@ -244,12 +244,11 @@ def get_orders():
         all_orders = Order.query.order_by(Order.id.asc()).all()
         print("DEBUG: getOrders retrieved:", all_orders)
 
-
-        # If no orders are found, return an error or empty list (here we mimic get_all_orders)
+        # If no orders are found, return an empty list or an error message
         if not all_orders:
             return jsonify({
                 'success': False,
-                'error': 'No unclaimed orders found'
+                'error': 'No orders found'
             }), 404
 
         # Convert orders to a list of dictionaries with product details
@@ -261,12 +260,14 @@ def get_orders():
             for order_item in order_items:
                 product = Product.query.get(order_item.product_id)
                 if product:
+                    # Instead of product.image_ids, query the ImageProduct table.
+                    image_ids = [ip.image_id for ip in ImageProduct.query.filter_by(product_id=product.id).all()]
                     products_with_quantity.append({
                         "id": product.id,
                         "name": product.name,
                         "price": product.price,
                         "quantity": order_item.order_quantity,
-                        "image_ids": product.image_ids
+                        "image_ids": image_ids
                     })
             
             order_info = {
@@ -276,7 +277,7 @@ def get_orders():
                 "status": order.status,
                 "products": products_with_quantity,
                 "created_at": order.created_at.isoformat(),
-                "arrive_by": order.arrive_by
+                "arrive_by": order.arrive_by.isoformat() if order.arrive_by else None
             }
             order_data.append(order_info)
 
@@ -289,9 +290,10 @@ def get_orders():
     except Exception as e:
         return jsonify({
             'success': False,
-            'error': 'Failed to fetch unclaimed orders',
+            'error': 'Failed to fetch orders',
             'message': str(e)
         }), 500
+
     
 
 
