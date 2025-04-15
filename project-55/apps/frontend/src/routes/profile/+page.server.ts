@@ -1,7 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import { getFlaskURL } from '$lib/api';
 import type { PastOrderType } from '$lib/types/OrderTypes';
-import type { UserType } from '$lib/types/UserTypes';
 
 export const load = async ({ locals, fetch }) => {
   // Redirect if the user is not logged in
@@ -46,16 +45,43 @@ export const load = async ({ locals, fetch }) => {
       error = 'Could not load unclaimed orders';
     }
 
+    //Fetch Claimed Orders 
+    let claimedOrders: PastOrderType[] = [];
+
+    // Fetch claimed orders for the employee or admin
+    try {
+      const claimedEndpoint = `${getFlaskURL()}/api/ordersControl/employeeDashboard/${locals.user.id}`;
+      console.log("Requesting claimed orders from:", claimedEndpoint);
+      const claimedRes = await fetch(claimedEndpoint, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      console.log("Claimed orders response status:", claimedRes.status);
+      const claimedData = await claimedRes.json();
+      console.log("Claimed orders data received:", claimedData);
+      if (claimedRes.ok) {
+        claimedOrders = claimedData.orders as PastOrderType[];
+      } else {
+        console.error("Error fetching claimed orders:", claimedData.error);
+      }
+    } catch (error) {
+      console.error("Failed to load claimed orders:", error);
+    }
+
     return { 
       user: locals.user, 
       recentUsers: (locals as any).recentUsers, // Attach all users here
-      orders: allOrders  // Attach all orders here
+      orders: allOrders,  // Attach all orders here
+      claimedOrders: claimedOrders
     };
     
-  } else if (locals.user.user_type === 'employee') {
+  } 
+  
+  if (locals.user.user_type === 'employee' || locals.user.user_type === 'admin') {
+
     let claimedOrders: PastOrderType[] = [];
     
-    // Fetch claimed orders for the employee
+    // Fetch claimed orders for the employee or admin
     try {
       const claimedEndpoint = `${getFlaskURL()}/api/ordersControl/employeeDashboard/${locals.user.id}`;
       console.log("Requesting claimed orders from:", claimedEndpoint);

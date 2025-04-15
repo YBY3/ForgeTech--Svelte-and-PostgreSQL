@@ -3,7 +3,7 @@
   <div class="flex flex-wrap gap-4 justify-center">
 
 <a
-  href="catalog\GPUs"
+  href="/catalog/GPUs"
   class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md divide-y overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
 >
   
@@ -27,7 +27,7 @@
 </a>
 
 <a
-  href="catalog\CPUs"
+  href="/catalog/CPUs"
   class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md divide-y overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
 >
   
@@ -51,7 +51,7 @@
 </a>
 
 <a
-  href="catalog\RAMs"
+  href="/catalog/RAMs"
   class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md divide-y overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
 >
   
@@ -74,9 +74,8 @@
   </footer>
 </a>
 
-
 <a
-  href="catalog\STORAGEs"
+  href="/catalog/STORAGEs"
   class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md divide-y overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
 >
   
@@ -100,7 +99,7 @@
 </a>
 
 <a
-  href="catalog\ALLPRODUCTs"
+  href="/catalog/ALLPRODUCTs"
   class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md divide-y overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
 >
   
