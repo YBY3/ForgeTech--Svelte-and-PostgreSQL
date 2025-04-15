@@ -22,12 +22,6 @@
         }
     });
 
-     // Function to handle login
-    function handleLogin() {
-        // Show the alert with the message when login is clicked
-        visible = true;
-    }
-
   </script>
 
   
@@ -35,12 +29,20 @@
   <div class="h-full bg-background flex flex-col items-center overflow-y-auto overflow-x-hidden scroll-smooth">
     
     <div class="relative w-full h-full"> 
-    <img class="absolute top-0 left-0 w-full h-full object-contain object-[85%] z-[-1] hidden xl:block" src="LandingPage-pic/gpu.png" alt="GPU Image">
+    <img 
+        class="absolute top-0 left-0 w-full h-full object-contain object-[85%] z-[-1] hidden xl:block" 
+        src="misc/gpu.png" 
+        alt="Sample GPU"
+    >
     <div class="z-[-2] absolute top-[47%] left-[70%] -translate-x-1/2 -translate-y-1/2 w-[30rem] h-[30rem] bg-primary-500 rounded-full blur-3xl opacity-30 animate-pulse hidden xl:block"></div>
 
 
     <div class="flex flex-col items-center md:text-left md:items-start space-x-4 sm:space-x-6 md:space-x-8 space-y-2 px-0 md:px-16 xl:px-32 mt-8 md:mt-32 mb-32">
-        <img src="LandingPage-pic/Logo Icon.png" class="w-24 sm:w-24 md:w-32">
+        <img 
+            class="w-24 sm:w-24 md:w-32" 
+            src="forgetech_logos/small.png" 
+            alt="ForgeTech Logo"
+        >
         <h1 class="[@media(max-width:430px)]:text-3xl text-5xl sm:text-6xl md:text-6xl font-bold">
             <span class="text-primary-500">Forge</span> power.
         </h1>
@@ -191,12 +193,12 @@
 <h1 class="text-4xl sm:text-6xl md:text-6xl font-bold text-center" id="partnersID">Our hardware partners</h1>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 items-center">
-    <div class="w-64"><img src="LandingPage-pic/nv.webp"></div>
-    <div class="w-64"><img src="LandingPage-pic/evga-logo.png"></div>
-    <div class="w-64"><img src="LandingPage-pic/AMDNORM.webp"></div>
-    <div class="w-64"><img src="LandingPage-pic/MSI-Logo.png"></div>
-    <div class="w-64"><img src="LandingPage-pic/GIGA.png"></div>
-    <div class="w-64"><img src="LandingPage-pic/intel.png"></div>
+    <div class="w-64"><img src="brands/nvidia.webp" alt="nvidia Logo"></div>
+    <div class="w-64"><img src="brands/evga.png" alt="evga Logo"></div>
+    <div class="w-64"><img src="brands/amd.webp" alt="amd Logo"></div>
+    <div class="w-64"><img src="brands/msi.png" alt="msi Logo"></div>
+    <div class="w-64"><img src="brands/gigabyte.png" alt="gigabyte Logo"></div>
+    <div class="w-64"><img src="brands/intel.png" alt="intel Logo"></div>
     </div>
 <br>
 <br>
@@ -222,7 +224,11 @@
         </div> 
         
             <div class="p-2">
-            <img class ="w-96 rounded-full"src="leo-pics/leo-cropped.png">
+            <img 
+                class ="w-96 rounded-full"
+                src="leo-pics/leo-cropped.png"
+                alt="LEO"
+            >
             </div>
 
         </div>

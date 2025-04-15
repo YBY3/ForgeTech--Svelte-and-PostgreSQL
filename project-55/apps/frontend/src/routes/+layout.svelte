@@ -70,12 +70,12 @@
 			<svelte:fragment slot="lead">
 				<a href="/">
 					<img 
-						src="LandingPage-pic/Logo Icon.png"
-						alt="Logo" 
+						src="/forgetech_logos/small.png"
+						alt="Small Logo" 
 						class="w-[70px] mb-[2px] mr-5 block md:hidden" />
 					<img 
-						src="/FT.png" 
-						alt="Logo" 
+						src="/forgetech_logos/large.png" 
+						alt="Large Logo" 
 						class="w-[220px] mb-[2px] mr-5 hidden md:block" />
 				</a>
 			</svelte:fragment>

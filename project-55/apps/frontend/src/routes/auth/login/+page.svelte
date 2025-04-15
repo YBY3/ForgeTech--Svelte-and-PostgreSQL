@@ -61,7 +61,7 @@
 
 <div class="text-center">
     <!-- Background image -->
-    <div class="p-5 bg-cover bg-center h-[300px]" style="background-image: url('/login-pics/loginBack.jpg');"></div>
+    <div class="p-5 bg-cover bg-center h-[300px]" style="background-image: url('/misc/backdrop.jpg');"></div>
 
     <!-- Login Card -->
     <div class="mx-4 md:mx-auto max-w-lg -mt-24 bg-surface-200 dark:bg-surface-700 shadow-lg rounded-lg">

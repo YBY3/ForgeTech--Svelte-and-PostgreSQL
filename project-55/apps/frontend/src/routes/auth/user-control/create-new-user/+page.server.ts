@@ -3,9 +3,11 @@ import { getFlaskURL } from '$lib/api';
 
 
 export const load = async ({ locals }) => {
-    if (!locals.user || locals.user.user_type !== 'admin') {
-        throw redirect(302, '/'); 
-    }
+    //Checks if User is Logged In
+    if (!locals.user) {throw redirect(302, '/auth/login');}
+
+    //Checks if User is a "admin"
+    else if (locals.user.user_type != "admin") {throw redirect(302, '/')}
 }
 
 

@@ -71,7 +71,7 @@
 </script>
 
 <!-- Background image -->
-<div class="p-5 bg-cover bg-center h-[300px]" style="background-image: url('/login-pics/loginBack.jpg');"></div>
+<div class="p-5 bg-cover bg-center h-[300px]" style="background-image: url('/misc/backdrop.jpg');"></div>
 
 <!-- Form Card -->
 <div class="p-4 text-center">
@@ -123,7 +123,6 @@
 					<label for="email" class="block text-sm font-medium text-on-surface">Email address</label>
 					<input 
 						type="text"
-						pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
 						id="email" 
 						name="email"
 						required

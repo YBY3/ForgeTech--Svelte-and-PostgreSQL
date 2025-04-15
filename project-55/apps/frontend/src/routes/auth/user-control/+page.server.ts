@@ -5,32 +5,35 @@ import type { UserType } from '$lib/types/UserTypes.js';
 
 export const load = async ({ locals, fetch }) => {
 
-    //Checks if User is Logged in
+    //Checks if User is Logged In
     if (!locals.user) {throw redirect(302, '/auth/login');}
 
-    if (locals.user.user_type !== 'admin') {
-        throw redirect(302, '/'); 
-    }
+    //Checks if User is a "admin"
+    else if (locals.user.user_type == "admin") {
 
-    try {
-        const response = await fetch(`${getFlaskURL()}/api/users/get_users`);
+        try {
+            const response = await fetch(`${getFlaskURL()}/api/users/get_users`);
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch users');
+            if (!response.ok) {
+                throw new Error('Failed to fetch users');
+            }
+            const users: UserType[] = await response.json();
+            const localUser: UserType = locals.user;
+            
+            return {
+                localUser: localUser,
+                user: locals.user ?? null,
+                users: users 
+            };
+        } 
+        catch (error) {
+            console.error('Error fetching users:', error);
+            return { user: locals.user ?? null, users: [] };
         }
-        const users: UserType[] = await response.json();
-        const localUser: UserType = locals.user;
-        
-        return {
-            localUser: localUser,
-            user: locals.user ?? null,
-            users: users 
-        };
-    } 
-    
-    catch (error) {
-        console.error('Error fetching users:', error);
-        return { user: locals.user ?? null, users: [] };
+
+    }
+    else {
+        throw redirect(302, '/')
     }
 };
 

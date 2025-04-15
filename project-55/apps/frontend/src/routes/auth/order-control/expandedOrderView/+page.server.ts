@@ -5,38 +5,45 @@ import type { PastOrderType } from '$lib/types/OrderTypes';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ url, fetch, locals }) => {
-  // Only allow employee users.
-  if (!locals.user || locals.user.user_type !== 'employee') {
-    throw redirect(302, '/auth/login');
-  }
 
-  // Get the order ID from query parameters.
-  const orderId = url.searchParams.get('orderId');
-  if (!orderId) {
-    return { error: 'No order ID provided' };
-  }
+  //Checks if User is Logged In
+  if (!locals.user) {throw redirect(302, '/auth/login');}
 
-  let order: PastOrderType | null = null;
-  let error: string | undefined = undefined;
+  //Checks if User is a "employee" or "admin"
+  else if (locals.user.user_type == "employee" || locals.user.user_type == "admin") {
 
-  try {
-    const apiUrl = `${getFlaskURL()}/api/ordersControl/orderDetails/${orderId}`;
-    const res = await fetch(apiUrl, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    });
-    const data = await res.json();
-    if (res.ok && data.success) {
-      order = data.order as PastOrderType;
-    } else {
-      error = data.error || 'Failed to load order details';
+    // Get the order ID from query parameters.
+    const orderId = url.searchParams.get('orderId');
+    if (!orderId) {
+      return { error: 'No order ID provided' };
     }
-  } catch (err) {
-    error = 'Could not load order details';
-    console.error("Error fetching order details:", err);
-  }
 
-  return { user: locals.user, order, error };
+    let order: PastOrderType | null = null;
+    let error: string | undefined = undefined;
+
+    try {
+      const apiUrl = `${getFlaskURL()}/api/ordersControl/orderDetails/${orderId}`;
+      const res = await fetch(apiUrl, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        order = data.order as PastOrderType;
+      } else {
+        error = data.error || 'Failed to load order details';
+      }
+    } catch (err) {
+      error = 'Could not load order details';
+      console.error("Error fetching order details:", err);
+    }
+
+    return { user: locals.user, order, error };
+    
+  }
+  else {
+    throw redirect(302, '/')
+  }
 };
 
 export const actions: Actions = {
