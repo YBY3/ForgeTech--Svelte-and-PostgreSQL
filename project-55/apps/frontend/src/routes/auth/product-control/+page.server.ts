@@ -1,43 +1,49 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { getFlaskURL } from '$lib/api';
+import { getFlaskURL, getImageURL } from '$lib/api';
 import type { RawProductType, ProductType } from '$lib/types/ProductTypes.js';
 
 
 export const load = async ({ locals, fetch }) => {
-    //Checks if User is Logged in
+    //Checks if User is Logged In
     if (!locals.user) {throw redirect(302, '/auth/login');}
+
     //Checks if User is a "employee" or "admin"
-    else if (locals.user.user_type != "employee" && locals.user.user_type != "admin") {throw redirect(302, '/')}
+    else if (locals.user.user_type == "employee" || locals.user.user_type == "admin") {
 
-    try {
-        //Fetch All Products
-        const flaskResponse = await fetch(`${getFlaskURL()}/api/products/get_all_products`);
-        
-        const responseData = await flaskResponse.json();
+        try {
+            //Fetch All Products
+            const flaskResponse = await fetch(`${getFlaskURL()}/api/products/get_all_products`);
+            
+            const responseData = await flaskResponse.json();
 
-        if (!flaskResponse.ok) {
-            console.error('Editing Product Failed:', responseData.error );
-            if (responseData.message) {
-                console.error('Error:', responseData.message );
+            if (!flaskResponse.ok) {
+                console.error('Editing Product Failed:', responseData.error );
+                if (responseData.message) {
+                    console.error('Error:', responseData.message );
+                }
+                return fail(flaskResponse.status, responseData);
             }
-            return fail(flaskResponse.status, responseData);
+
+            let productData: ProductType[] = [];
+
+            if (responseData.data.length > 0) {
+                //Convert Image IDs to Image URLs
+                productData = responseData.data.map((product: RawProductType) => ({
+                    ...product,
+                    image_urls: product.image_ids.map(id => `${getImageURL()}/api/images/${id}`)
+                }));
+            }
+
+            return { products: productData };
+        } 
+        catch (error) {
+            console.error('Error Fetching Products:', error);
+            return { products: [] as ProductType[] };
         }
 
-        let productData: ProductType[] = [];
-
-        if (responseData.data.length > 0) {
-            //Convert Image IDs to Image URLs
-            productData = responseData.data.map((product: RawProductType) => ({
-                ...product,
-                image_urls: product.image_ids.map(id => `${getFlaskURL()}/api/images/${id}`)
-            }));
-        }
-
-        return { products: productData };
-    } 
-    catch (error) {
-        console.error('Error Fetching Products:', error);
-        return { products: [] as ProductType[] };
+    }
+    else {
+        throw redirect(302, '/')
     }
 };
 
@@ -93,7 +99,7 @@ export const actions = {
             // Get Updated Image URLs
             let image_urls: string[] = [];
             if (responseData.image_ids && responseData.image_ids.length > 0) {
-                image_urls = responseData.image_ids.map((id: number) => `${getFlaskURL()}/api/images/${id}`);
+                image_urls = responseData.image_ids.map((id: number) => `${getImageURL()}/api/images/${id}`);
             }
 
             return { success: true, image_ids: responseData.image_ids, image_urls: image_urls };
@@ -156,7 +162,7 @@ export const actions = {
             // Get Updated Image URLs
             let image_urls: string[] = [];
             if (responseData.image_ids && responseData.image_ids.length > 0) {
-                image_urls = responseData.image_ids.map((id: number) => `${getFlaskURL()}/api/images/${id}`);
+                image_urls = responseData.image_ids.map((id: number) => `${getImageURL()}/api/images/${id}`);
             }
 
             return { success: true, product_id: product_id, image_ids: responseData.image_ids, image_urls: image_urls };
