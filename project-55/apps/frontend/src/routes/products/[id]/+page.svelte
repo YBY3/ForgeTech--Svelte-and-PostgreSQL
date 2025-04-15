@@ -3,10 +3,12 @@
     import type { ProductType } from '$lib/types/ProductTypes';
     import { addToOrder } from "$lib/stores/OrdersStore";
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
     export let isLoggedIn = false;
     export let data: {
-		 user: any; product: ProductType, isLoggedIn: boolean 
+		 user: any; product: ProductType, isLoggedIn: boolean, productData: ProductType[] 
     };
+    let relatedProducts: ProductType[] = [];
 
     const isInStock = data.product.product_stock > 0;
 
@@ -14,18 +16,24 @@
       if (data.user) {
         isLoggedIn = true;
       }
-      
+
+      data.productData.filter
+      relatedProducts = data.productData.filter(
+    (item) => item.product_type === data.product.product_type && item.id !== data.product.id
+  );
     });
 
   </script>
   
-<div class="items-center justify-center">
-  <div class="flex md:flex-row flex-col items-center justify-center p-8 gap-x-6">
+<div class="items-center justify-center px-2">
+    <br>
+  <div class="flex md:flex-row flex-col items-center justify-center p-8 gap-x-6 bg-white dark:bg-black rounded-xl">
 
-    <div class="w-full lg:w-1/2">
-        <img src={data.product.image_urls[0]}>
+    <div class="w-full md:w-1/2">
+        <img class="rounded-xl border-2 dark:border-white border-black" src={data.product.image_urls[0]}>
     </div>
-    <div class="flex flex-col space-y-1">
+    <br>
+    <div class="flex flex-col space-y-1 md:w-1/2 w-full">
         <h1 class="text-lg sm:text-2xl md:text-4xl font-semibold">{data.product.name}</h1>
         <p class="text-md sm:text-lg md:text-xl dark:text-gray-400 text-gray-600">by <span class="font-medium">{data.product.brand}</span> · <span class="italic">{data.product.product_type}</span></p>
         <p class="text-md dark:text-gray-500 text-gray-500 truncate">{data.product.description}</p>
@@ -58,4 +66,19 @@
         </button>
     </div>
   </div>
+  <div>
+    <br>
+    <p class="text-4xl text-center font-bold">Related Items</p>
+  </div>
+  <br>
+  <hr class="border-t border-white w-full w-3/4 mx-auto">
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
+    {#each relatedProducts as product}
+      <ProductCard 
+      product={product} 
+      onProductSelect={(product) => window.location.href = `/products/${product.id}`}
+      isLoggedIn={isLoggedIn}
+      />
+    {/each}
+  </div>  
 </div>

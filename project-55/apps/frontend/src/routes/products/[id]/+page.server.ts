@@ -24,12 +24,22 @@ export const load = async ({ params, locals, fetch }) => {
             image_urls: rawProduct.image_ids.map(id => `${getFlaskURL()}/api/images/${id}`)
         };
 
+        let productData: ProductType[] = [];
+
+        if (responseData.data.length > 0) {
+            //Convert Image IDs to Image URLs
+            productData = responseData.data.map((product: RawProductType) => ({
+                ...product,
+                image_urls: product.image_ids.map(id => `${getFlaskURL()}/api/images/${id}`)
+            }));
+        }
+
         let isLoggedIn = false;
         if (locals.user) {
             isLoggedIn = true;
         }
 
-        return { product, isLoggedIn };
+        return { product, isLoggedIn, productData };
     } catch (err) {
         console.error('Error loading product detail:', err);
         throw error(500, 'Failed to load product detail');
