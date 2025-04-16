@@ -15,8 +15,8 @@
     let productView = false;
     let isLoggedIn = false;
   
-    const gpuProducts = derived(productsStore, ($products) =>
-    $products.filter(p => p.product_type === 'GPU')
+    const BOARDProducts = derived(productsStore, ($products) =>
+    $products.filter(p => p.product_type === 'MOTHERBOARD')
     );
     
     onMount(() => {
@@ -39,7 +39,7 @@
     }
   </script>
   
-  {#if $gpuProducts}
+  {#if $BOARDProducts}
   {#if catalogView}
     <div class="flex flex-col items-center w-full h-full overflow-y-auto">
       
@@ -51,7 +51,7 @@
       <br>
       <!-- Catalog Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
-        {#each $gpuProducts as product}
+        {#each $BOARDProducts as product}
           <ProductCard 
           product={product} 
           onProductSelect={(product) => goto(`/products/${product.id}`)} 

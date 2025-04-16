@@ -45,15 +45,15 @@
 	});
 </script>
   
-<div class="items-center justify-center px-2">
+<div class="items-center justify-center bg-white dark:bg-black">
 	<br>
-	<div class="flex md:flex-row flex-col items-center justify-center p-8 gap-x-6 bg-white dark:bg-black rounded-xl">
+	<div class="flex md:flex-row flex-col items-center justify-center p-4 gap-x-6">
   
 		<!-- Image container with slider functionality -->
 		<div class="relative w-full md:w-1/2">
 			<!-- The following <img> tag has a style attribute that restricts its height -->
 			<img 
-				class="rounded-xl border-2 dark:border-white border-black" 
+				class="rounded-xl aspect-[21/12]" 
 				src={data.product.image_urls[currentImageIndex]}
 				style="max-height: 400px; width: 100%; object-fit: contain;" />
 			{#if data.product.image_urls && data.product.image_urls.length > 1}
@@ -61,13 +61,13 @@
 				<button 
 					on:click={previousImage}
 					style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; font-size: 2rem; cursor: pointer;">
-					◀
+					<i class="fa-solid fa-chevron-left"></i>
 				</button>
 				<!-- Right arrow button -->
 				<button 
 					on:click={nextImage}
 					style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; font-size: 2rem; cursor: pointer;">
-					▶
+					<i class="fa-solid fa-chevron-right"></i>
 				</button>
 			{/if}
 		</div>
@@ -77,7 +77,7 @@
 			<p class="text-md sm:text-lg md:text-xl dark:text-gray-400 text-gray-600">
 				by <span class="font-medium">{data.product.brand}</span> · <span class="italic">{data.product.product_type}</span>
 			</p>
-			<p class="text-md dark:text-gray-500 text-gray-500 truncate">{data.product.description}</p>
+			<p class="text-md dark:text-gray-500 text-gray-500">{data.product.description}</p>
 			<br>
 			{#if data.product.options && data.product.options.length > 0}
 				<div class="mt-2">
@@ -113,7 +113,6 @@
 		<p class="text-4xl text-center font-bold">Related Items</p>
 	</div>
 	<br>
-	<hr class="border-t border-white w-full w-3/4 mx-auto">
 	<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
 		{#each relatedProducts as product}
 			<ProductCard 
