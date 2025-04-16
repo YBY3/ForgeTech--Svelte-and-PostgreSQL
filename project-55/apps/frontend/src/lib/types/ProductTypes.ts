@@ -30,3 +30,11 @@ export type ProductPreviewType = {
     name: string;
     price: number;
 }
+
+
+export type ProductOrderPreviewType = {
+    id: number;
+    name: string;
+    price: number;
+    quantity: number;
+}

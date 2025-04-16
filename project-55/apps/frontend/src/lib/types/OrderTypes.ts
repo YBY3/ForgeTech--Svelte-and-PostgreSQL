@@ -1,9 +1,9 @@
-import type { ProductPreviewType } from "./ProductTypes";
+import type { ProductOrderPreviewType } from "./ProductTypes";
 
 export type OrderType = {
     id: number;
     user_id: number;
-    products: ProductPreviewType[]
+    products: ProductOrderPreviewType[]
     status: string;
     total: number;
     created_at: string;
