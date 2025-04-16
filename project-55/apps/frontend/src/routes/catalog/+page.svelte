@@ -1,17 +1,3 @@
-<script lang="ts">
-	import { onMount } from "svelte";
-
-  export let data;
-  let isLoggedIn = false;
-
-  onMount(() => {
-      if (data.user) {
-        isLoggedIn = true;
-      }
-    });
-</script>
-
-
 <div class="flex flex-col items-center w-full h-full overflow-y-auto px-4">
   <br>
   <div class="flex flex-wrap gap-4 justify-center">
@@ -112,9 +98,33 @@
   </footer>
 </a>
 
+<a
+  href="/catalog/COOLINGs"
+  class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
+>
+  
+  <header>
+    <img src="/catalog-images/COOLEST.jpg" class="aspect-[21/12] w-full grayscale hue-rotate-90 hover:grayscale-0 hover:hue-rotate-0" alt="banner" />
+  </header>
+  
+  <article class="space-y-4 p-4">
+    <div>
+      <h2 class="h6">Products</h2>
+      <h3 class="h3">Cooling</h3>
+    </div>
+    <p class="opacity-60">
+      Expand your storage capabilities with our high-speed SSDs and reliable hard drives. Perfect for gaming, data storage, and ensuring fast access to your files.
+    </p>
+  </article>
+  
+  <footer class="flex items-center justify-between gap-4 p-4">
+    <small class="text-lg text-primary-500">Shop Now <i class="fa-solid fa-chevron-right"></i></small>
+  </footer>
+</a>
+
 
 <a
-  href="catalog/MOTHERBs"
+  href="/catalog/MOTHERBs"
   class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
 >
   
@@ -139,7 +149,7 @@
 
 <a
   href="/catalog/ALLPRODUCTs"
-  class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
+  class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-2xl overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
 >
   
   <header>

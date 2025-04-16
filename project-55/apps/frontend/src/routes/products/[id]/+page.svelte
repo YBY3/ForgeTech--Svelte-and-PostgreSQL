@@ -41,7 +41,9 @@
   
 		relatedProducts = data.productData.filter(
 			(item) => item.product_type === data.product.product_type && item.id !== data.product.id
-		);
+		)
+    .slice(0, 4);
+    
 	});
 </script>
   
@@ -58,13 +60,13 @@
 				style="max-height: 400px; width: 100%; object-fit: contain;" />
 			{#if data.product.image_urls && data.product.image_urls.length > 1}
 				<!-- Left arrow button -->
-				<button 
+				<button class="text-primary-500"
 					on:click={previousImage}
 					style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; font-size: 2rem; cursor: pointer;">
 					<i class="fa-solid fa-chevron-left"></i>
 				</button>
 				<!-- Right arrow button -->
-				<button 
+				<button class="text-primary-500"
 					on:click={nextImage}
 					style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; font-size: 2rem; cursor: pointer;">
 					<i class="fa-solid fa-chevron-right"></i>

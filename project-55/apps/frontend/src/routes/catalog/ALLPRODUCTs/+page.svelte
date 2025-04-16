@@ -40,11 +40,12 @@ import { derived } from 'svelte/store';
 
 {#if $ALLProducts}
 {#if catalogView}
-  <div class="flex flex-col items-center w-full h-full overflow-y-auto">
+  <div class="flex flex-col items-center w-full h-full bg-white dark:bg-black overflow-y-auto">
     
     <br>
     
-    <h1 class="text-center text-4xl font-medium">Our Products</h1>
+    <h1 class="text-center text-4xl font-medium">Build It Your Way</h1>
+    <h2 class="text-center text-2xl font-medium">Browse our full catalog of premium PC components — everything you need, all in one place.</h2>
     
     
     <br>

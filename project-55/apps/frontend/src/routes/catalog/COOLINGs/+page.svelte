@@ -3,20 +3,21 @@
     import type { ProductType } from "$lib/types/ProductTypes";
     import ProductCard from "$lib/components/product/ProductCard.svelte";
     import { goto } from '$app/navigation';
-	import { productsStore } from '$lib/stores/ProductsStore.js';
-	import { derived } from 'svelte/store';
+  import { productsStore } from '$lib/stores/ProductsStore.js';
+  import { derived } from 'svelte/store';
   
     //Product Data
     export let data;
     let productData: ProductType[];
+  
     //Page Elements
     let selectedProduct: ProductType;
     let catalogView = true;
     let productView = false;
     let isLoggedIn = false;
   
-    const BOARDProducts = derived(productsStore, ($products) =>
-    $products.filter(p => p.product_type === 'MOTHERBOARD')
+    const COOLProducts = derived(productsStore, ($products) =>
+    $products.filter(p => p.product_type === 'COOLER')
     );
     
     onMount(() => {
@@ -24,9 +25,9 @@
         isLoggedIn = true;
       }
       if (data.products) {
-        productData = data.products;
-        productsStore.set(productData);
-      }
+          productData = data.products;
+          productsStore.set(productData);
+        }
     });
     function showCatalogView() {
         productView = false;
@@ -39,20 +40,20 @@
     }
   </script>
   
-  {#if $BOARDProducts}
+  {#if $COOLProducts}
   {#if catalogView}
     <div class="flex flex-col items-center w-full h-full bg-white dark:bg-black overflow-y-auto">
       
       <br>
       
-      <h1 class="text-center text-4xl font-medium">Built to Connect</h1>
-      <h2 class="text-center text-2xl font-medium">Powerful, compatible, and future-ready — the backbone of every great PC.</h2>
+      <h1 class="text-center text-4xl font-medium">Stay Frosty</h1>
+      <h2 class="text-center text-2xl font-medium">Keep your system chill with high-performance air and liquid cooling solutions.</h2>
       
       
       <br>
       <!-- Catalog Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
-        {#each $BOARDProducts as product}
+        {#each $COOLProducts as product}
           <ProductCard 
           product={product} 
           onProductSelect={(product) => goto(`/products/${product.id}`)} 

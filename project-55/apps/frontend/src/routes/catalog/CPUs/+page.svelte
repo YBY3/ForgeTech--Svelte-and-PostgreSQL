@@ -42,11 +42,12 @@ import { derived } from 'svelte/store';
 
 {#if $CPUProducts}
 {#if catalogView}
-  <div class="flex flex-col items-center w-full h-full overflow-y-auto">
+  <div class="flex flex-col items-center w-full h-full bg-white dark:bg-black overflow-y-auto">
     
     <br>
     
-    <h1 class="text-center text-4xl font-medium">Our Products</h1>
+    <h1 class="text-center text-4xl font-medium">Brains of the Operation</h1>
+    <h2 class="text-center text-2xl font-medium">Unlock elite computing power with processors built for speed, multitasking, and efficiency.</h2>
     
     
     <br>
