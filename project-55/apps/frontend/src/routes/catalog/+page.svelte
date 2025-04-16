@@ -13,7 +13,6 @@
   
   <article class="space-y-4 p-4">
     <div>
-      <h2 class="h6">Products</h2>
       <h3 class="h3">Graphics Cards</h3>
     </div>
     <p class="opacity-60">
@@ -37,7 +36,6 @@
   
   <article class="space-y-4 p-4">
     <div>
-      <h2 class="h6">Products</h2>
       <h3 class="h3">Processors</h3>
     </div>
     <p class="opacity-60">
@@ -61,7 +59,6 @@
   
   <article class="space-y-4 p-4">
     <div>
-      <h2 class="h6">Products</h2>
       <h3 class="h3">RAM</h3>
     </div>
     <p class="opacity-60">
@@ -85,7 +82,6 @@
   
   <article class="space-y-4 p-4">
     <div>
-      <h2 class="h6">Products</h2>
       <h3 class="h3">Storage</h3>
     </div>
     <p class="opacity-60">
@@ -109,11 +105,10 @@
   
   <article class="space-y-4 p-4">
     <div>
-      <h2 class="h6">Products</h2>
       <h3 class="h3">Cooling</h3>
     </div>
     <p class="opacity-60">
-      Expand your storage capabilities with our high-speed SSDs and reliable hard drives. Perfect for gaming, data storage, and ensuring fast access to your files.
+      Keep your system running cool and quiet with our range of high-performance air and liquid cooling solutions. Perfect for gamers, creators, and power users alike.
     </p>
   </article>
   
@@ -134,7 +129,6 @@
   
   <article class="space-y-4 p-4">
     <div>
-      <h2 class="h6">Products</h2>
       <h3 class="h3">Motherboards</h3>
     </div>
     <p class="opacity-60">
@@ -158,7 +152,6 @@
   
   <article class="space-y-4 p-4">
     <div>
-      <h2 class="h6">Products</h2>
       <h3 class="h3">All Products</h3>
     </div>
     <p class="opacity-60">

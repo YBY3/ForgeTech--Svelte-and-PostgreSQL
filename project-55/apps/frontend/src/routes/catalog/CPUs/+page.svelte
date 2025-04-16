@@ -9,12 +9,18 @@ import { derived } from 'svelte/store';
   //Product Data
   export let data;
   let productData: ProductType[];
+  let filterProducts: ProductType[] = [];
 
   //Page Elements
-  let selectedProduct: ProductType;
   let catalogView = true;
-  let productView = false;
   let isLoggedIn = false;
+
+
+  let showAMD = false;
+  let showNVIDIA = false;
+  let showINTEL = false;
+  let showSamsung = false;
+  let showIBM = false;
 
   const CPUProducts = derived(productsStore, ($products) =>
   $products.filter(p => p.product_type === 'CPU')
@@ -25,23 +31,73 @@ import { derived } from 'svelte/store';
       isLoggedIn = true;
     }
     if (data.products) {
-        productData = data.products;
-        productsStore.set(productData);
-      }
-  });
-  function showCatalogView() {
-      productView = false;
-      catalogView = true;
-  }
+      productData = data.products;
+      productsStore.set(productData);
+    }
 
-  function showProductView() {
-      catalogView = false;
-      productView = true;
+    changer()
+  });
+  
+
+
+  function changer() {
+  const selectedBrands: string[] = [];
+
+    if (showAMD) selectedBrands.push('AMD');
+    if (showNVIDIA) selectedBrands.push('NVIDIA');
+    if (showINTEL) selectedBrands.push('INTEL');
+    if (showSamsung) selectedBrands.push('Samsung');
+    if (showIBM) selectedBrands.push('IBM');
+
+// If no brand is selected, show all
+if (selectedBrands.length === 0) {
+  filterProducts = $CPUProducts;
+  return;
+}
+
+filterProducts = $CPUProducts.filter(product =>
+  selectedBrands.includes(product.brand)
+);
+}
+
+
+
+function handleChange() {
+      changer();
   }
 </script>
 
 {#if $CPUProducts}
 {#if catalogView}
+
+<div class="flex flex-row items-center w-full h-full bg-white dark:bg-black overflow-y-auto">
+  <!-- Filter (Left Side) -->
+  <div class="w-64 p-6 rounded-lg space-y-4 hidden sm:block">
+    <p class="text-xl font-bold">Brand</p>
+    <form class="space-y-2">
+        <label class="flex items-center space-x-2">
+          <input class="checkbox" type="checkbox" bind:checked={showAMD} on:change={handleChange}/>
+          <p>AMD</p>
+        </label>
+        <label class="flex items-center space-x-2">
+          <input class="checkbox" type="checkbox" bind:checked={showNVIDIA} on:change={handleChange}/>
+          <p>NVIDIA</p>
+        </label>
+        <label class="flex items-center space-x-2">
+          <input class="checkbox" type="checkbox" bind:checked={showINTEL} on:change={handleChange}/>
+          <p>INTEL</p>
+        </label>
+        <label class="flex items-center space-x-2">
+          <input class="checkbox" type="checkbox" bind:checked={showSamsung} on:change={handleChange}/>
+          <p>SAMSUNG</p>
+        </label>
+        <label class="flex items-center space-x-2">
+          <input class="checkbox" type="checkbox" bind:checked={showIBM} on:change={handleChange}/>
+          <p>IBM</p>
+        </label>
+      </form>
+</div>
+
   <div class="flex flex-col items-center w-full h-full bg-white dark:bg-black overflow-y-auto">
     
     <br>
@@ -52,8 +108,8 @@ import { derived } from 'svelte/store';
     
     <br>
     <!-- Catalog Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
-      {#each $CPUProducts as product}
+    <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
+      {#each filterProducts as product}
         <ProductCard 
         product={product} 
         onProductSelect={(product) => goto(`/products/${product.id}`)} 
@@ -62,25 +118,7 @@ import { derived } from 'svelte/store';
       {/each}
     </div>  
   </div>
+</div>
 
-{:else if productView}
-
-  <!-- Product Detail View using ProductCard.svelte -->
-   <br>
-  <div class="flex flex-col items-center justify-center about-me w-full h-full overflow-y-auto">
-    <div class="w-1/3 mx-auto text-center p-6">
-      <!--<ProductCard product={selectedProduct} detailedView={true} isLoggedIn={isLoggedIn} />-->
-      
-      <!-- Back to Catalog Button -->
-      <button 
-        class="mt-6 px-4 py-2 bg-primary-700 text-white rounded-lg hover:bg-primary-800 transition"
-        on:click={() => showCatalogView()}
-      >
-        Back to Catalog
-      </button> 
-    </div>
-    <br>
-    <br> 
-  </div> 
 {/if}
 {/if}
