@@ -2,6 +2,9 @@
     import { onMount } from 'svelte';
     import type { ProductType } from "$lib/types/ProductTypes"
     import { addToOrder } from "$lib/stores/OrdersStore";
+	import { productsStore } from '$lib/stores/ProductsStore.js';
+	import ProductCard from '$lib/components/product/ProductCard.svelte';
+	import { goto } from '$app/navigation';
 
     //Data
     export let data;
@@ -13,6 +16,9 @@
     let message = "Login functionality coming soon!"; 
     let title = "Notice"; 
 
+    let productData: ProductType[];
+    const ALLProducts = productsStore;
+
     onMount(() => {
         if (data.products) {
             featuredProduct = data.products.find(p => p.name.includes("3090")) ?? data.products[0];
@@ -20,6 +26,11 @@
         if (data.isLoggedIn) {
             isLoggedIn = data.isLoggedIn;
         }
+
+        if (data.products) {
+      productData = data.products;
+      productsStore.set(productData);
+    }
     });
 
   </script>
@@ -67,7 +78,7 @@
     </div>
     </div>
 
-<div class="sticky top-0 w-full variant-glass-surface md:text-center md:flex md:justify-evenly py-6 z-[2] text-secondary-600 dark:text-white" id="second_tab">
+<div class="sticky top-0 w-full bg-surface-200 dark:bg-surface-700 md:text-center md:flex md:justify-evenly py-6 z-[2]" id="second_tab">
     <!--<button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out block md:hidden px-8"><a href="#products">PRODUCTS</a></button>-->
     <select class="select w-32 block md:hidden ml-4">
         <option value="1">Featured</option>
@@ -185,14 +196,37 @@
         <!-- we want this for logged in users only, would consider removing this logic -->
         <!-- Buttons & Cart Display -->
         <!--<div class="container mx-auto p-4 flex flex-col items-center text-center pb-20"></div>-->
-
+<div class="bg-white dark:bg-black w-screen">
 <br>
 <br>
 <br>
+<h2 class="text-2xl font-semibold text-white-900 font-bold text-center">Discover a Few of Our Favorites</h2>
+<br>
+<h1 class="text-2xl sm:text-4xl font-bold text-center">Reliable. Powerful. Ready to perform.</h1> 
+<br>
+    <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
+        {#each $ALLProducts.slice(0, 4) as product}
+          <ProductCard 
+          product={product} 
+          onProductSelect={(product) => goto(`/products/${product.id}`)} 
+          isLoggedIn={isLoggedIn}
+          />
+        {/each}
+      </div>  
+<br>
+<br>
+<br>
+</div>
 
-<h1 class="text-4xl sm:text-6xl md:text-6xl font-bold text-center" id="partnersID">Our hardware partners</h1>
+<div class="bg-white w-screen items-center" id="partnersID">
+    <br>
+<br>
+<br>
+<h2 class="text-2xl text-black font-semibold text-white-900 font-bold text-center">Trusted by Top Brands</h2>
+<br>
+<h1 class="text-2xl text-black sm:text-4xl font-bold text-center">Partners powering every build.</h1> 
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 items-center">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 items-center ml-8 sm:ml-10">
     <div class="w-64"><img src="brands/nvidia.webp" alt="nvidia Logo"></div>
     <div class="w-64"><img src="brands/evga.png" alt="evga Logo"></div>
     <div class="w-64"><img src="brands/amd.webp" alt="amd Logo"></div>
@@ -200,9 +234,10 @@
     <div class="w-64"><img src="brands/gigabyte.png" alt="gigabyte Logo"></div>
     <div class="w-64"><img src="brands/intel.png" alt="intel Logo"></div>
     </div>
+    <br>
 <br>
 <br>
-<br>
+</div>
 
         <!-- About Us -->
         <div class="lg:py-16 bg-primary-500 w-screen flex flex-col lg:flex-row items-center lg:items-start justify-center gap-8">
@@ -221,6 +256,7 @@
             </p>
             <br>
             <a href="/about-us"><button class="text-black font-bold p-2 border-2 border-black rounded-lg hover:bg-white transition-all duration-300 ease-in-out hover:border-white">Meet the Team <i class="fa-solid fa-arrow-right ml-1"></i></button></a>
+            <a href="/about-us"><button class="text-black font-bold p-2 border-2 border-black rounded-lg hover:bg-white transition-all duration-300 ease-in-out hover:border-white">Contact Us <i class="fa-solid fa-arrow-right ml-1"></i></button></a>
         </div> 
         
             <div class="p-2">

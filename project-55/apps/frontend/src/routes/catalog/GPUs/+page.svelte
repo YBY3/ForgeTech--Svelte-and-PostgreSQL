@@ -1,10 +1,12 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { RangeSlider } from '@skeletonlabs/skeleton';
     import type { ProductType } from "$lib/types/ProductTypes";
     import ProductCard from "$lib/components/product/ProductCard.svelte";
     import { goto } from '$app/navigation';
 	import { productsStore } from '$lib/stores/ProductsStore.js';
 	import { derived } from 'svelte/store';
+  
   
     //Product Data
     export let data;
@@ -34,11 +36,14 @@
         productData = data.products;
         productsStore.set(productData);
       }
+      
+	    
 
       changer()
     });
     
-
+    let Minvalue = 0;
+    let Maxvalue = 5000; 
 
     function changer() {
     const selectedBrands: string[] = [];
@@ -49,6 +54,7 @@
       if (showGIGABYTE) selectedBrands.push('GIGABYTE');
       if (showASUS) selectedBrands.push('ASUS');
 
+      
   // If no brand is selected, show all
   if (selectedBrands.length === 0) {
     filterProducts = $gpuProducts;
@@ -58,6 +64,7 @@
   filterProducts = $gpuProducts.filter(product =>
     selectedBrands.includes(product.brand)
   );
+
   }
   
 
@@ -65,7 +72,9 @@
   function handleChange() {
         changer();
     }
-  </script>
+  
+
+</script>
   
   {#if $gpuProducts}
   {#if catalogView}
@@ -73,6 +82,8 @@
 <div class="flex flex-row items-center w-full h-full bg-white dark:bg-black overflow-y-auto">
     <!-- Filter (Left Side) -->
     <div class="w-64 p-6 rounded-lg space-y-4 hidden sm:block">
+      <p class="text-lg"><span class="font-bold text-xl">Price</span><br>$0 - $5000</p>
+      <RangeSlider name="example" {Maxvalue} />
       <p class="text-xl font-bold">Brand</p>
       <form class="space-y-2">
           <label class="flex items-center space-x-2">
