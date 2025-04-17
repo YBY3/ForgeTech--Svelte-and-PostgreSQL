@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import '../app.postcss';
+	import '../app.css';
 	import { AppBar, LightSwitch, type PopupSettings, popup, Toast } from '@skeletonlabs/skeleton';
 	import { ordersStore } from "$lib/stores/OrdersStore";
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
