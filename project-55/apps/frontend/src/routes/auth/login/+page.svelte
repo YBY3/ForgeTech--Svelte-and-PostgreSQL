@@ -42,7 +42,7 @@
                 // Reload App
                 invalidate('app:load');
                 // Go to Profile page
-                window.location.href = '/profile';
+                window.location.href = '/dashboard';
             } else {
                 const errorMessage = parsedResultData[parsedResultData[0].error];
                 throw new Error(errorMessage);

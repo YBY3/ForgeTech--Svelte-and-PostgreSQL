@@ -10,7 +10,8 @@
 	import { productsStore } from '$lib/stores/ProductsStore.js';
 
     //Tailwind Classes
-    let navButtonClass = "w-full h-full btn variant-ringed text-xl hover:text-primary-500 font-bold uppercase rounded-lg";
+    let navButtonClass = " w-full h-full btn text-xl hover:text-primary-500 font-bold uppercase rounded-lg ";
+    let navContainerClass = " w-full md:w-3/4 grid grid-cols-2 gap-1 items-center justify-center card variant-soft rounded-lg p-1 ";
 
     function getActiveNavButtonClass(view: boolean) {
         return view ? "text-primary-500" : "hover:text-primary-500";
@@ -262,7 +263,7 @@
     <div class="w-full h-full flex flex-col items-center gap-4 p-4 overflow-y-auto">
 
         <!-- Product View Options -->
-        <div class="w-full md:w-3/4 grid grid-cols-1 md:grid-cols-2 gap-4 items-center justify-center card variant-soft rounded-lg p-4">
+        <div class="{navContainerClass}">
             <button on:click={() => showProductView()} class="{navButtonClass} {getActiveNavButtonClass(productsView)}">View Products</button>
             <button on:click={() => showAddProductFormView()} class="{navButtonClass} {getActiveNavButtonClass(addProductFormView)}">Add Product</button>
         </div>

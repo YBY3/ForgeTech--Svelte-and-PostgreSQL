@@ -39,9 +39,9 @@
 			const success = parsedResultData[parsedResultData[0].success];
 
 			if (success) {
-				// Reload App & Redirect to Catalog
+				// Reload App & Redirect to Dashboard
 				invalidate('app:load');
-				window.location.href = '/catalog';
+				window.location.href = '/dashboard';
 			} else {
 				const errorMessage = parsedResultData[parsedResultData[0].error];
 				// If error indicates account already exists, redirect to login

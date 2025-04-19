@@ -173,7 +173,7 @@
 				<ul class="space-y-4">
 					{#each claimedOrders as order (order.id)}
 						<li class="group border rounded-lg p-4 transition-transform duration-300 transform hover:scale-105 cursor-pointer">
-							<a href={`/auth/order-control/expandedOrderView?orderId=${order.id}`} class="order-link block">
+							<a href={`/control/order-control/expandedOrderView?orderId=${order.id}`} class="order-link block">
 								<div>
 									<strong>Order ID:</strong> {order.id} <br />
 									<strong>Status:</strong> {order.status} <br />

@@ -91,13 +91,13 @@
 			return;
 		}
 
-        if (orderStatus != "claimed") {
-            toastStore.trigger({
-				message: 'This Order is Not Claimed',
-				background: 'variant-filled-error'
-			});
-			return;
-        }
+        // if (orderStatus != "claimed") {
+        //     toastStore.trigger({
+		// 		message: 'This Order is Not Claimed',
+		// 		background: 'variant-filled-error'
+		// 	});
+		// 	return;
+        // }
 
 		try {
 			submitting = true;
@@ -153,14 +153,14 @@
                 <!-- Navigation -->
                 <div class="{navContainerClass}">
                     {#if showAdminInfo} 
-                        <a href="/auth/user-control" class="w-full block">
+                        <a href="/control/user-control" class="w-full block">
                             <button class="{navButtonClass}">User Control</button>
                         </a>
                     {/if}
-                    <a href="/auth/product-control" class="w-full block">
+                    <a href="/control/product-control" class="w-full block">
                         <button class="{navButtonClass}">Product Control</button>
                     </a>
-                    <a href="/auth/order-control" class="w-full block">
+                    <a href="/control/order-control" class="w-full block">
                         <button class="{navButtonClass}">Order Control</button>
                     </a>
                 </div>

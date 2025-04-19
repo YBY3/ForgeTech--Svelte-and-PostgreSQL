@@ -126,8 +126,8 @@
 						<hr class="border-t w-full mx-auto">
 						{#if isLoggedIn}
 							<!-- Common Link -->
-							<a href="/profile" class="w-full block">
-								<button class="btn hover:bg-primary-500 w-full">Profile</button>
+							<a href="/dashboard" class="w-full block">
+								<button class="btn hover:bg-primary-500 w-full">Dashboard</button>
 							</a>
 							<!-- Conditional link based on user_type -->
 							{#if data.user}
@@ -137,15 +137,15 @@
 									</a>
 								{/if}
 								{#if data.user.user_type === 'employee' || data.user.user_type === 'admin'}
-									<a href="/auth/order-control" class="w-full block">
+									<a href="/control/order-control" class="w-full block">
 										<button class="btn hover:bg-primary-500 w-full">Order Control</button>
 									</a>
-									<a href="/auth/product-control" class="w-full block">
+									<a href="/control/product-control" class="w-full block">
 										<button class="btn hover:bg-primary-500 w-full">Product Control</button>
 									</a>
 								{/if}
 								{#if data.user.user_type === 'admin'}
-									<a href="/auth/user-control" class="w-full block">
+									<a href="/control/user-control" class="w-full block">
 										<button class="btn hover:bg-primary-500 w-full">User Control</button>
 									</a>
 									<!-- <a href="/auth/product-control" class="w-full block">
