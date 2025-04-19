@@ -7,6 +7,7 @@
     import ProductSmallPreview from "$lib/components/product/ProductSmallPreview.svelte";
     import ProductForm from "$lib/components/product/ProductForm.svelte";
 	import type { ProductType } from "$lib/types/ProductTypes";
+	import { productsStore } from '$lib/stores/ProductsStore.js';
 
     //Tailwind Classes
     let navButtonClass = "w-full h-full btn variant-ringed text-xl hover:text-primary-500 font-bold uppercase rounded-lg";

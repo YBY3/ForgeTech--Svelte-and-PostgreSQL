@@ -4,7 +4,7 @@
 
 <a
   href="/catalog/GPUs"
-  class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md divide-y overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
+  class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
 >
   
   <header>
@@ -13,7 +13,6 @@
   
   <article class="space-y-4 p-4">
     <div>
-      <h2 class="h6">Products</h2>
       <h3 class="h3">Graphics Cards</h3>
     </div>
     <p class="opacity-60">
@@ -22,13 +21,13 @@
   </article>
   
   <footer class="flex items-center justify-between gap-4 p-4">
-    <small class="text-lg text-primary-500">Shop Now <i class="fa-solid fa-arrow-right"></i></small>
+    <small class="text-lg text-primary-500">Shop Now <i class="fa-solid fa-chevron-right"></i></small>
   </footer>
 </a>
 
 <a
   href="/catalog/CPUs"
-  class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md divide-y overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
+  class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
 >
   
   <header>
@@ -37,7 +36,6 @@
   
   <article class="space-y-4 p-4">
     <div>
-      <h2 class="h6">Products</h2>
       <h3 class="h3">Processors</h3>
     </div>
     <p class="opacity-60">
@@ -46,13 +44,13 @@
   </article>
   
   <footer class="flex items-center justify-between gap-4 p-4">
-    <small class="text-lg text-primary-500">Shop Now <i class="fa-solid fa-arrow-right"></i></small>
+    <small class="text-lg text-primary-500">Shop Now <i class="fa-solid fa-chevron-right"></i></small>
   </footer>
 </a>
 
 <a
   href="/catalog/RAMs"
-  class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md divide-y overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
+  class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
 >
   
   <header>
@@ -61,7 +59,6 @@
   
   <article class="space-y-4 p-4">
     <div>
-      <h2 class="h6">Products</h2>
       <h3 class="h3">RAM</h3>
     </div>
     <p class="opacity-60">
@@ -70,13 +67,13 @@
   </article>
   
   <footer class="flex items-center justify-between gap-4 p-4">
-    <small class="text-lg text-primary-500">Shop Now <i class="fa-solid fa-arrow-right"></i></small>
+    <small class="text-lg text-primary-500">Shop Now <i class="fa-solid fa-chevron-right"></i></small>
   </footer>
 </a>
 
 <a
   href="/catalog/STORAGEs"
-  class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md divide-y overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
+  class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
 >
   
   <header>
@@ -85,7 +82,6 @@
   
   <article class="space-y-4 p-4">
     <div>
-      <h2 class="h6">Products</h2>
       <h3 class="h3">Storage</h3>
     </div>
     <p class="opacity-60">
@@ -94,13 +90,60 @@
   </article>
   
   <footer class="flex items-center justify-between gap-4 p-4">
-    <small class="text-lg text-primary-500">Shop Now <i class="fa-solid fa-arrow-right"></i></small>
+    <small class="text-lg text-primary-500">Shop Now <i class="fa-solid fa-chevron-right"></i></small>
+  </footer>
+</a>
+
+<a
+  href="/catalog/COOLINGs"
+  class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
+>
+  
+  <header>
+    <img src="/catalog-images/COOLEST.jpg" class="aspect-[21/12] w-full grayscale hue-rotate-90 hover:grayscale-0 hover:hue-rotate-0" alt="banner" />
+  </header>
+  
+  <article class="space-y-4 p-4">
+    <div>
+      <h3 class="h3">Cooling</h3>
+    </div>
+    <p class="opacity-60">
+      Keep your system running cool and quiet with our range of high-performance air and liquid cooling solutions. Perfect for gamers, creators, and power users alike.
+    </p>
+  </article>
+  
+  <footer class="flex items-center justify-between gap-4 p-4">
+    <small class="text-lg text-primary-500">Shop Now <i class="fa-solid fa-chevron-right"></i></small>
+  </footer>
+</a>
+
+
+<a
+  href="/catalog/MOTHERBs"
+  class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
+>
+  
+  <header>
+    <img src="catalog-images/motherboard.jpg" class="aspect-[21/12] w-full grayscale hue-rotate-90 hover:grayscale-0 hover:hue-rotate-0" alt="banner" />
+  </header>
+  
+  <article class="space-y-4 p-4">
+    <div>
+      <h3 class="h3">Motherboards</h3>
+    </div>
+    <p class="opacity-60">
+      Power your build with top-tier motherboards designed for performance, compatibility, and future-proofing. Ideal for gaming rigs, workstations, and custom PC setups.
+    </p>
+  </article>
+  
+  <footer class="flex items-center justify-between gap-4 p-4">
+    <small class="text-lg text-primary-500">Shop Now <i class="fa-solid fa-chevron-right"></i></small>
   </footer>
 </a>
 
 <a
   href="/catalog/ALLPRODUCTs"
-  class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-md divide-y overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
+  class="card preset-filled-surface-100-900 card-hover divide-surface-200-800 block max-w-2xl overflow-hidden rounded-none hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]"
 >
   
   <header>
@@ -109,7 +152,6 @@
   
   <article class="space-y-4 p-4">
     <div>
-      <h2 class="h6">Products</h2>
       <h3 class="h3">All Products</h3>
     </div>
     <p class="opacity-60">
@@ -118,7 +160,7 @@
   </article>
   
   <footer class="flex items-center justify-between gap-4 p-4">
-    <small class="text-lg text-primary-500">Shop Now <i class="fa-solid fa-arrow-right"></i></small>
+    <small class="text-lg text-primary-500">Shop Now <i class="fa-solid fa-chevron-right"></i></small>
   </footer>
 </a>
 

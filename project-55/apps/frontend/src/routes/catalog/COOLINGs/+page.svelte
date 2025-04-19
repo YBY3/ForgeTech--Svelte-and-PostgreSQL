@@ -17,13 +17,13 @@ import { derived } from 'svelte/store';
 
 
   let showCorsair = false;
-  let showSamsung = false;
+  let showNZXT = false;
   let showMSI = false;
   let showGIGABYTE = false;
-  let showASUS = false;
+  let showCooler_Master = false;
 
-  const RAMProducts = derived(productsStore, ($products) =>
-  $products.filter(p => p.product_type === 'RAM')
+  const COOLProducts = derived(productsStore, ($products) =>
+  $products.filter(p => p.product_type === 'Cooling')
   );
   
   onMount(() => {
@@ -44,18 +44,18 @@ import { derived } from 'svelte/store';
   const selectedBrands: string[] = [];
 
     if (showCorsair) selectedBrands.push('Corsair');
-    if (showSamsung) selectedBrands.push('Samsung');
+    if (showNZXT) selectedBrands.push('NZXT');
     if (showMSI) selectedBrands.push('MSI');
     if (showGIGABYTE) selectedBrands.push('GIGABYTE');
-    if (showASUS) selectedBrands.push('ASUS');
+    if (showCooler_Master) selectedBrands.push('Cooler Master');
 
 // If no brand is selected, show all
 if (selectedBrands.length === 0) {
-  filterProducts = $RAMProducts;
+  filterProducts = $COOLProducts;
   return;
 }
 
-filterProducts = $RAMProducts.filter(product =>
+filterProducts = $COOLProducts.filter(product =>
   selectedBrands.includes(product.brand)
 );
 }
@@ -80,8 +80,8 @@ function handleChange() {
           <p>CORSAIR</p>
         </label>
         <label class="flex items-center space-x-2">
-          <input class="checkbox" type="checkbox" bind:checked={showSamsung} on:change={handleChange}/>
-          <p>SAMSUNG</p>
+          <input class="checkbox" type="checkbox" bind:checked={showNZXT} on:change={handleChange}/>
+          <p>NZXT</p>
         </label>
         <label class="flex items-center space-x-2">
           <input class="checkbox" type="checkbox" bind:checked={showMSI} on:change={handleChange}/>
@@ -92,8 +92,8 @@ function handleChange() {
           <p>GIGABYTE</p>
         </label>
         <label class="flex items-center space-x-2">
-          <input class="checkbox" type="checkbox" bind:checked={showASUS} on:change={handleChange}/>
-          <p>ASUS</p>
+          <input class="checkbox" type="checkbox" bind:checked={showCooler_Master} on:change={handleChange}/>
+          <p>COOLER MASTER</p>
         </label>
       </form>
 </div>
@@ -102,8 +102,8 @@ function handleChange() {
     
     <br>
     
-    <h1 class="text-center text-4xl font-medium">Speed Meets Memory</h1>
-    <h2 class="text-center text-2xl font-medium">Boost your system’s multitasking and responsiveness with high-performance RAM.</h2>
+    <h1 class="text-center text-4xl font-medium">Stay Frosty</h1>
+    <h2 class="text-center text-2xl font-medium">Keep your system chill with high-performance air and liquid cooling solutions.</h2>
     
     
     <br>

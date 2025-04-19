@@ -16,14 +16,14 @@ import { derived } from 'svelte/store';
   let isLoggedIn = false;
 
 
-  let showCorsair = false;
-  let showSamsung = false;
+  let showAMD = false;
+  let showNVIDIA = false;
   let showMSI = false;
   let showGIGABYTE = false;
   let showASUS = false;
 
-  const RAMProducts = derived(productsStore, ($products) =>
-  $products.filter(p => p.product_type === 'RAM')
+  const BOARDProducts = derived(productsStore, ($products) =>
+  $products.filter(p => p.product_type === 'MOTHERBOARD')
   );
   
   onMount(() => {
@@ -43,19 +43,19 @@ import { derived } from 'svelte/store';
   function changer() {
   const selectedBrands: string[] = [];
 
-    if (showCorsair) selectedBrands.push('Corsair');
-    if (showSamsung) selectedBrands.push('Samsung');
+    if (showAMD) selectedBrands.push('AMD');
+    if (showNVIDIA) selectedBrands.push('NVIDIA');
     if (showMSI) selectedBrands.push('MSI');
     if (showGIGABYTE) selectedBrands.push('GIGABYTE');
     if (showASUS) selectedBrands.push('ASUS');
 
 // If no brand is selected, show all
 if (selectedBrands.length === 0) {
-  filterProducts = $RAMProducts;
+  filterProducts = $BOARDProducts;
   return;
 }
 
-filterProducts = $RAMProducts.filter(product =>
+filterProducts = $BOARDProducts.filter(product =>
   selectedBrands.includes(product.brand)
 );
 }
@@ -76,12 +76,12 @@ function handleChange() {
     <p class="text-xl font-bold">Brand</p>
     <form class="space-y-2">
         <label class="flex items-center space-x-2">
-          <input class="checkbox" type="checkbox" bind:checked={showCorsair} on:change={handleChange}/>
-          <p>CORSAIR</p>
+          <input class="checkbox" type="checkbox" bind:checked={showAMD} on:change={handleChange}/>
+          <p>AMD</p>
         </label>
         <label class="flex items-center space-x-2">
-          <input class="checkbox" type="checkbox" bind:checked={showSamsung} on:change={handleChange}/>
-          <p>SAMSUNG</p>
+          <input class="checkbox" type="checkbox" bind:checked={showNVIDIA} on:change={handleChange}/>
+          <p>NVIDIA</p>
         </label>
         <label class="flex items-center space-x-2">
           <input class="checkbox" type="checkbox" bind:checked={showMSI} on:change={handleChange}/>
@@ -102,8 +102,8 @@ function handleChange() {
     
     <br>
     
-    <h1 class="text-center text-4xl font-medium">Speed Meets Memory</h1>
-    <h2 class="text-center text-2xl font-medium">Boost your system’s multitasking and responsiveness with high-performance RAM.</h2>
+    <h1 class="text-center text-4xl font-medium">Built to Connect</h1>
+    <h2 class="text-center text-2xl font-medium">Powerful, compatible, and future-ready — the backbone of every great PC.</h2>
     
     
     <br>

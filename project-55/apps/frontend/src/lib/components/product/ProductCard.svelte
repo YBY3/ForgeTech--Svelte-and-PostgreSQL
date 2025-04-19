@@ -10,16 +10,16 @@
   const isInStock = product.product_stock > 0;
 </script>
 
-<div class="w-full max-w-md bg-white dark:bg-black rounded-lg shadow-lg p-4 hover:shadow-xl transition duration-200">
+<div class="w-full max-w-md bg-white dark:bg-black border-gray-300 border-2 dark:border-gray-800 p-4">
   <!-- Product Image -->
-  <div class="w-full h-64 bg-gray-100 rounded-lg overflow-hidden mb-4 cursor-pointer" on:click={() => onProductSelect && onProductSelect(product)}>
+  <div class="w-full h-64 rounded-lg overflow-hidden mb-4 cursor-pointer" on:click={() => onProductSelect && onProductSelect(product)}>
     <img src={product.image_urls[0]} alt={product.name} class="w-full h-full object-cover transition duration-200 hover:scale-105" />
   </div>
 
   <!-- Product Details -->
   <div class="flex flex-col space-y-1">
-    <h2 class="text-xl font-semibold">{product.name}</h2>
-    <p class="text-sm dark:text-gray-400 text-gray-600">by <span class="font-medium">{product.brand}</span> · <span class="italic">{product.product_type}</span></p>
+    <h2 class="text-xl font-semibold truncate">{product.name}</h2>
+    <p class="text-sm dark:text-gray-400 text-gray-600 truncate">by <span class="font-medium">{product.brand}</span> · <span class="italic">{product.product_type}</span></p>
     <p class="text-sm dark:text-gray-500 text-gray-500 truncate">{product.description}</p>
 
     <!-- Options -->
