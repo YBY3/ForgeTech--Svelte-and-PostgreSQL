@@ -7,6 +7,11 @@
     import type { UserType } from '$lib/types/UserTypes.js';
     import type { OrderType } from '$lib/types/OrderTypes';
 
+    //Tailwind Classes
+    let navButtonClass = " w-full h-full btn text-md md:text-lg lg:text-xl hover:text-primary-500 font-bold uppercase rounded-lg ";
+    let navContainerClass = " w-full grid grid-cols-3 gap-1 items-center justify-center card variant-soft rounded-lg p-1 ";
+  
+    //Data
     export let data;
     let userData: UserType;
     let userOrders: OrderType[];
@@ -15,9 +20,33 @@
     let allOrders: OrderType[]
 
     //Page Elements
+    let submitting = false;
+    const toastStore = getToastStore();
     let recentlyRegisteredUsers: UserType[];
     let recentlyActiveUsers: UserType[];
-    let recentlyPlacedOrders: OrderType[]
+    let recentlyPlacedOrders: OrderType[];
+    let adminInfoToggle = true;
+    let employeeInfoToggle = true;
+    let customerInfoToggle = true;
+    let showAdminInfo = false;
+    let showEmployeeInfo = false;
+    let showCustomerInfo = false;
+
+    //Reactively Determine Which Items Can Be Shown
+    $: {
+        showAdminInfo = (users && (userData.user_type == "admin"));
+        showEmployeeInfo = (employeeClaimedOrders && (userData.user_type == "employee" || userData.user_type == "admin"));
+        showCustomerInfo = (userOrders && (userData.user_type == "customer" || userData.user_type == "admin"));
+
+        //Update Tailwind Classes
+        if (showAdminInfo) {
+            navContainerClass = " w-full grid grid-cols-3 gap-1 items-center justify-center card variant-soft rounded-lg p-1 ";
+        }
+        else if (showEmployeeInfo) {
+            navButtonClass = " w-full h-full btn text-xl hover:text-primary-500 font-bold uppercase rounded-lg ";
+            navContainerClass = " w-full grid grid-cols-2 gap-1 items-center justify-center card variant-soft rounded-lg p-1 ";
+        }
+    }
 
     onMount(() => {
         if (data.user) {
@@ -53,47 +82,110 @@
         }
     });
 
+    async function unclaimOrder(orderId: number, orderStatus: string) {
+		if (submitting) {
+			toastStore.trigger({
+				message: 'Already Managing Order Claim, Please Wait',
+				background: 'variant-filled-error'
+			});
+			return;
+		}
+
+        if (orderStatus != "claimed") {
+            toastStore.trigger({
+				message: 'This Order is Not Claimed',
+				background: 'variant-filled-error'
+			});
+			return;
+        }
+
+		try {
+			submitting = true;
+			const formData = new FormData();
+			formData.append("order_id", JSON.stringify(orderId));
+
+			const response = await fetch('?/unclaimOrder', {
+				method: 'POST',
+				body: formData
+			});
+
+			const result = await response.json();
+			const parsedResultData = JSON.parse(result.data);
+			const success = parsedResultData[parsedResultData[0].success];
+
+			if (success) {
+				const successMessage = parsedResultData[parsedResultData[0].message];
+				toastStore.trigger({
+					message: successMessage,
+					background: 'variant-filled-success'
+				});
+
+				const orderToMove = employeeClaimedOrders.find((o) => o.id === orderId);
+				if (orderToMove) {
+					employeeClaimedOrders = employeeClaimedOrders.filter((o) => o.id !== orderId);
+					orderToMove.status = "pending";
+				}
+			} else {
+				const errorMessage = parsedResultData[parsedResultData[0].error];
+				throw new Error(errorMessage);
+			}
+		} catch (error) {
+			const errorMessage: string = `${error}`;
+			toastStore.trigger({
+				message: errorMessage,
+				background: 'variant-filled-error'
+			});
+		} finally {
+			submitting = false;
+		}
+	}
+
 </script>
 
 
 {#if userData}
     <!-- Dashboard -->
-    <div class="w-full h-full flex flex-col gap-4 items-center ">
+    <div class="w-full h-full flex flex-col gap-4 items-center pt-4">
 
-        <div class="w-full md:w-3/4 flex flex-col gap-4 items-center pt-4">
-            <h1 class="text-5xl">Dashboard</h1>
+        {#if showEmployeeInfo || showAdminInfo} 
+            <div class="w-full md:w-3/4 flex flex-col gap-4 items-center">
 
-            <!-- Info Filters -->
-            <form class="w-full md:w-3/4 flex gap-16 items-center justify-center">                
-                <div class="flex gap-2 items-center">
-                    <input class="checkbox" type="checkbox"/>
-                    <p>Admin Info</p>
+                <!-- Navigation -->
+                <div class="{navContainerClass}">
+                    {#if showAdminInfo} 
+                        <a href="/auth/user-control" class="w-full block">
+                            <button class="{navButtonClass}">User Control</button>
+                        </a>
+                    {/if}
+                    <a href="/auth/product-control" class="w-full block">
+                        <button class="{navButtonClass}">Product Control</button>
+                    </a>
+                    <a href="/auth/order-control" class="w-full block">
+                        <button class="{navButtonClass}">Order Control</button>
+                    </a>
                 </div>
+
+                <!-- Info Filters -->
+                {#if showAdminInfo} 
+                    <form class="{navContainerClass}">              
+                        <div class="w-full flex gap-2 items-center justify-center p-3 rounded-lg">
+                            <input class="checkbox" type="checkbox" bind:checked={adminInfoToggle}/>
+                            <p>Admin Info</p>
+                        </div>
+                        
+                        <div class="w-full flex gap-2 items-center justify-center p-3 rounded-lg">
+                            <input class="checkbox" type="checkbox" bind:checked={employeeInfoToggle}/>
+                            <p>Employee Info</p>
+                        </div>
                 
-                <div class="flex gap-2 items-center">
-                    <input class="checkbox" type="checkbox"/>
-                    <p>Employee Info</p>
-                </div>
-        
-                <div class="flex gap-2 items-center">
-                    <input class="checkbox" type="checkbox"/>
-                    <p>Customer Info</p>
-                </div>
-            </form>
-        </div>
-
-        <!-- Navigation -->
-        <div class="flex flex-col sm:flex-row w-full md:w-3/4 card variant-surface">
-            <a href="/auth/order-control" class="w-full block">
-                <button class="btn hover:bg-primary-500 w-full text-2xl">Order Control</button>
-            </a>
-            <a href="/auth/product-control" class="w-full block">
-                <button class="btn hover:bg-primary-500 w-full text-2xl">Product Control</button>
-            </a>
-            <a href="/auth/user-control" class="w-full block">
-                <button class="btn hover:bg-primary-500 w-full text-2xl">User Control</button>
-            </a>
-        </div>
+                        <div class="w-full flex gap-2 items-center justify-center p-3 rounded-lg">
+                            <input class="checkbox" type="checkbox" bind:checked={customerInfoToggle}/>
+                            <p>Customer Info</p>
+                        </div>
+                    </form>
+                {/if}
+            </div>
+        {/if}
 
         <!-- Dashboard Grid -->
         <div class="w-full md:w-3/4 grid grid-cols-1 lg:grid-cols-2 grid-rows-[300px_300px] gap-4 pb-4">
@@ -126,7 +218,7 @@
 
             </div>
 
-            {#if users && userData.user_type == "admin"}
+            {#if showAdminInfo && adminInfoToggle}
 
                 <!-- Recently Registered Users -->
                 <div class="h-[300px] max-h-[300px] flex flex-col items-center card variant-surface gap-2 p-2">
@@ -179,7 +271,7 @@
                 </div>
             
             {/if}
-            {#if employeeClaimedOrders && (userData.user_type == "employee" || userData.user_type == "admin")}
+            {#if showEmployeeInfo && employeeInfoToggle}
 
                 <!-- Employee Claimed Orders -->
                 <div class="w-full h-[616px] max-h-[616px] flex flex-col items-center card variant-surface gap-2 p-2 row-span-2">
@@ -188,13 +280,13 @@
                     <!-- Claimed Orders -->
                     <div class="w-full h-full flex flex-col gap-3 overflow-y-auto hide-scrollbar card variant-soft p-4">
                         {#each employeeClaimedOrders as order (order.id)}
-                            <OrderInfoCard order={order} showClaimButton={true} />
+                            <OrderInfoCard order={order} showClaimButton={true} on:claimRequest={(event) => unclaimOrder(event.detail.orderID, event.detail.orderStatus)} />
                         {/each}
                     </div>
                 </div>
             
             {/if}
-            {#if userOrders && (userData.user_type == "customer" || userData.user_type == "admin")}
+            {#if showCustomerInfo && customerInfoToggle}
 
                 <!-- User Orders -->
                 <div class="w-full h-[616px] max-h-[616px] flex flex-col items-center card variant-surface gap-2 p-2 row-span-2">
@@ -203,7 +295,7 @@
                     <!-- Orders -->
                     <div class="w-full h-full flex flex-col gap-3 overflow-y-auto hide-scrollbar card variant-soft p-4">
                         {#each userOrders as order (order.id)}
-                            <OrderInfoCard order={order} showCancelButton={true} />
+                            <OrderInfoCard order={order} showCancelButton={true} /> <!-- Order Cancel Logic Here -->
                         {/each}
                     </div>
                 </div>

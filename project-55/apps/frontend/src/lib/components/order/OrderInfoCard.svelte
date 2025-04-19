@@ -1,13 +1,25 @@
 <script lang="ts">
+    import { createEventDispatcher } from 'svelte';
     import ProductSmallPreview from '$lib/components/product/ProductSmallPreview.svelte';
     import type { OrderType } from '$lib/types/OrderTypes';
     import type { ProductOrderPreviewType } from '$lib/types/ProductTypes';
 
+    //Data
     export let order: OrderType;
     let products: ProductOrderPreviewType[] = order.products;
 
+    //Component Elements
     export let showCancelButton = false;
     export let showClaimButton = false;
+    const dispatch = createEventDispatcher();
+
+    function handleCancelButtonClick(orderID: number) {
+        dispatch('cancelRequest', { orderID: orderID });
+    }
+
+    function handleClaimButtonClick(orderID: number, orderStatus: string) {
+        dispatch('claimRequest', { orderID: orderID, orderStatus: orderStatus  });
+    }
 </script>
 
 
@@ -48,20 +60,29 @@
         </div>
         
         {#if showCancelButton}
-            <div class="w-1/2 flex flex-col btn variant-filled-primary text-lg text-center font-semibold cursor-grab rounded-lg gap-4 p-1">
+            <button 
+                class="w-1/2 flex flex-col btn variant-filled-primary text-lg text-center font-semibold cursor-grab rounded-lg gap-4 p-1"
+                on:click={() => handleCancelButtonClick(order.id)}
+            >
                 Cancel Order
-            </div>
+            </button>
         {/if}
 
         {#if showClaimButton}
             {#if order.status == "pending"}
-                <div class="w-1/2 flex flex-col btn variant-filled-success text-lg text-center font-semibold cursor-grab rounded-lg gap-4 p-1">
+                <button 
+                    class="w-1/2 flex flex-col btn variant-filled-success text-lg text-center font-semibold cursor-grab rounded-lg gap-4 p-1"
+                    on:click={() => handleClaimButtonClick(order.id, order.status)}
+                >
                     Claim Order
-                </div>
+                </button>
             {:else}
-                <div class="w-1/2 flex flex-col btn variant-filled-primary text-lg text-center font-semibold cursor-grab rounded-lg gap-4 p-1">
+                <button 
+                    class="w-1/2 flex flex-col btn variant-filled-primary text-lg text-center font-semibold cursor-grab rounded-lg gap-4 p-1"
+                    on:click={() => handleClaimButtonClick(order.id, order.status)}
+                >
                     Unclaim Order
-                </div>
+                </button>
             {/if}
         {/if}
     </div>
