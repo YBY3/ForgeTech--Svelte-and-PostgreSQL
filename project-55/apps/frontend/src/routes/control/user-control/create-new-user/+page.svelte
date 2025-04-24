@@ -50,7 +50,7 @@
 				//Reload App
 				invalidate('app:load');
 				//Go to Catalog
-                window.location.href = '/auth/user-control';
+                window.location.href = '/control/user-control';
             }
             else {
 				const errorMessage = parsedResultData[parsedResultData[0].error];
@@ -164,7 +164,7 @@
 
                 <div class="flex gap-10px justify-between gap-x-10">
                     <div>
-                        <a href="/auth/user-control"><button class="px-10 py-2 rounded-lg border-2 border-primary-700 hover:bg-primary-700 transition-all duration-300 transform hover:scale-105 text-center hover:text-white">
+                        <a href="/control/user-control"><button class="px-10 py-2 rounded-lg border-2 border-primary-700 hover:bg-primary-700 transition-all duration-300 transform hover:scale-105 text-center hover:text-white">
                             <i class="fa-solid fa-x"></i> Cancel
                         </button></a>
                     </div>

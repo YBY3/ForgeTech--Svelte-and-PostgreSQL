@@ -79,6 +79,7 @@
             formData.append('options', JSON.stringify(product.options));
             formData.append('product_type', product.product_type);
             formData.append('product_stock', JSON.stringify(product.product_stock));
+            formData.append('hidden', JSON.stringify(product.hidden));
             formData.append('image_ids', JSON.stringify(product.image_ids));
             files.forEach((file, index) => {
                 formData.append(`files[${index}]`, file);
@@ -152,6 +153,7 @@
             formData.append('options', JSON.stringify(product.options));
             formData.append('product_type', product.product_type);
             formData.append('product_stock', JSON.stringify(product.product_stock));
+            formData.append('hidden', JSON.stringify(product.hidden));
             files.forEach((file, index) => {
                 formData.append(`files[${index}]`, file);
             });

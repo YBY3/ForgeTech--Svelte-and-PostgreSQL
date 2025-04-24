@@ -12,6 +12,8 @@
     //Product Data
     export let product: ProductType | null = null;
 
+    $: console.log('Hidden changed to:', hidden);
+
     //Image Elements
     let imageFiles: File[] = []; 
     let imagePreviews: string[] = []; 
@@ -29,6 +31,7 @@
     let product_stock: number;
     let image_ids: number[] = [];
     let image_urls: string[] = [];
+    let hidden: boolean = false;
 
     if (product != null) {
         id = product.id;
@@ -39,6 +42,7 @@
         options = product.options?.join(", ") || "No components";
         product_type = product.product_type;
         product_stock = product.product_stock;
+        hidden = product.hidden;
         image_ids = product.image_ids;
         image_urls = product.image_urls;
     }
@@ -114,6 +118,7 @@
                 options: options.split(',').map((opt) => opt.trim()),
                 product_type,
                 product_stock,
+                hidden,
                 image_ids: image_ids,
                 image_urls: image_urls,
             },
@@ -265,6 +270,15 @@
         min="0"
         bind:value={product_stock} 
         required 
+    />
+
+    <!-- Product hidden -->
+    <input
+        id="hidden" 
+        class="{inputClass}" 
+        type="checkbox" 
+        placeholder="hidden"
+        bind:checked={hidden} 
     />
 
     <!-- Submit Button -->

@@ -144,6 +144,7 @@ def get_all_orders():
                         "name": product.name,
                         "price": product.price,
                         "quantity": order_item.order_quantity,
+                        "product_option": order_item.product_option,
                         "image_ids": image_ids
                     })
             
@@ -267,6 +268,7 @@ def get_orders():
                         "name": product.name,
                         "price": product.price,
                         "quantity": order_item.order_quantity,
+                        "product_option": order_item.product_option,
                         "image_ids": image_ids
                     })
             

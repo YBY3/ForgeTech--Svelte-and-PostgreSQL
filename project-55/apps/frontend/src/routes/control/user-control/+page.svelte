@@ -68,7 +68,7 @@
             </div>
 
             <div>
-                <a href="/auth/user-control/create-new-user"><button class="border-2 border-primary-500 rounded-lg p-2 hover:bg-primary-500 hover:text-white transition-colors duration-300"><i class="fa-solid fa-user-plus"></i> Create User</button></a>
+                <a href="user-control/create-new-user"><button class="border-2 border-primary-500 rounded-lg p-2 hover:bg-primary-500 hover:text-white transition-colors duration-300"><i class="fa-solid fa-user-plus"></i> Create User</button></a>
             </div>
 
         </div>

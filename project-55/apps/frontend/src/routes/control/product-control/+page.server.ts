@@ -62,6 +62,7 @@ export const actions = {
                 options: formData.get('options'),
                 product_type: formData.get('product_type'),
                 product_stock: formData.get('product_stock'),
+                hidden: formData.get('hidden'),
                 image_ids: formData.get('image_ids'),
                 files: [] as { data: string; name: string; type: string }[]
             };
@@ -123,6 +124,7 @@ export const actions = {
                 options: formData.get('options'),
                 product_type: formData.get('product_type'),
                 product_stock: formData.get('product_stock'),
+                hidden: formData.get('hidden'),
                 files: [] as { data: string; name: string; type: string }[]
             };
 

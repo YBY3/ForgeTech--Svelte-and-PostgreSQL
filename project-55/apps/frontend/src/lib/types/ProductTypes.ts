@@ -20,6 +20,7 @@ export type ProductType = {
     options: string[];
     product_type: string;
     product_stock: number;
+    hidden : boolean;
     image_ids: number[];
     image_urls: string[];
 };

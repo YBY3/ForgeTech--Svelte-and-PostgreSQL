@@ -24,7 +24,7 @@ def edit_product():
         data = request.get_json()
         # print(f"Received data: {data}", file=sys.stderr)
 
-        required_fields = ['id', 'name', 'price', 'description', 'brand', 'options', 'product_type', 'product_stock']
+        required_fields = ['id', 'name', 'price', 'description', 'brand', 'options', 'product_type', 'product_stock','hidden']
         missing_fields = [field for field in required_fields if field not in data or data[field] is None]
         if missing_fields:
             return jsonify({
@@ -120,7 +120,14 @@ def edit_product():
                         'error': 'Invalid Image Data',
                         'message': f"Image Processing Failed: {str(e)}"
                     }), 400
-                
+        
+        hidden_raw = data.get('hidden', False)
+        hidden = False
+        if isinstance(hidden_raw, bool):
+            hidden = hidden_raw
+        elif isinstance(hidden_raw, str):
+            hidden = hidden_raw.lower() == 'true'
+
         # Update product fields
         product.name = data['name']
         product.price = float(data['price'])
@@ -129,6 +136,7 @@ def edit_product():
         product.options = cleaned_options  
         product.product_type = data['product_type']
         product.product_stock = int(data['product_stock'])
+        product.hidden = hidden
 
         # Sync ImageProduct relationships
         existing_links = ImageProduct.query.filter_by(product_id=product_id).all()
@@ -196,7 +204,7 @@ def add_product():
     try:
         data = request.get_json()
 
-        required_fields = ['name', 'price', 'description', 'brand', 'options', 'product_type', 'product_stock']
+        required_fields = ['name', 'price', 'description', 'brand', 'options', 'product_type', 'product_stock','hidden']
         missing_fields = [field for field in required_fields if field not in data or data[field] is None]
         if missing_fields:
             return jsonify({
@@ -269,6 +277,14 @@ def add_product():
                     'message': f"Image Processing Failed: {str(e)}"
                 }), 400
 
+        
+        hidden_raw = data.get('hidden', False)
+        hidden = False
+        if isinstance(hidden_raw, bool):
+            hidden = hidden_raw
+        elif isinstance(hidden_raw, str):
+            hidden = hidden_raw.lower() == 'true'
+        
         # Create New Product Instance
         product = Product(
             name=data['name'],
@@ -277,7 +293,8 @@ def add_product():
             brand=data['brand'],
             options=cleaned_options,
             product_type=data['product_type'],
-            product_stock=int(data['product_stock'])
+            product_stock=int(data['product_stock']),
+            hidden=hidden
         )
 
         # Add to Database
@@ -415,6 +432,7 @@ def get_all_products():
         }), 200
 
     except Exception as e:
+        print(f"Error fetching orders: {str(e)}", file=sys.stderr)
         return jsonify({
             'success': False,
             'error': 'Failed to Fetch Products',

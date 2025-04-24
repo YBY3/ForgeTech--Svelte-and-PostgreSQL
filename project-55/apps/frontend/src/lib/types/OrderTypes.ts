@@ -9,6 +9,7 @@ export type OrderType = {
     created_at: string;
     claimed_by_employee_id?: number;
     arrive_by: number;
+    hidden: boolean;
 };
 
 
@@ -21,4 +22,5 @@ export type PastOrderType = { //what is this?
     created_at: string;
     claimed_by_employee_id?: number;
     arrive_by: number;
+    hidden: boolean;
 };

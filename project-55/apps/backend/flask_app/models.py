@@ -32,6 +32,9 @@ class User(db.Model):
     registered_by = db.Column(db.DateTime, default=datetime.utcnow)
     active_by = db.Column(db.DateTime, default=datetime.utcnow)
 
+    messages = db.relationship('user_message', back_populates='user')
+
+
     def __repr__(self):
         return f'<User {self.name}>'
    
@@ -59,6 +62,7 @@ class Product(db.Model):
     options = db.Column(db.ARRAY(db.String(256)), nullable=True)
     product_type = db.Column(db.String(50), nullable=False)
     product_stock = db.Column(db.Integer, nullable=False, default=100000)
+    hidden = db.Column(db.Boolean, default=False)
 
     image_ids = db.relationship('ImageProduct', back_populates='product')
     orders = db.relationship('OrderProduct', back_populates='product')
@@ -76,7 +80,8 @@ class Product(db.Model):
             'image_ids': [image_product.image.id for image_product in self.image_ids],
             'product_type': self.product_type,
             'product_stock': self.product_stock,
-            'options': self.options
+            'options': self.options,
+            'hidden': self.hidden
         }
 
 
@@ -90,6 +95,7 @@ class Order(db.Model):
     claimed_by_employee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     arrive_by = db.Column(db.DateTime, default=datetime.utcnow)
+    hidden = db.Column(db.Boolean, default=False)
 
     order_items = db.relationship('OrderProduct', back_populates='order')
 
@@ -105,7 +111,8 @@ class Order(db.Model):
             'status': self.status,
             'claimed_by_employee_id': self.claimed_by_employee_id,
             'created_at': self.created_at.isoformat(),
-            'arrive_by': self.arrive_by.isoformat()
+            'arrive_by': self.arrive_by.isoformat(),
+            'hidden': self.hidden
         }
     
 
@@ -128,6 +135,7 @@ class OrderProduct(db.Model):
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
     order_quantity = db.Column(db.Integer, nullable=False, default=1)
+    product_option = db.Column(db.String(256), nullable=True)
 
     order = db.relationship('Order', back_populates='order_items')
     product = db.relationship('Product', back_populates='orders')
@@ -147,3 +155,16 @@ class ImageProduct(db.Model):
 
     def __repr__(self):
         return f'<ImageProduct ImageID: {self.image_id}, ProductID: {self.product_id}>'
+    
+
+
+class user_message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    message = db.Column(db.String(1024), nullable=False)
+    request = db.Column(db.String(1024), nullable=False)
+
+    user = db.relationship('User', back_populates='messages')
+
+    def __repr__(self):
+        return f'<UserMessage ID: {self.id}, UserID: {self.user_id}>'
