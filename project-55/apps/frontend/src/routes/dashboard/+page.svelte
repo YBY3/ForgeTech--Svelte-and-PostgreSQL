@@ -1,7 +1,5 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import type { ActionResult } from '@sveltejs/kit';
-    import { deserialize } from '$app/forms';
     import { getToastStore, Avatar, FileButton } from '@skeletonlabs/skeleton';
     import OrderInfoCard from '$lib/components/order/OrderInfoCard.svelte';
     import type { UserType } from '$lib/types/UserTypes.js';
@@ -10,6 +8,7 @@
     //Tailwind Classes
     let navButtonClass = " w-full h-full btn text-md md:text-lg lg:text-xl hover:text-primary-500 font-bold uppercase rounded-lg ";
     let navContainerClass = " w-full grid grid-cols-3 gap-1 items-center justify-center card variant-soft rounded-lg p-1 ";
+    let errorCardClass = " flex justify-center text-xl card variant-soft-error rounded-lg p-4 ";
   
     //Data
     export let data;
@@ -23,22 +22,17 @@
     let submitting = false;
     const toastStore = getToastStore();
     let recentlyRegisteredUsers: UserType[];
-    let recentlyActiveUsers: UserType[];
+    let recentlyActiveEmployees: UserType[];
     let recentlyPlacedOrders: OrderType[];
     let adminInfoToggle = true;
     let employeeInfoToggle = true;
     let customerInfoToggle = true;
-    let showAdminInfo = false;
-    let showEmployeeInfo = false;
-    let showCustomerInfo = false;
+    let showAdminInfo: boolean = false;
+    let showEmployeeInfo: boolean = false;
+    let showCustomerInfo: boolean = false;
 
-    //Reactively Determine Which Items Can Be Shown
+    //Reactively Update Tailwind Classes
     $: {
-        showAdminInfo = (users && (userData.user_type == "admin"));
-        showEmployeeInfo = (employeeClaimedOrders && (userData.user_type == "employee" || userData.user_type == "admin"));
-        showCustomerInfo = (userOrders && (userData.user_type == "customer" || userData.user_type == "admin"));
-
-        //Update Tailwind Classes
         if (showAdminInfo) {
             navContainerClass = " w-full grid grid-cols-3 gap-1 items-center justify-center card variant-soft rounded-lg p-1 ";
         }
@@ -49,37 +43,62 @@
     }
 
     onMount(() => {
-        if (data.user) {
-            userData = data.user;
+        if (data.user != null) {
+            if (data.user.success == true) {
+                userData = data.user.response;
+            }
         }
 
-        if (data.userOrders) {
-            userOrders = data.userOrders;
+        if (data.userOrders != null) {
+            if (data.userOrders.success == true) {
+                if (Array.isArray(data.userOrders.response)) {
+                    userOrders = data.userOrders.response;
+                }
+            }
         }
 
-        if (data.employeeClaimedOrders) {
-            employeeClaimedOrders = data.employeeClaimedOrders;
+        if (data.employeeClaimedOrders != null) {
+            if (data.employeeClaimedOrders.success == true) {
+                if (Array.isArray(data.employeeClaimedOrders.response)) {
+                    if (data.employeeClaimedOrders.response.length > 0) {
+                        employeeClaimedOrders = data.employeeClaimedOrders.response;
+                    }
+                }
+            }
         }
 
-        if (data.users) {
-            users = data.users;
+        if (data.users != null) {
+            if (data.users.success == true) {
+                if (Array.isArray(data.users.response)) {
+                    users = data.users.response;
 
-            //Sort By Recently Registered
-            recentlyRegisteredUsers = users
-				.sort((a: any, b: any) => new Date(a.registered_by).getTime() - new Date(b.registered_by).getTime())
+                    //Sort By Recently Registered
+                    recentlyRegisteredUsers = users
+                        .sort((a: any, b: any) => new Date(a.registered_by).getTime() - new Date(b.registered_by).getTime())
 
-            //Sort by Recently Active
-            recentlyActiveUsers = users
-				.sort((a: any, b: any) => new Date(b.active_by).getTime() - new Date(a.active_by).getTime())
+                    //Sort by Recently Active Employees
+                    recentlyActiveEmployees = users
+                        .filter((user: UserType) => user.user_type === 'employee')
+                        .sort((a: any, b: any) => new Date(b.active_by).getTime() - new Date(a.active_by).getTime())
+                }
+            }
         }
 
-        if (data.allOrders) {
-            allOrders = data.allOrders;
+        if (data.allOrders != null) {
+            if (data.allOrders.success == true) {
+                if ((Array.isArray(data.allOrders.response))) {
+                    allOrders = data.allOrders.response;
 
-            //Sort by Recently Placed
-            recentlyPlacedOrders = allOrders
-			.sort((a: OrderType, b: OrderType) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                    //Sort by Recently Placed
+                    recentlyPlacedOrders = allOrders
+                    .sort((a: OrderType, b: OrderType) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                }
+            }
         }
+
+        showAdminInfo = (userData.user_type == "admin");
+        showEmployeeInfo = (userData.user_type == "employee" || userData.user_type == "admin");
+        showCustomerInfo = (userData.user_type == "customer" || userData.user_type == "admin");
     });
 
     async function unclaimOrder(orderId: number, orderStatus: string) {
@@ -226,35 +245,43 @@
 
                     <!-- Users -->
                     <ul class="w-full h-full space-y-4 overflow-y-auto hide-scrollbar card variant-soft p-4">
-                        {#each recentlyRegisteredUsers as user (user.id)}
+                        {#if recentlyRegisteredUsers}
+                            {#each recentlyRegisteredUsers as user (user.id)}
 
-                            <li class="flex items-center justify-between p-4 dark:bg-surface-700 rounded-lg shadow-md bg-surface-200 card card-hover">
-                                <span class="text-sm md:text-lg font-medium">{user.id}</span>
-                                <span class="text-sm md:text-lg">{user.email}</span>
-                                <span class="text-sm md:text-lg">{user.user_type}</span>
-                            </li>
-
-                        {/each}
-                    </ul>
-                </div>
-
-                <!-- Recently Actice Employees -->
-                <div class="w-full h-[300px] max-h-[300px] flex flex-col items-center card variant-surface gap-2 p-2">
-                    <h1 class="text-3xl rounded-lg p-2">Active Employees</h1>
-
-                    <!-- Users -->
-                    <ul class="w-full h-full space-y-4 overflow-y-auto hide-scrollbar card variant-soft p-4">
-                        {#each recentlyActiveUsers as user (user.id)}
-                            
-                            {#if user.user_type == "employee"}
                                 <li class="flex items-center justify-between p-4 dark:bg-surface-700 rounded-lg shadow-md bg-surface-200 card card-hover">
                                     <span class="text-sm md:text-lg font-medium">{user.id}</span>
                                     <span class="text-sm md:text-lg">{user.email}</span>
                                     <span class="text-sm md:text-lg">{user.user_type}</span>
                                 </li>
-                            {/if}
 
-                        {/each}
+                            {/each}
+                        {:else}
+                            <div class="{errorCardClass}">No Users Found</div>
+                        {/if}
+                    </ul>
+                </div>
+
+                <!-- Recently Active Employees -->
+                <div class="w-full h-[300px] max-h-[300px] flex flex-col items-center card variant-surface gap-2 p-2">
+                    <h1 class="text-3xl rounded-lg p-2">Active Employees</h1>
+
+                    <!-- Users -->
+                    <ul class="w-full h-full space-y-4 overflow-y-auto hide-scrollbar card variant-soft p-4">
+                        {#if recentlyActiveEmployees}
+                            {#if recentlyActiveEmployees.length > 0}
+                                {#each recentlyActiveEmployees as user (user.id)}
+                                    <li class="flex items-center justify-between p-4 dark:bg-surface-700 rounded-lg shadow-md bg-surface-200 card card-hover">
+                                        <span class="text-sm md:text-lg font-medium">{user.id}</span>
+                                        <span class="text-sm md:text-lg">{user.email}</span>
+                                        <span class="text-sm md:text-lg">{user.user_type}</span>
+                                    </li>
+                                {/each}
+                            {:else}
+                                <div class="{errorCardClass}">No Employees Found</div>
+                            {/if}
+                        {:else}
+                            <div class="{errorCardClass}">Error Loading Employees</div>
+                        {/if}
                     </ul>
                 </div>
 
@@ -264,9 +291,13 @@
 
                     <!-- Orders -->
                     <div class="w-full h-full flex flex-col gap-3 overflow-y-auto hide-scrollbar card variant-soft p-4">
-                        {#each recentlyPlacedOrders as order (order.id)}
-                            <OrderInfoCard order={order} />
-                        {/each}
+                        {#if recentlyPlacedOrders}
+                            {#each recentlyPlacedOrders as order (order.id)}
+                                <OrderInfoCard order={order} />
+                            {/each}
+                        {:else}
+                            <div class="{errorCardClass}">No Orders Found</div>
+                        {/if}
                     </div>
                 </div>
             
@@ -279,9 +310,13 @@
 
                     <!-- Claimed Orders -->
                     <div class="w-full h-full flex flex-col gap-3 overflow-y-auto hide-scrollbar card variant-soft p-4">
-                        {#each employeeClaimedOrders as order (order.id)}
-                            <OrderInfoCard order={order} showClaimButton={true} on:claimRequest={(event) => unclaimOrder(event.detail.orderID, event.detail.orderStatus)} />
-                        {/each}
+                        {#if employeeClaimedOrders}
+                            {#each employeeClaimedOrders as order (order.id)}
+                                <OrderInfoCard order={order} showClaimButton={true} on:claimRequest={(event) => unclaimOrder(event.detail.orderID, event.detail.orderStatus)} />
+                            {/each}
+                        {:else}
+                            <div class="{errorCardClass}">No Claimed Orders Found</div>
+                        {/if}
                     </div>
                 </div>
             
@@ -294,9 +329,13 @@
 
                     <!-- Orders -->
                     <div class="w-full h-full flex flex-col gap-3 overflow-y-auto hide-scrollbar card variant-soft p-4">
-                        {#each userOrders as order (order.id)}
-                            <OrderInfoCard order={order} showCancelButton={true} /> <!-- Order Cancel Logic Here -->
-                        {/each}
+                        {#if userOrders}
+                            {#each userOrders as order (order.id)}
+                                <OrderInfoCard order={order} showCancelButton={true} /> <!-- Order Cancel Logic Here -->
+                            {/each}
+                        {:else}
+                            <div class="{errorCardClass}">No Orders Found</div>
+                        {/if}
                     </div>
                 </div>
             

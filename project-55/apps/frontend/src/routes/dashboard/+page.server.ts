@@ -2,16 +2,31 @@ import { fail, redirect } from '@sveltejs/kit';
 import { getFlaskURL, getImageURL } from '$lib/api';
 import type { OrderType } from '$lib/types/OrderTypes';
 import type { UserType } from '$lib/types/UserTypes';
+import type { ErrorResponseType } from '$lib/types/ResponseTypes';
 
-let userOrders: OrderType[];
-let employeeClaimedOrders: OrderType[];
-let users: UserType[];
-let allOrders: OrderType[];
+type returnData = {
+    user: {success: boolean, response: UserType} | null;
+    userOrders: {success: boolean, response: OrderType[]} | ErrorResponseType | null;
+    employeeClaimedOrders: {success: boolean, response: OrderType[]} | ErrorResponseType | null;
+    users: {success: boolean, response: UserType[]} | ErrorResponseType | null;
+    allOrders: {success: boolean, response: OrderType[]} | ErrorResponseType | null;
+}
+
+let returnData: returnData = {
+    user: null,
+    userOrders: null,
+    employeeClaimedOrders: null,
+    users: null,
+    allOrders: null,
+}
 
 export const load = async ({ locals, fetch }) => {
 
     //Checks if User is Logged In
     if (!locals.user) {throw redirect(302, '/auth/login');}
+    else {
+        returnData.user = {success: true, response: locals.user};
+    }
 
     //Load User Order Info
     if (locals.user.user_type == "customer" || locals.user.user_type == "admin") {
@@ -34,13 +49,15 @@ export const load = async ({ locals, fetch }) => {
                 console.error('Loading Orders Failed:', responseData.error );
                 if (responseData.message) {
                     console.error('Error:', responseData.message );
+                    returnData.userOrders = {success: false, response: {status: flaskResponse.status, error: responseData.error, message: responseData.message}}
                 }
-                // return fail(flaskResponse.status, responseData);
+                else {
+                    returnData.userOrders = {success: false, response: {status: flaskResponse.status, error: responseData.error, message: null}}
+                }
             }
-
-            userOrders = responseData.orders;
-
-            // return { user: locals.user, userOrders: userOrders };
+            else {
+                returnData.userOrders = {success: true, response: responseData.orders};
+            }
         } 
         catch (error) {
             console.error('Error Loading User Orders:', error);
@@ -67,13 +84,15 @@ export const load = async ({ locals, fetch }) => {
                 console.error('Loading Employee Claimed Orders Failed:', responseData.error );
                 if (responseData.message) {
                     console.error('Error:', responseData.message );
+                    returnData.employeeClaimedOrders = {success: false, response: {status: flaskResponse.status, error: responseData.error, message: responseData.message}}
                 }
-                // return fail(flaskResponse.status, responseData);
+                else {
+                    returnData.employeeClaimedOrders = {success: false, response: {status: flaskResponse.status, error: responseData.error, message: null}}
+                }
             }
-
-            employeeClaimedOrders = responseData.orders;
-
-            // return { user: locals.user, userOrders: userOrders };
+            else {
+                returnData.employeeClaimedOrders = {success: true, response: responseData.orders};
+            }
         } 
         catch (error) {
             console.error('Error Loading Employee Claimed Orders:', error);
@@ -97,13 +116,15 @@ export const load = async ({ locals, fetch }) => {
                 console.error('Loading User Data Failed:', responseData.error );
                 if (responseData.message) {
                     console.error('Error:', responseData.message );
+                    returnData.users = {success: false, response: {status: flaskResponse.status, error: responseData.error, message: responseData.message}}
                 }
-                // return fail(flaskResponse.status, responseData);
+                else {
+                    returnData.users = {success: false, response: {status: flaskResponse.status, error: responseData.error, message: null}}
+                }
             }
-
-            users = responseData;
-
-            // return { user: locals.user, userOrders: userOrders };
+            else {
+                returnData.users = {success: true, response: responseData};
+            }
         } 
         catch (error) {
             console.error('Error Loading Admin User Info:', error);
@@ -123,13 +144,15 @@ export const load = async ({ locals, fetch }) => {
                 console.error('Loading Order Data Failed:', responseData.error );
                 if (responseData.message) {
                     console.error('Error:', responseData.message );
+                    returnData.allOrders = {success: false, response: {status: flaskResponse.status, error: responseData.error, message: responseData.message}}
                 }
-                // return fail(flaskResponse.status, responseData);
+                else {
+                    returnData.allOrders = {success: false, response: {status: flaskResponse.status, error: responseData.error, message: null}}
+                }
             }
-
-            allOrders = responseData.orders;
-
-            // return { user: locals.user, userOrders: userOrders };
+            else {
+                returnData.allOrders = {success: true, response: responseData.orders};
+            }
         } 
         catch (error) {
             console.error('Error Loading Admin Order Info:', error);
@@ -137,17 +160,12 @@ export const load = async ({ locals, fetch }) => {
     }
 
     //Return Data
-    if (userOrders || employeeClaimedOrders || users || allOrders) {
-        return { 
-            user: locals.user, 
-            userOrders: userOrders,
-            employeeClaimedOrders: employeeClaimedOrders,
-            users: users,
-            allOrders: allOrders
-        };
+    if (returnData.userOrders != null || returnData.employeeClaimedOrders != null || returnData.users != null || returnData.allOrders != null) {
+        console.error(returnData)
+        return returnData;
     }
-
     else {
+        // If this happens, something is really fucked up
         throw redirect(302, '/')
     }
 }
