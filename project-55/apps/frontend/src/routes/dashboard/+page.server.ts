@@ -161,7 +161,7 @@ export const load = async ({ locals, fetch }) => {
 
     //Return Data
     if (returnData.userOrders != null || returnData.employeeClaimedOrders != null || returnData.users != null || returnData.allOrders != null) {
-        console.error(returnData)
+        // console.error(returnData)
         return returnData;
     }
     else {
