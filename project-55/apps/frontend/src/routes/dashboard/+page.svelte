@@ -165,6 +165,12 @@
                     </a>
                 </div>
 
+                <div class="w-full card variant-soft rounded-lg p-1">
+                <a href="/control/analytics" class="w-full block">
+                    <button class="{navButtonClass}">Analytics</button>
+                </a>
+                </div>
+
                 <!-- Info Filters -->
                 {#if showAdminInfo} 
                     <form class="{navContainerClass}">              

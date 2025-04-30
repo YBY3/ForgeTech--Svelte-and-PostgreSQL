@@ -152,6 +152,14 @@
 										<button class="btn hover:bg-primary-500 w-full">Product Control</button>
 									</a> -->
 								{/if}
+								{#if data.user.user_type === 'admin'}
+									<a href="/control/analytics" class="w-full block">
+										<button class="btn hover:bg-primary-500 w-full">Analytics</button>
+									</a>
+									<!-- <a href="/auth/product-control" class="w-full block">
+										<button class="btn hover:bg-primary-500 w-full">Product Control</button>
+									</a> -->
+								{/if}
 							{/if}
 							<!-- Always show About Us -->
 							<a href="/about-us" class="w-full block">

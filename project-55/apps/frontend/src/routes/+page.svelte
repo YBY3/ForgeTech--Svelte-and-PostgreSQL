@@ -5,6 +5,7 @@
 	import { productsStore } from '$lib/stores/ProductsStore.js';
 	import ProductCard from '$lib/components/product/ProductCard.svelte';
 	import { goto } from '$app/navigation';
+    
 
     //Data
     export let data;

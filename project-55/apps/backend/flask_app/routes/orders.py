@@ -505,3 +505,15 @@ def working_order():
     db.session.commit()
     
     return jsonify(order.to_dict()), 200
+
+
+@order_bp.route('/actually_get_all_orders', methods=['GET'])
+def actually_get_all_orders():
+    orders = Order.query.all()
+    return jsonify([order.to_dict() for order in orders])
+
+
+@order_bp.route('/get_all_OrderProducts', methods=['GET'])
+def get_all_OrderProducts():
+    OrdersProducts = OrderProduct.query.all()
+    return jsonify([OrderProduct.to_dict() for OrderProduct in OrdersProducts])

@@ -143,6 +143,15 @@ class OrderProduct(db.Model):
     def __repr__(self):
         return f'<OrderProduct OrderID: {self.order_id}, ProductID: {self.product_id}>'
     
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'order_id': self.order_id,
+            'product_id': self.product_id,
+            'order_quantity': self.order_quantity,
+            'product_option': self.product_option
+        }
+    
 
 # Image Product Relationship
 class ImageProduct(db.Model):
