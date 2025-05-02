@@ -129,6 +129,7 @@
 							<a href="/dashboard" class="w-full block">
 								<button class="btn hover:bg-primary-500 w-full">Dashboard</button>
 							</a>
+					
 							<!-- Conditional link based on user_type -->
 							{#if data.user}
 								{#if data.user.user_type === 'customer' || data.user.user_type === 'admin'}
@@ -171,6 +172,10 @@
 							<a class="btn hover:bg-primary-500 w-full" href="/auth/login">Login</a>
 							<a class="btn hover:bg-primary-500 w-full" href="/auth/sign-up">Sign Up</a>
 						{/if}
+							<!-- Build Your PC Link -->
+							<a href="/builder" class="w-full block">
+								<button class="btn hover:bg-primary-500 w-full">Build Your PC</button>
+							</a>
 					</div>
 				</div>
 			</svelte:fragment>
