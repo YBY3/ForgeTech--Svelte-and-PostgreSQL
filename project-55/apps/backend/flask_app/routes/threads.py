@@ -175,7 +175,7 @@ def add_thread():
         return jsonify({
             'success': True,
             'thread': {
-                'thread_id': thread.id,
+                'id': thread.id,
                 'name': thread.name,
                 'created_by_id': thread.created_by_id,
                 'username': thread.creator.username,
@@ -217,7 +217,15 @@ def add_message():
             }), 400
 
         # Validate thread_id
-        thread_id = data['thread_id']
+        try:
+            thread_id = int(data['thread_id'])
+        except (ValueError, TypeError):
+            return jsonify({
+                'success': False,
+                'error': 'Invalid Thread ID',
+                'message': 'Thread ID must be an integer'
+            }), 400
+
         thread = Thread.query.get(thread_id)
         if not thread:
             return jsonify({
@@ -227,7 +235,15 @@ def add_message():
             }), 404
 
         # Validate user_id
-        user_id = data['user_id']
+        try:
+            user_id = int(data['user_id'])
+        except (ValueError, TypeError):
+            return jsonify({
+                'success': False,
+                'error': 'Invalid User ID',
+                'message': 'User ID must be an integer'
+            }), 400
+
         user = User.query.get(user_id)
         if not user:
             return jsonify({
@@ -247,13 +263,29 @@ def add_message():
 
         # Validate responding_to_id (if provided)
         responding_to_id = data.get('responding_to_id')
-        if responding_to_id is not None:
-            parent_message = Message.query.get(responding_to_id)
-            if not parent_message or parent_message.thread_id != thread_id:
+        if responding_to_id == 'null' or responding_to_id is None:
+            responding_to_id = None
+        else:
+            try:
+                responding_to_id = int(responding_to_id)
+                parent_message = Message.query.get(responding_to_id)
+                if not parent_message:
+                    return jsonify({
+                        'success': False,
+                        'error': 'Invalid Parent Message',
+                        'message': f'Parent message with ID {responding_to_id} does not exist'
+                    }), 404
+                if parent_message.thread_id != thread_id:
+                    return jsonify({
+                        'success': False,
+                        'error': 'Invalid Parent Message',
+                        'message': f'Parent message with ID {responding_to_id} belongs to thread {parent_message.thread_id}, not thread {thread_id}'
+                    }), 400
+            except (ValueError, TypeError):
                 return jsonify({
                     'success': False,
-                    'error': 'Invalid Parent Message',
-                    'message': f'Parent message with ID {responding_to_id} does not exist in thread {thread_id}'
+                    'error': 'Invalid Parent Message ID',
+                    'message': 'Parent message ID must be an integer or null'
                 }), 400
 
         # Create new message
@@ -298,6 +330,100 @@ def add_message():
             'message': str(e)
         }), 500
     
-# Get Messages from Thread VIA thread_id
+
+@thread_bp.route('/get_thread_messages', methods=['POST'])
+def get_thread_messages():
+    try:
+        data = request.get_json()
+
+        # Required fields
+        if 'thread_id' not in data or data['thread_id'] is None:
+            return jsonify({
+                'success': False,
+                'error': 'Missing Thread ID',
+                'message': 'Thread ID is required'
+            }), 400
+
+        # Validate thread_id
+        thread_id = data['thread_id']
+        thread = Thread.query.get(thread_id)
+        if not thread:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid Thread',
+                'message': f'Thread with ID {thread_id} does not exist'
+            }), 404
+
+        # Fetch all messages for the thread
+        messages = Message.query.filter_by(thread_id=thread_id).all()
+
+        # Build message tree for hierarchical ordering
+        message_dict = {msg.id: {
+            'id': msg.id,
+            'thread_id': msg.thread_id,
+            'user_id': msg.user_id,
+            'username': msg.user.username,
+            'responding_to_id': msg.responding_to_id,
+            'message': msg.message,
+            'created_at': msg.created_at.isoformat(),
+            'children': []
+        } for msg in messages}
+
+        # Group messages by responding_to_id
+        root_messages = []
+        for msg in messages:
+            msg_data = message_dict[msg.id]
+            if msg.responding_to_id is None:
+                root_messages.append(msg_data)
+            else:
+                parent = message_dict.get(msg.responding_to_id)
+                if parent:
+                    parent['children'].append(msg_data)
+
+        # Sort messages by created_at within each level
+        def sort_messages(msg_list):
+            msg_list.sort(key=lambda x: x['created_at'])
+            for msg in msg_list:
+                sort_messages(msg['children'])
+
+        sort_messages(root_messages)
+
+        # Flatten the tree into a list
+        def flatten_messages(msg_list, result):
+            for msg in msg_list:
+                result.append({
+                    'id': msg['id'],
+                    'thread_id': msg['thread_id'],
+                    'user_id': msg['user_id'],
+                    'username': msg['username'],
+                    'responding_to_id': msg['responding_to_id'],
+                    'message': msg['message'],
+                    'created_at': msg['created_at']
+                })
+                flatten_messages(msg['children'], result)
+
+        ordered_messages = []
+        flatten_messages(root_messages, ordered_messages)
+
+        return jsonify({
+            'success': True,
+            'messages': ordered_messages
+        }), 200
+
+    except ValueError as ve:
+        print(f"ValueError: {str(ve)}", file=sys.stderr)
+        return jsonify({
+            'success': False,
+            'error': 'Invalid Data Format',
+            'message': str(ve)
+        }), 400
+
+    except Exception as e:
+        print(f"Error Fetching Thread Messages: {str(e)}", file=sys.stderr)
+        return jsonify({
+            'success': False,
+            'error': 'Failed to Fetch Messages',
+            'message': str(e)
+        }), 500
 
 # Resolve Thread (Employee Only Action)

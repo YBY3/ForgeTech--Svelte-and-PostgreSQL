@@ -9,22 +9,12 @@
     export let thread: ThreadType;
     export let messages: MessageType[]; 
     export let showBackButton = false;
-
-    // let thread = {id: 4, user_id: 1, name: 'Thread #4', initial_message_id: 1}
-    // let messages = [
-    //     {id: 1, thread_id: 4, user_id: 1, responding_to_id: null, message: 'Hi' },
-    //     {id: 2, thread_id: 4, user_id: 2, responding_to_id: 1, message: 'Hello' },
-    //     {id: 3, thread_id: 4, user_id: 1, responding_to_id: 2, message: 'This is a test This is a test This is a test This is a test This is a test This is a test' },
-    //     {id: 4, thread_id: 4, user_id: 2, responding_to_id: 3, message: 'This is a test' },
-    //     {id: 5, thread_id: 4, user_id: 1, responding_to_id: 4, message: 'This is a test' },
-    //     {id: 6, thread_id: 4, user_id: 2, responding_to_id: 5, message: 'This is a test' }
-    // ];
+    export let messageSending = false;
 
     //Component Elements
     const dispatch = createEventDispatcher();
     let currentMessage = '';
     let messagesContainer: HTMLDivElement;
-    let messageSending = false;
 
     //Scoll to Bottom on New Message
     afterUpdate(() => {

@@ -136,9 +136,7 @@ export const actions = {
                 return fail(flaskResponse.status, responseData);
             }
 
-            console.error(responseData)
-
-            // return { success: true, thread: responseData.thread };
+            return { success: true, messages: responseData.messages };
         } 
         
         catch (error) {
@@ -174,9 +172,7 @@ export const actions = {
                 return fail(flaskResponse.status, responseData);
             }
 
-            console.error(responseData)
-
-            // return { success: true, thread: responseData.thread };
+            return { success: true, message: responseData.message };
         } 
         
         catch (error) {

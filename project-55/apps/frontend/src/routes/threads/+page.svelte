@@ -19,6 +19,7 @@
     let submitting = false;
     let newThreadName: string;
     let currentThread: ThreadType;
+    let messageSending = false;
 
     //Page Views
     let threadsView = true;
@@ -63,9 +64,9 @@
             formData.append('user_id', JSON.stringify(userData.id));
 
 			// Log the form data entries for debugging
-			for (const [key, value] of formData.entries()) {
-				console.log(`${key}: ${value}`);
-			}
+			// for (const [key, value] of formData.entries()) {
+			// 	console.log(`${key}: ${value}`);
+			// }
             
             //Post New Form Data
             const response = await fetch('?/add_thread', {
@@ -76,20 +77,13 @@
             const result: ActionResult = deserialize(await response.text());
 
             if (result.type === 'success') {
-                // // Update Product Locally
-                // if (result.data) {
-                //     product.image_ids = result.data.image_ids
-                //     product.image_urls = result.data.image_urls
-                // }
-                // products = products.filter(p => p.id !== product.id);
-                // products.push(product)
-
-                toastStore.trigger({
-                    message: "New Thread Created Successfully",
-                    background: 'variant-filled-success'
-                });
-
-				// showOpenThreadView();
+                if (result.data) {
+                    const thread = result.data.thread;
+                    console.log(thread);
+                    threads = [...threads, thread];
+                    console.log(threads)
+				    showOpenThreadView(thread);
+                }
             } 
             else if (result.type === 'failure') {
                 if (result.data) {
@@ -127,9 +121,9 @@
             formData.append('thread_id', JSON.stringify(thread.id));
 
 			// Log the form data entries for debugging
-			for (const [key, value] of formData.entries()) {
-				console.log(`${key}: ${value}`);
-			}
+			// for (const [key, value] of formData.entries()) {
+			// 	console.log(`${key}: ${value}`);
+			// }
             
             //Post New Form Data
             const response = await fetch('?/get_thread_messages', {
@@ -137,33 +131,21 @@
                 body: formData
             });
 
-            showOpenThreadView(thread);
+            const result: ActionResult = deserialize(await response.text());
 
-            // const result: ActionResult = deserialize(await response.text());
-
-            // if (result.type === 'success') {
-            //     // // Update Product Locally
-            //     // if (result.data) {
-            //     //     product.image_ids = result.data.image_ids
-            //     //     product.image_urls = result.data.image_urls
-            //     // }
-            //     // products = products.filter(p => p.id !== product.id);
-            //     // products.push(product)
-
-            //     // toastStore.trigger({
-            //     //     message: "New Thread Created Successfully",
-            //     //     background: 'variant-filled-success'
-            //     // });
-
-			// 	// showOpenThreadView();
-            // } 
-            // else if (result.type === 'failure') {
-            //     if (result.data) {
-            //         const errorMessage = result.data.error;
-            //         throw new Error(errorMessage);
-            //     }
-            //     throw new Error("Server Error, Try Again Later");
-            // }
+            if (result.type === 'success') {
+                if (result.data) {
+                    currentMessages = result.data.messages;
+				    showOpenThreadView(thread);
+                }
+            } 
+            else if (result.type === 'failure') {
+                if (result.data) {
+                    const errorMessage = result.data.error;
+                    throw new Error(errorMessage);
+                }
+                throw new Error("Server Error, Try Again Later");
+            }
         
         } catch (error) {
             const errorMessage: string = `${error}`;
@@ -189,6 +171,7 @@
         //Try Submitting
         try {
             submitting = true;
+            messageSending = true;
             const formData = new FormData();
             formData.append('thread_id', JSON.stringify(message.thread_id));
             formData.append('user_id', JSON.stringify(userData.id));
@@ -200,37 +183,26 @@
 				console.log(`${key}: ${value}`);
 			}
             
-            // //Post New Form Data
-            // const response = await fetch('?/send_message', {
-            //     method: 'POST',
-            //     body: formData
-            // });
+            //Post New Form Data
+            const response = await fetch('?/send_message', {
+                method: 'POST',
+                body: formData
+            });
 
-            // const result: ActionResult = deserialize(await response.text());
+            const result: ActionResult = deserialize(await response.text());
 
-            // if (result.type === 'success') {
-            //     // // Update Product Locally
-            //     // if (result.data) {
-            //     //     product.image_ids = result.data.image_ids
-            //     //     product.image_urls = result.data.image_urls
-            //     // }
-            //     // products = products.filter(p => p.id !== product.id);
-            //     // products.push(product)
-
-            //     // toastStore.trigger({
-            //     //     message: "New Thread Created Successfully",
-            //     //     background: 'variant-filled-success'
-            //     // });
-
-			// 	// showOpenThreadView();
-            // } 
-            // else if (result.type === 'failure') {
-            //     if (result.data) {
-            //         const errorMessage = result.data.error;
-            //         throw new Error(errorMessage);
-            //     }
-            //     throw new Error("Server Error, Try Again Later");
-            // }
+            if (result.type === 'success') {
+                if (result.data) {
+                    currentMessages = [...currentMessages, result.data.message];
+                }
+            } 
+            else if (result.type === 'failure') {
+                if (result.data) {
+                    const errorMessage = result.data.error;
+                    throw new Error(errorMessage);
+                }
+                throw new Error("Server Error, Try Again Later");
+            }
         
         } catch (error) {
             const errorMessage: string = `${error}`;
@@ -239,29 +211,10 @@
                 background: 'variant-filled-error'
             });
         } finally {
+            messageSending = false
             submitting = false;
         }
     }
-
-    // async function showEditProductFormView(product: ProductType) {
-    //     selectedProduct = product;
-
-    //     addProductFormView = false;
-    //     productsView = false;
-    //     editProductFormView = true;
-    // }
-
-    // const formData = new FormData();
-    // formData.append('user_id', JSON.stringify(1));
-    // formData.append('reponding_to', JSON.stringify(respondingID));
-    // formData.append('message', currentMessage);
-
-    // Log the form data entries for debugging
-    // for (const [key, value] of formData.entries()) {
-    //     console.log(`${key}: ${value}`);
-    // }
-
-    console.log(data);
 
     //Load Page Data
     onMount(() => {
@@ -365,7 +318,7 @@
         {:else if openThreadView}
 
             <MessageCard 
-                showBackButton={true} userID={userData.id} thread={currentThread} messages={currentMessages}
+                showBackButton={true} messageSending={messageSending} userID={userData.id} thread={currentThread} messages={currentMessages}
                 on:goBack={showThreadView} on:sendMessage={(event) => sendMessage(event.detail.message)}
             />
 
