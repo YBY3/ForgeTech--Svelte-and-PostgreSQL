@@ -32,8 +32,9 @@ class User(db.Model):
     registered_by = db.Column(db.DateTime, default=datetime.utcnow)
     active_by = db.Column(db.DateTime, default=datetime.utcnow)
 
-    messages = db.relationship('user_message', back_populates='user')
-
+    # Relationships
+    threads = db.relationship('Thread', back_populates='creator', lazy='dynamic')
+    messages = db.relationship('Message', back_populates='user', lazy='dynamic')
 
     def __repr__(self):
         return f'<User {self.name}>'
@@ -64,6 +65,7 @@ class Product(db.Model):
     product_stock = db.Column(db.Integer, nullable=False, default=100000)
     hidden = db.Column(db.Boolean, default=False)
 
+    # Relationships
     image_ids = db.relationship('ImageProduct', back_populates='product')
     orders = db.relationship('OrderProduct', back_populates='product')
 
@@ -126,6 +128,40 @@ class Image(db.Model):
 
     def __repr__(self):
         return f'<Image {self.name}>'
+    
+
+# Message Model
+class Message(db.Model):
+    __tablename__ = 'message'
+    id = db.Column(db.Integer, primary_key=True)
+    thread_id = db.Column(db.Integer, db.ForeignKey('thread.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    responding_to_id = db.Column(db.Integer, db.ForeignKey('message.id'), nullable=True)
+    message = db.Column(db.String(1024), nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    # Relationships
+    thread = db.relationship('Thread', back_populates='messages')
+    user = db.relationship('User', back_populates='messages')
+    replies = db.relationship('Message', backref=db.backref('parent', remote_side=[id]), lazy='dynamic')
+
+    def __repr__(self):
+        return f'<id: {self.id}, thread_id: {self.thread_id}, user_id: {self.user_id}, responding_to_id: {self.responding_to_id}, message: {self.message[:20]}>'
+    
+
+# Thread Model
+class Thread(db.Model):
+    __tablename__ = 'thread'
+    id = db.Column(db.Integer, primary_key=True)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    creator = db.relationship('User', back_populates='threads')
+    messages = db.relationship('Message', back_populates='thread', lazy='dynamic')
+
+    def __repr__(self):
+        return f'<Thread ID: {self.id}, Name: {self.name}>'
 
     
 # Order Product Relationship
@@ -155,16 +191,3 @@ class ImageProduct(db.Model):
 
     def __repr__(self):
         return f'<ImageProduct ImageID: {self.image_id}, ProductID: {self.product_id}>'
-    
-
-
-class user_message(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    message = db.Column(db.String(1024), nullable=False)
-    request = db.Column(db.String(1024), nullable=False)
-
-    user = db.relationship('User', back_populates='messages')
-
-    def __repr__(self):
-        return f'<UserMessage ID: {self.id}, UserID: {self.user_id}>'
