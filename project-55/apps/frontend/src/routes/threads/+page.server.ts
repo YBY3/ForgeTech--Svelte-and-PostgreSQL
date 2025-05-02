@@ -77,68 +77,6 @@ export const load = async ({ locals, fetch }) => {
 
 
 export const actions = {
-    // edit_product: async ({ request }) => {
-    //     try {
-    //         const formData = await request.formData();
-
-    //         const jsonData = {
-    //             id: formData.get('id'),
-    //             name: formData.get('name'),
-    //             price: formData.get('price'),
-    //             description: formData.get('description'),
-    //             brand: formData.get('brand'),
-    //             options: formData.get('options'),
-    //             product_type: formData.get('product_type'),
-    //             product_stock: formData.get('product_stock'),
-    //             hidden: formData.get('hidden'),
-    //             image_ids: formData.get('image_ids'),
-    //             files: [] as { data: string; name: string; type: string }[]
-    //         };
-
-    //         // Add Images to jsonData
-    //         for (const [key, value] of formData.entries()) {
-    //             if (key.startsWith('files[')) {
-    //                 const file = value as File;
-    //                 const arrayBuffer = await file.arrayBuffer();
-    //                 const base64Data = Buffer.from(arrayBuffer).toString('base64');
-    //                 jsonData.files.push({
-    //                     data: base64Data,
-    //                     name: file.name,
-    //                     type: file.type
-    //                 });
-    //             }
-    //         }
-
-    //         const flaskResponse = await fetch(`${getFlaskURL()}/api/products/edit_product`, {
-    //             method: 'POST',
-    //             headers: { 'Content-Type': 'application/json' },
-    //             body: JSON.stringify(jsonData)
-    //         });
-
-    //         const responseData = await flaskResponse.json();
-
-    //         if (!flaskResponse.ok) {
-    //             console.error('Editing Product Failed:', responseData.error );
-    //             if (responseData.message) {
-    //                 console.error('Error:', responseData.message );
-    //             }
-    //             return fail(flaskResponse.status, responseData);
-    //         }
-
-    //         // Get Updated Image URLs
-    //         let image_urls: string[] = [];
-    //         if (responseData.image_ids && responseData.image_ids.length > 0) {
-    //             image_urls = responseData.image_ids.map((id: number) => `${getImageURL()}/api/images/${id}`);
-    //         }
-
-    //         return { success: true, image_ids: responseData.image_ids, image_urls: image_urls };
-    //     } 
-        
-    //     catch (error) {
-    //         console.error('Error in edit_product action:', error);
-    //         return fail(500, { error: 'Internal Server Error' });
-    //     }
-    // },
 
     add_thread: async ({ request }) => {
         try {
@@ -174,35 +112,76 @@ export const actions = {
         }
     },
 
-    // delete_product: async ({ request }) => {
-    //     try {
-    //         const formData = await request.formData();
-    //         const jsonData = {
-    //             id: formData.get('id'),
-    //         };
+    get_thread_messages: async ({ request }) => {
+        try {
+            const formData = await request.formData();
 
-    //         const flaskResponse = await fetch(`${getFlaskURL()}/api/products/delete_product`, {
-    //             method: 'POST',
-    //             headers: { 'Content-Type': 'application/json' },
-    //             body: JSON.stringify(jsonData)
-    //         });
+            let jsonData = {
+                thread_id: formData.get('thread_id'),
+            };
 
-    //         const responseData = await flaskResponse.json();
+            let flaskResponse = await fetch(`${getFlaskURL()}/api/threads/get_thread_messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(jsonData)
+            });
 
-    //         if (!flaskResponse.ok) {
-    //             console.error('Removing Product Failed:', responseData.error );
-    //             if (responseData.message) {
-    //                 console.error('Error:', responseData.message );
-    //             }
-    //             return fail(flaskResponse.status, responseData);
-    //         }
+            let responseData = await flaskResponse.json();
 
-    //         return { success: true };
-    //     } 
+            if (!flaskResponse.ok) {
+                console.error('Loading Thread Messages Failed:', responseData.error );
+                if (responseData.message) {
+                    console.error('Error:', responseData.message );
+                }
+                return fail(flaskResponse.status, responseData);
+            }
+
+            console.error(responseData)
+
+            // return { success: true, thread: responseData.thread };
+        } 
         
-    //     catch (error) {
-    //         console.error('Error in delete_product action:', error);
-    //         return fail(500, { error: 'Internal Server Error' });
-    //     }
-    // }
+        catch (error) {
+            console.error('Error in get_thread_messages action:', error);
+            return fail(500, { error: 'Internal Server Error' });
+        }
+    },
+
+    send_message: async ({ request }) => {
+        try {
+            const formData = await request.formData();
+
+            let jsonData = {
+                thread_id: formData.get('thread_id'),
+                user_id: formData.get('user_id'),
+                responding_to_id: formData.get('responding_to_id'),
+                message: formData.get('message'),
+            };
+
+            let flaskResponse = await fetch(`${getFlaskURL()}/api/threads/add_message`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(jsonData)
+            });
+
+            let responseData = await flaskResponse.json();
+
+            if (!flaskResponse.ok) {
+                console.error('Adding Message to Thread Failed:', responseData.error );
+                if (responseData.message) {
+                    console.error('Error:', responseData.message );
+                }
+                return fail(flaskResponse.status, responseData);
+            }
+
+            console.error(responseData)
+
+            // return { success: true, thread: responseData.thread };
+        } 
+        
+        catch (error) {
+            console.error('Error in send_message action:', error);
+            return fail(500, { error: 'Internal Server Error' });
+        }
+    }
 };

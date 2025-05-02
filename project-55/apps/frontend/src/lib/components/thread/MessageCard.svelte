@@ -8,6 +8,7 @@
     export let userID: number;
     export let thread: ThreadType;
     export let messages: MessageType[]; 
+    export let showBackButton = false;
 
     // let thread = {id: 4, user_id: 1, name: 'Thread #4', initial_message_id: 1}
     // let messages = [
@@ -23,6 +24,7 @@
     const dispatch = createEventDispatcher();
     let currentMessage = '';
     let messagesContainer: HTMLDivElement;
+    let messageSending = false;
 
     //Scoll to Bottom on New Message
     afterUpdate(() => {
@@ -31,25 +33,36 @@
         }
     });
 
+    function goBack() {
+        dispatch('goBack');
+    }
+
     //Send Message
     function handleMessage() {
+        if (messageSending) {return}
+
+        messageSending = true
+
         if (!currentMessage) {
             return;
         }
 
-        const respondingID = messages.length > 0 ? messages[messages.length - 1].id : null;
+        let respondingID = null;
+        if (messages.length > 0) {
+            respondingID = messages[messages.length - 1].id
+        }
 
         dispatch('sendMessage', {
             message: {
                 id: -1,
                 thread_id: thread.id,
                 user_id: userID,
-                respondingID: respondingID,
+                responding_to_id: respondingID,
                 message: currentMessage,
             }
         });
 
-        messages = [...messages, {id: -1, thread_id: 4, user_id: 1, responding_to_id: respondingID, message: currentMessage}];
+        messages = [...messages, {id: -1, thread_id: thread.id, user_id: userID, responding_to_id: respondingID, message: 'SENDING...'}];
         currentMessage = '';
     }
 </script>
@@ -59,7 +72,20 @@
     <!-- Message Card -->
     <div class="w-full md:w-3/4 h-full min-h-80 flex flex-col items-center card variant-surface p-2">
 
-        <h1 class="h-16 text-3xl rounded-lg p-2">Contact</h1>
+        <div class="w-full h-16 flex justify-between items-center pl-4 pr-4 pb-2">
+            {#if showBackButton}
+                <button 
+                    class="w-20 h-10 btn variant-ghost hover:text-primary-500 font-bold uppercase text-xl rounded-lg shadow-lg p-2" 
+                    on:click={() => goBack()}
+                >
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+            {:else}
+                <div class="w-20"></div> <!-- Spacer -->
+            {/if}
+            <h1 class="h-12 text-2xl md:text-3xl rounded-lg p-2">Messages</h1>
+            <div class="w-20"></div> <!-- Spacer -->
+        </div>
 
         <!-- Inner Card / Message Info -->
         <div class="w-full h-full min-h-64 flex flex-col card variant-soft p-4">

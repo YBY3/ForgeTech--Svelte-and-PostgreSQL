@@ -5,17 +5,20 @@
     import { deserialize } from '$app/forms';
     import MessageCard from "$lib/components/thread/MessageCard.svelte"
     import type { UserType } from "$lib/types/UserTypes";
+    import type { MessageType } from "$lib/types/MessageTypes";
     import type { ThreadType } from "$lib/types/ThreadTypes";
 
     //Data
     export let data;
     let userData: UserType;
     let threads: ThreadType[];
+    let currentMessages: MessageType[] = [];
 
     //Page Elements
     const toastStore = getToastStore();
     let submitting = false;
     let newThreadName: string;
+    let currentThread: ThreadType;
 
     //Page Views
     let threadsView = true;
@@ -34,7 +37,9 @@
         createNewThreadView = true;
     }
 
-    function showOpenThreadView() {
+    function showOpenThreadView(thread: ThreadType) {
+        currentThread = thread;
+
         createNewThreadView = false;
         threadsView = false;
         openThreadView = true;
@@ -44,7 +49,7 @@
         //If Already Submitting, Exit
         if (submitting) {
             toastStore.trigger({
-                message: 'Product Control is Submitting Changes, Please Wait',
+                message: 'This Page is Submitting Changes, Please Wait',
                 background: 'variant-filled-error'
             });
             return;
@@ -93,6 +98,139 @@
                 }
                 throw new Error("Server Error, Try Again Later");
             }
+        
+        } catch (error) {
+            const errorMessage: string = `${error}`;
+			toastStore.trigger({
+                message: errorMessage,
+                background: 'variant-filled-error'
+            });
+        } finally {
+            submitting = false;
+        }
+    }
+
+    async function getThreadMessages(thread: ThreadType) {
+        //If Already Submitting, Exit
+        if (submitting) {
+            toastStore.trigger({
+                message: 'This Page is Submitting Changes, Please Wait',
+                background: 'variant-filled-error'
+            });
+            return;
+        }
+
+        //Try Submitting
+        try {
+            submitting = true;
+            const formData = new FormData();
+            formData.append('thread_id', JSON.stringify(thread.id));
+
+			// Log the form data entries for debugging
+			for (const [key, value] of formData.entries()) {
+				console.log(`${key}: ${value}`);
+			}
+            
+            //Post New Form Data
+            const response = await fetch('?/get_thread_messages', {
+                method: 'POST',
+                body: formData
+            });
+
+            showOpenThreadView(thread);
+
+            // const result: ActionResult = deserialize(await response.text());
+
+            // if (result.type === 'success') {
+            //     // // Update Product Locally
+            //     // if (result.data) {
+            //     //     product.image_ids = result.data.image_ids
+            //     //     product.image_urls = result.data.image_urls
+            //     // }
+            //     // products = products.filter(p => p.id !== product.id);
+            //     // products.push(product)
+
+            //     // toastStore.trigger({
+            //     //     message: "New Thread Created Successfully",
+            //     //     background: 'variant-filled-success'
+            //     // });
+
+			// 	// showOpenThreadView();
+            // } 
+            // else if (result.type === 'failure') {
+            //     if (result.data) {
+            //         const errorMessage = result.data.error;
+            //         throw new Error(errorMessage);
+            //     }
+            //     throw new Error("Server Error, Try Again Later");
+            // }
+        
+        } catch (error) {
+            const errorMessage: string = `${error}`;
+			toastStore.trigger({
+                message: errorMessage,
+                background: 'variant-filled-error'
+            });
+        } finally {
+            submitting = false;
+        }
+    }
+
+    async function sendMessage(message: MessageType) {
+        //If Already Submitting, Exit
+        if (submitting) {
+            toastStore.trigger({
+                message: 'This Page is Submitting Changes, Please Wait',
+                background: 'variant-filled-error'
+            });
+            return;
+        }
+
+        //Try Submitting
+        try {
+            submitting = true;
+            const formData = new FormData();
+            formData.append('thread_id', JSON.stringify(message.thread_id));
+            formData.append('user_id', JSON.stringify(userData.id));
+            formData.append('responding_to_id', JSON.stringify(message.responding_to_id));
+            formData.append('message', message.message);
+
+			// Log the form data entries for debugging
+			for (const [key, value] of formData.entries()) {
+				console.log(`${key}: ${value}`);
+			}
+            
+            // //Post New Form Data
+            // const response = await fetch('?/send_message', {
+            //     method: 'POST',
+            //     body: formData
+            // });
+
+            // const result: ActionResult = deserialize(await response.text());
+
+            // if (result.type === 'success') {
+            //     // // Update Product Locally
+            //     // if (result.data) {
+            //     //     product.image_ids = result.data.image_ids
+            //     //     product.image_urls = result.data.image_urls
+            //     // }
+            //     // products = products.filter(p => p.id !== product.id);
+            //     // products.push(product)
+
+            //     // toastStore.trigger({
+            //     //     message: "New Thread Created Successfully",
+            //     //     background: 'variant-filled-success'
+            //     // });
+
+			// 	// showOpenThreadView();
+            // } 
+            // else if (result.type === 'failure') {
+            //     if (result.data) {
+            //         const errorMessage = result.data.error;
+            //         throw new Error(errorMessage);
+            //     }
+            //     throw new Error("Server Error, Try Again Later");
+            // }
         
         } catch (error) {
             const errorMessage: string = `${error}`;
@@ -160,7 +298,10 @@
 
                     {#if threads}
                         {#each threads as thread}
-                            <button class="flex items-center justify-between p-4 dark:bg-surface-700 rounded-lg shadow-md bg-surface-200 card card-hover">
+                            <button 
+                                class="flex items-center justify-between p-4 dark:bg-surface-700 rounded-lg shadow-md bg-surface-200 card card-hover"
+                                on:click={() => getThreadMessages(thread)}
+                            >
                                 <span class="text-sm md:text-lg">{thread.name}</span>
                                 <span class="text-sm md:text-lg font-medium">{thread.username}</span>
                             </button>
@@ -183,13 +324,13 @@
 
                 <div class="w-full h-16 flex justify-between items-center pl-4 pr-4 pb-2">
                     <button 
-                        class="w-24 h-10 btn variant-ghost hover:text-primary-500 font-bold uppercase text-xl rounded-lg shadow-lg p-2" 
+                        class="w-20 h-10 btn variant-ghost hover:text-primary-500 font-bold uppercase text-xl rounded-lg shadow-lg p-2" 
                         on:click={() => showThreadView()}
                     >
                         <i class="fa-solid fa-arrow-left"></i>
                     </button>
-                    <h1 class="h-12 text-3xl rounded-lg p-2">Create New Thread</h1>
-                    <div class="w-24"></div> <!-- Spacer -->
+                    <h1 class="h-12 text-2xl md:text-3xl rounded-lg p-2">Create New Thread</h1>
+                    <div class="w-20"></div> <!-- Spacer -->
                 </div>
 
                 <!-- Inner Card / Threads Info -->
@@ -220,6 +361,13 @@
 
                 </div>
             </div>
+
+        {:else if openThreadView}
+
+            <MessageCard 
+                showBackButton={true} userID={userData.id} thread={currentThread} messages={currentMessages}
+                on:goBack={showThreadView} on:sendMessage={(event) => sendMessage(event.detail.message)}
+            />
 
         {/if}
     </div>

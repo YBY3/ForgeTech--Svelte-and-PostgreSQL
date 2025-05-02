@@ -201,6 +201,103 @@ def add_thread():
         }), 500
     
 
-# Add to Thread (Add Message to Thread)
+@thread_bp.route('/add_message', methods=['POST'])
+def add_message():
+    try:
+        data = request.get_json()
+
+        # Required fields
+        required_fields = ['thread_id', 'user_id', 'message']
+        missing_fields = [field for field in required_fields if field not in data or data[field] is None]
+        if missing_fields:
+            return jsonify({
+                'success': False,
+                'error': 'Missing Message Info',
+                'message': f"Fields missing: {', '.join(missing_fields)}"
+            }), 400
+
+        # Validate thread_id
+        thread_id = data['thread_id']
+        thread = Thread.query.get(thread_id)
+        if not thread:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid Thread',
+                'message': f'Thread with ID {thread_id} does not exist'
+            }), 404
+
+        # Validate user_id
+        user_id = data['user_id']
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid User',
+                'message': f'User with ID {user_id} does not exist'
+            }), 400
+
+        # Validate message
+        message_text = data['message'].strip()
+        if not message_text:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid Message',
+                'message': 'Message cannot be empty'
+            }), 400
+
+        # Validate responding_to_id (if provided)
+        responding_to_id = data.get('responding_to_id')
+        if responding_to_id is not None:
+            parent_message = Message.query.get(responding_to_id)
+            if not parent_message or parent_message.thread_id != thread_id:
+                return jsonify({
+                    'success': False,
+                    'error': 'Invalid Parent Message',
+                    'message': f'Parent message with ID {responding_to_id} does not exist in thread {thread_id}'
+                }), 400
+
+        # Create new message
+        new_message = Message(
+            thread_id=thread_id,
+            user_id=user_id,
+            responding_to_id=responding_to_id,
+            message=message_text
+        )
+
+        # Add to database
+        db.session.add(new_message)
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': {
+                'id': new_message.id,
+                'thread_id': new_message.thread_id,
+                'user_id': new_message.user_id,
+                'username': user.username,
+                'responding_to_id': new_message.responding_to_id,
+                'message': new_message.message,
+                'created_at': new_message.created_at.isoformat()
+            }
+        }), 201
+
+    except ValueError as ve:
+        print(f"ValueError: {str(ve)}", file=sys.stderr)
+        return jsonify({
+            'success': False,
+            'error': 'Invalid Data Format',
+            'message': str(ve)
+        }), 400
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error Adding Message: {str(e)}", file=sys.stderr)
+        return jsonify({
+            'success': False,
+            'error': 'Failed to Add Message',
+            'message': str(e)
+        }), 500
+    
+# Get Messages from Thread VIA thread_id
 
 # Resolve Thread (Employee Only Action)
