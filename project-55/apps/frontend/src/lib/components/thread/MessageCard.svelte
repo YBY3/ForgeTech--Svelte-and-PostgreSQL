@@ -90,7 +90,7 @@
             >
                 {#each messages as message}
 
-                    {#if message.user_id == 1}
+                    {#if message.user_id == userID}
 
                         <div class="w-full flex justify-end text-center">
                             <div class="w-auto max-w-64 md:max-w-96 p-4 dark:bg-surface-700 rounded-lg shadow-md bg-surface-200 card">

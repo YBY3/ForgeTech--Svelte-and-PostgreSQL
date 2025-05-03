@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 from sqlalchemy.orm import joinedload
 from flask_app.models import Message, Thread, User
 from flask_app.extensions import db
+import math
 
 
 # CODES USE:
@@ -15,6 +16,78 @@ from flask_app.extensions import db
 
 
 thread_bp = Blueprint('threads', __name__)
+
+
+@thread_bp.route('/get_all_threads', methods=['GET'])
+def get_all_threads():
+    try:
+        # Get pagination parameter
+        page = request.args.get('page', default=1, type=int)
+        per_page = 10  # Fixed per_page value
+
+        # Validate page parameter
+        if page < 1:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid Page Number',
+                'message': 'Page number must be a positive integer'
+            }), 400
+
+        # Placeholder for employee access check
+        # Example: Check if user is an employee (adjust based on your auth system)
+        # if not is_employee(request):
+        #     return jsonify({
+        #         'success': False,
+        #         'error': 'Unauthorized',
+        #         'message': 'Only employees can access all threads'
+        #     }), 403
+
+        # Count total threads
+        total_threads = Thread.query.count()
+
+        # Calculate pagination
+        total_pages = math.ceil(total_threads / per_page)
+        offset = (page - 1) * per_page
+
+        # Fetch paginated threads
+        threads = Thread.query\
+            .order_by(Thread.created_at.asc())\
+            .limit(per_page)\
+            .offset(offset)\
+            .all()
+
+        return jsonify({
+            'success': True,
+            'threads': [{
+                'id': thread.id,
+                'name': thread.name,
+                'created_by_id': thread.created_by_id,
+                'username': thread.creator.username,
+                'created_at': thread.created_at.isoformat()
+            } for thread in threads],
+            'pagination': {
+                'total_threads': total_threads,
+                'total_pages': total_pages,
+                'current_page': page,
+                'per_page': per_page
+            }
+        }), 200
+
+    except ValueError as ve:
+        print(f"ValueError: {str(ve)}", file=sys.stderr)
+        return jsonify({
+            'success': False,
+            'error': 'Invalid Data Format',
+            'message': str(ve)
+        }), 400
+
+    except Exception as e:
+        print(f"Error Retrieving All Threads: {str(e)}", file=sys.stderr)
+        return jsonify({
+            'success': False,
+            'error': 'Failed to Retrieve Threads',
+            'message': str(e)
+        }), 500
 
 
 @thread_bp.route('/get_threads', methods=['GET'])
@@ -426,4 +499,80 @@ def get_thread_messages():
             'message': str(e)
         }), 500
 
-# Resolve Thread (Employee Only Action)
+
+@thread_bp.route('/resolve_thread', methods=['POST'])
+def resolve_thread():
+    try:
+        data = request.get_json()
+
+        # Validate thread_id
+        if 'thread_id' not in data or data['thread_id'] is None:
+            return jsonify({
+                'success': False,
+                'error': 'Missing Thread ID',
+                'message': 'Thread ID is required'
+            }), 400
+
+        try:
+            thread_id = int(data['thread_id'])
+        except (ValueError, TypeError):
+            return jsonify({
+                'success': False,
+                'error': 'Invalid Thread ID',
+                'message': 'Thread ID must be an integer'
+            }), 400
+
+        # Check if thread exists
+        thread = Thread.query.get(thread_id)
+        if not thread:
+            return jsonify({
+                'success': False,
+                'error': 'Thread Not Found',
+                'message': f'Thread with ID {thread_id} does not exist'
+            }), 404
+
+        # Placeholder for employee access check
+        # Example: Check if user is an employee (adjust based on your auth system)
+        # if not is_employee(request):
+        #     return jsonify({
+        #         'success': False,
+        #         'error': 'Unauthorized',
+        #         'message': 'Only employees can delete threads'
+        #     }), 403
+
+        # Delete messages and thread in a transaction
+        try:
+            # Delete all messages for the thread
+            Message.query.filter_by(thread_id=thread_id).delete()
+            # Delete the thread
+            db.session.delete(thread)
+            # Commit the transaction
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error Deleting Thread and Messages: {str(e)}", file=sys.stderr)
+            return jsonify({
+                'success': False,
+                'error': 'Failed to Delete Thread',
+                'message': f'Error deleting thread: {str(e)}'
+            }), 500
+
+        return jsonify({
+            'success': True
+        }), 200
+
+    except ValueError as ve:
+        print(f"ValueError: {str(ve)}", file=sys.stderr)
+        return jsonify({
+            'success': False,
+            'error': 'Invalid Data Format',
+            'message': str(ve)
+        }), 400
+
+    except Exception as e:
+        print(f"Error Resolving Thread: {str(e)}", file=sys.stderr)
+        return jsonify({
+            'success': False,
+            'error': 'Failed to Resolve Thread',
+            'message': str(e)
+        }), 500

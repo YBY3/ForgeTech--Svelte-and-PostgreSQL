@@ -11,8 +11,30 @@
     //Data
     export let data;
     let userData: UserType;
-    let threads: ThreadType[];
+    let threads: ThreadType[] = [];
     let currentMessages: MessageType[] = [];
+    let pagination: {current_page: number, per_page: number, total_pages: number, total_threads:2}
+
+    //Load Page Data
+    onMount(() => {
+        //User Data
+        if (data.user) {
+            userData = data.user;
+        }
+
+        //Thread Data
+        if (data.threads) {
+            if (data.threads.length > 0) {
+                threads = data.threads;
+                startingThreadsSize = threads.length;
+            }
+        }
+
+        //Pagination Data
+        if (data.pagination) {
+            pagination = data.pagination;
+        }
+    });
 
     //Page Elements
     const toastStore = getToastStore();
@@ -20,6 +42,7 @@
     let newThreadName: string;
     let currentThread: ThreadType;
     let messageSending = false;
+    let startingThreadsSize = 0;
 
     //Page Views
     let threadsView = true;
@@ -44,6 +67,76 @@
         createNewThreadView = false;
         threadsView = false;
         openThreadView = true;
+    }
+
+    async function goToNextPage(direction: number) {
+        // 1 == Up
+        // -1 == Down
+        let page = pagination.current_page;
+
+        if (threads.length == startingThreadsSize) {
+            page = pagination.current_page + direction;
+        }
+        await getAllThreads(page)
+    }
+
+    async function getAllThreads(page: number) {
+        //If Already Submitting, Exit
+        if (submitting) {
+            toastStore.trigger({
+                message: 'This Page is Submitting Changes, Please Wait',
+                background: 'variant-filled-error'
+            });
+            return;
+        }
+
+        //Try Submitting
+        try {
+            submitting = true;
+            const formData = new FormData();
+            formData.append('page', JSON.stringify(page));
+
+			// Log the form data entries for debugging
+			// for (const [key, value] of formData.entries()) {
+			// 	console.log(`${key}: ${value}`);
+			// }
+            
+            //Post New Form Data
+            const response = await fetch('?/get_all_threads', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result: ActionResult = deserialize(await response.text());
+
+            if (result.type === 'success') {
+                if (result.data) {
+                    if (result.data) {
+                        threads = result.data.threads;
+                        pagination = result.data.pagination;
+                        startingThreadsSize = threads.length;
+                        currentMessages = []
+                        newThreadName = "";
+                    }
+                }
+            } 
+            else if (result.type === 'failure') {
+                if (result.data) {
+                    const errorMessage = result.data.error;
+                    throw new Error(errorMessage);
+                }
+                throw new Error("Server Error, Try Again Later");
+            }
+        
+        } catch (error) {
+            const errorMessage: string = `${error}`;
+			toastStore.trigger({
+                message: errorMessage,
+                background: 'variant-filled-error'
+            });
+        } finally {
+            submitting = false;
+        }
     }
 
     async function addThread() {
@@ -79,9 +172,10 @@
             if (result.type === 'success') {
                 if (result.data) {
                     const thread = result.data.thread;
-                    console.log(thread);
+                    currentMessages = []
+                    newThreadName = "";
                     threads = [...threads, thread];
-                    console.log(threads)
+                    startingThreadsSize = threads.length;
 				    showOpenThreadView(thread);
                 }
             } 
@@ -179,9 +273,9 @@
             formData.append('message', message.message);
 
 			// Log the form data entries for debugging
-			for (const [key, value] of formData.entries()) {
-				console.log(`${key}: ${value}`);
-			}
+			// for (const [key, value] of formData.entries()) {
+			// 	console.log(`${key}: ${value}`);
+			// }
             
             //Post New Form Data
             const response = await fetch('?/send_message', {
@@ -216,20 +310,62 @@
         }
     }
 
-    //Load Page Data
-    onMount(() => {
-        //User Data
-        if (data.user) {
-            userData = data.user;
+    async function resloveThread(thread: ThreadType) {
+        //If Already Submitting, Exit
+        if (submitting) {
+            toastStore.trigger({
+                message: 'This Page is Submitting Changes, Please Wait',
+                background: 'variant-filled-error'
+            });
+            return;
         }
 
-        //Thread Data
-        if (data.threads) {
-            if (data.threads.length > 0) {
-                threads = data.threads;
+        //Try Submitting
+        try {
+            submitting = true;
+            const formData = new FormData();
+            formData.append('thread_id', JSON.stringify(thread.id));
+
+			// Log the form data entries for debugging
+			// for (const [key, value] of formData.entries()) {
+			// 	console.log(`${key}: ${value}`);
+			// }
+            
+            //Post New Form Data
+            const response = await fetch('?/resolve_thread', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result: ActionResult = deserialize(await response.text());
+
+            if (result.type === 'success') {
+                toastStore.trigger({
+                    message: "Thread Resolved",
+                    background: 'variant-filled-success'
+                });
+
+                //Remove Thread from threads
+                threads = threads.filter(t => t.id !== thread.id);
+            } 
+            else if (result.type === 'failure') {
+                if (result.data) {
+                    const errorMessage = result.data.error;
+                    throw new Error(errorMessage);
+                }
+                throw new Error("Server Error, Try Again Later");
             }
+        
+        } catch (error) {
+            const errorMessage: string = `${error}`;
+			toastStore.trigger({
+                message: errorMessage,
+                background: 'variant-filled-error'
+            });
+        } finally {
+            submitting = false;
         }
-    });
+    }
 
 </script>
 
@@ -247,27 +383,63 @@
                 <h1 class="h-16 text-3xl rounded-lg p-2">Threads</h1>
 
                 <!-- Inner Card / Threads Info -->
-                <div class="w-full h-full min-h-64 flex flex-col gap-4 card variant-soft p-4">
+                <div class="w-full h-full min-h-48 flex flex-col gap-4 card variant-soft p-4 overflow-y-auto hide-scrollbar">
 
-                    {#if threads}
-                        {#each threads as thread}
-                            <button 
-                                class="flex items-center justify-between p-4 dark:bg-surface-700 rounded-lg shadow-md bg-surface-200 card card-hover"
-                                on:click={() => getThreadMessages(thread)}
-                            >
-                                <span class="text-sm md:text-lg">{thread.name}</span>
-                                <span class="text-sm md:text-lg font-medium">{thread.username}</span>
-                            </button>
-                        {/each}
-                    {/if}
                     <button 
                         class="text-md md:text-lg lg:text-xl font-bold uppercase hover:text-primary-500 p-4 dark:bg-surface-700 rounded-lg shadow-md bg-surface-200 card card-hover"
                         on:click={() => showCreateNewThreadView()}
                     >
                         Create New Thread
                     </button>
+                    {#if threads}
+                        {#each threads as thread}
+                            <div class="w-full flex gap-2 items-center">
+                                <button 
+                                    class="w-full flex items-center justify-between p-4 dark:bg-surface-700 rounded-lg shadow-md bg-surface-200 card card-hover"
+                                    on:click={() => getThreadMessages(thread)}
+                                >
+                                    <span class="text-sm md:text-lg">{thread.name}</span>
+                                    <span class="text-sm md:text-lg font-medium">{thread.username}</span>
+                                </button>
+
+                                {#if userData.user_type == "employee" || userData.user_type == "admin"}
+                                    <button 
+                                        class="w-1/3 h-12 btn text-lg font-bold rounded-lg variant-filled-secondary"
+                                        on:click={() => resloveThread(thread)}
+                                    >
+                                        Resolve
+                                    </button>
+                                {/if}
+                            </div>
+                        {/each}
+                    {/if}
 
                 </div>
+
+                {#if pagination}
+                    <div class="h-16 text-3xl rounded-lg p-2">
+                    
+                        {#if pagination.total_pages > 1}
+                            {#if pagination.current_page != 1}
+                                <button 
+                                    class="w-20 h-10 btn variant-ghost hover:text-primary-500 font-bold uppercase text-xl rounded-lg shadow-lg p-2" 
+                                    on:click={() => goToNextPage(-1)}
+                                >
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                </button>
+                            {/if}
+                            {#if pagination.current_page != pagination.total_pages}
+                                <button 
+                                    class="w-20 h-10 btn variant-ghost hover:text-primary-500 font-bold uppercase text-xl rounded-lg shadow-lg p-2" 
+                                    on:click={() => goToNextPage(1)}
+                                >
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            {/if}
+                        {/if}
+
+                    </div>
+                {/if}
             </div>
 
         {:else if createNewThreadView}

@@ -8,42 +8,38 @@ export const load = async ({ locals, fetch }) => {
     //Checks if User is Logged In
     if (!locals.user) {throw redirect(302, '/auth/login');}
 
-    //Checks if User is a "employee" or "admin"
-        // else if (locals.user.user_type == "employee" || locals.user.user_type == "admin") {
-
-        // try {
-        //     //Fetch All Products
-        //     const flaskResponse = await fetch(`${getFlaskURL()}/api/products/get_all_products`);
+    else if (locals.user.user_type == "employee" || locals.user.user_type == "admin") {
+        //Loads All Threads via Pagination
+        try { 
             
-        //     const responseData = await flaskResponse.json();
-
-        //     if (!flaskResponse.ok) {
-        //         console.error('Editing Product Failed:', responseData.error );
-        //         if (responseData.message) {
-        //             console.error('Error:', responseData.message );
-        //         }
-        //         return fail(flaskResponse.status, responseData);
-        //     }
-
-        //     let productData: ProductType[] = [];
-
-        //     if (responseData.data.length > 0) {
-        //         //Convert Image IDs to Image URLs
-        //         productData = responseData.data.map((product: RawProductType) => ({
-        //             ...product,
-        //             image_urls: product.image_ids.map(id => `${getImageURL()}/api/images/${id}`)
-        //         }));
-        //     }
-
-        // return { user: locals.user };
-        // } 
-        // catch (error) {
-        //     console.error('Error Fetching Products:', error);
-        //     return { products: [] as ProductType[] };
-        // }
+            //Load First Page
+            const page = 1;
+    
+            const flaskResponse = await fetch(`${getFlaskURL()}/api/threads/get_all_threads?page=${page}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+    
+            const responseData = await flaskResponse.json();
+    
+            if (!flaskResponse.ok) {
+                console.error('Loading All Threads Failed:', responseData.error);
+                if (responseData.message) {
+                    console.error('Error:', responseData.message);
+                }
+                return fail(flaskResponse.status, responseData);
+            }
+            
+            return { user: locals.user, threads: responseData.threads, pagination: responseData.pagination };
+        }
+        catch (error) {
+            console.error('Error Fetching All Threads:', error);
+            return { user: locals.user, threads: [] as ThreadType[] };
+        }
+    }
 
     else {
-        //Load Threads Via User ID
+        //Load Threads Via User ID (Max for Single User is 3)
         try {
         
             const flaskResponse = await fetch(`${getFlaskURL()}/api/threads/get_threads?user_id=${locals.user.id}`, {
@@ -68,46 +64,37 @@ export const load = async ({ locals, fetch }) => {
             return { user: locals.user, threads: [] as ThreadType[] };
         }
     }
-
-    // }
-    // else {
-    //     throw redirect(302, '/')
-    // }
 };
 
 
 export const actions = {
 
-    add_thread: async ({ request }) => {
+    get_all_threads: async ({ request }) => {
         try {
             const formData = await request.formData();
+            
+            const page = formData.get('page');
 
-            let jsonData = {
-                name: formData.get('name'),
-                user_id: formData.get('user_id'),
-            };
-
-            let flaskResponse = await fetch(`${getFlaskURL()}/api/threads/add_thread`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(jsonData)
+            const flaskResponse = await fetch(`${getFlaskURL()}/api/threads/get_all_threads?page=${page}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
             });
 
             let responseData = await flaskResponse.json();
 
             if (!flaskResponse.ok) {
-                console.error('Adding Thread Failed:', responseData.error );
+                console.error('Loading Threads Failed:', responseData.error );
                 if (responseData.message) {
                     console.error('Error:', responseData.message );
                 }
                 return fail(flaskResponse.status, responseData);
             }
 
-            return { success: true, thread: responseData.thread };
+            return { success: true, threads: responseData.threads, pagination: responseData.pagination };
         } 
         
         catch (error) {
-            console.error('Error in add_thread action:', error);
+            console.error('Error in get_all_threads action:', error);
             return fail(500, { error: 'Internal Server Error' });
         }
     },
@@ -145,6 +132,40 @@ export const actions = {
         }
     },
 
+    add_thread: async ({ request }) => {
+        try {
+            const formData = await request.formData();
+
+            let jsonData = {
+                name: formData.get('name'),
+                user_id: formData.get('user_id'),
+            };
+
+            let flaskResponse = await fetch(`${getFlaskURL()}/api/threads/add_thread`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(jsonData)
+            });
+
+            let responseData = await flaskResponse.json();
+
+            if (!flaskResponse.ok) {
+                console.error('Adding Thread Failed:', responseData.error );
+                if (responseData.message) {
+                    console.error('Error:', responseData.message );
+                }
+                return fail(flaskResponse.status, responseData);
+            }
+
+            return { success: true, thread: responseData.thread };
+        } 
+        
+        catch (error) {
+            console.error('Error in add_thread action:', error);
+            return fail(500, { error: 'Internal Server Error' });
+        }
+    },
+
     send_message: async ({ request }) => {
         try {
             const formData = await request.formData();
@@ -177,6 +198,39 @@ export const actions = {
         
         catch (error) {
             console.error('Error in send_message action:', error);
+            return fail(500, { error: 'Internal Server Error' });
+        }
+    },
+
+    resolve_thread: async ({ request }) => {
+        try {
+            const formData = await request.formData();
+
+            let jsonData = {
+                thread_id: formData.get('thread_id'),
+            };
+
+            let flaskResponse = await fetch(`${getFlaskURL()}/api/threads/resolve_thread`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(jsonData)
+            });
+
+            let responseData = await flaskResponse.json();
+
+            if (!flaskResponse.ok) {
+                console.error('Resolving Thread Failed:', responseData.error );
+                if (responseData.message) {
+                    console.error('Error:', responseData.message );
+                }
+                return fail(flaskResponse.status, responseData);
+            }
+
+            return { success: true };
+        } 
+        
+        catch (error) {
+            console.error('Error in resolve_thread action:', error);
             return fail(500, { error: 'Internal Server Error' });
         }
     }
