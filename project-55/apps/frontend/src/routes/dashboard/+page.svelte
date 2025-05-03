@@ -322,24 +322,28 @@
             
             {/if}
             {#if showCustomerInfo && customerInfoToggle}
-
-                <!-- User Orders -->
-                <div class="w-full h-[616px] max-h-[616px] flex flex-col items-center card variant-surface gap-2 p-2 row-span-2">
-                    <h1 class="text-3xl rounded-lg p-2">My Orders</h1>
-
-                    <!-- Orders -->
-                    <div class="w-full h-full flex flex-col gap-3 overflow-y-auto hide-scrollbar card variant-soft p-4">
-                        {#if userOrders}
-                            {#each userOrders as order (order.id)}
-                                <OrderInfoCard order={order} showCancelButton={true} /> <!-- Order Cancel Logic Here -->
-                            {/each}
-                        {:else}
-                            <div class="{errorCardClass}">No Orders Found</div>
-                        {/if}
-                    </div>
-                </div>
-            
-            {/if}
+            <!-- User Orders -->
+            <div class="w-full h-[616px] max-h-[616px] flex flex-col items-center card variant-surface gap-2 p-2 row-span-2">
+              <h1 class="text-3xl rounded-lg p-2">My Orders</h1>
+          
+              <!-- Orders -->
+              <div class="w-full h-full flex flex-col gap-3 overflow-y-auto hide-scrollbar card variant-soft p-4">
+                {#if userOrders}
+                  {#each userOrders as order (order.id)}
+                    <a href={`/dashboard/expandedView?orderId=${order.id}`} class="block">
+                      <OrderInfoCard
+                        {order}
+                        showCancelButton={true}
+                        
+                      />
+                    </a>
+                  {/each}
+                {:else}
+                  <div class="{errorCardClass}">No Orders Found</div>
+                {/if}
+              </div>
+            </div>
+          {/if}
         </div>
     </div>
 {/if}
