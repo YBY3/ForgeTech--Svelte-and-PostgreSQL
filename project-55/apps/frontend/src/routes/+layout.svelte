@@ -136,7 +136,13 @@
 									<a href="/catalog" class="w-full block">
 										<button class="btn hover:bg-primary-500 w-full">Catalog</button>
 									</a>
+									<a href="/builder" class="w-full block">
+										<button class="btn hover:bg-primary-500 w-full">Build A PC</button>
+									</a>
 								{/if}
+								<a href="/threads" class="w-full block">
+									<button class="btn hover:bg-primary-500 w-full">Threads</button>
+								</a>
 								{#if data.user.user_type === 'employee' || data.user.user_type === 'admin'}
 									<a href="/control/order-control" class="w-full block">
 										<button class="btn hover:bg-primary-500 w-full">Order Control</button>
@@ -144,22 +150,6 @@
 									<a href="/control/product-control" class="w-full block">
 										<button class="btn hover:bg-primary-500 w-full">Product Control</button>
 									</a>
-								{/if}
-								{#if data.user.user_type === 'admin'}
-									<a href="/control/user-control" class="w-full block">
-										<button class="btn hover:bg-primary-500 w-full">User Control</button>
-									</a>
-									<!-- <a href="/auth/product-control" class="w-full block">
-										<button class="btn hover:bg-primary-500 w-full">Product Control</button>
-									</a> -->
-								{/if}
-								{#if data.user.user_type === 'admin'}
-									<a href="/control/analytics" class="w-full block">
-										<button class="btn hover:bg-primary-500 w-full">Analytics</button>
-									</a>
-									<!-- <a href="/auth/product-control" class="w-full block">
-										<button class="btn hover:bg-primary-500 w-full">Product Control</button>
-									</a> -->
 								{/if}
 							{/if}
 							<!-- Always show About Us -->
@@ -174,16 +164,15 @@
 							<a href="/catalog" class="w-full block">
 								<button class="btn hover:bg-primary-500 w-full">Products</button>
 							</a>
+							<a href="/builder" class="w-full block">
+								<button class="btn hover:bg-primary-500 w-full">Build A PC</button>
+							</a>
 							<a href="/about-us" class="w-full block">
 								<button class="btn hover:bg-primary-500 w-full">About Us</button>
 							</a>
 							<a class="btn hover:bg-primary-500 w-full" href="/auth/login">Login</a>
 							<a class="btn hover:bg-primary-500 w-full" href="/auth/sign-up">Sign Up</a>
-						{/if}
-							<!-- Build Your PC Link -->
-							<a href="/builder" class="w-full block">
-								<button class="btn hover:bg-primary-500 w-full">Build Your PC</button>
-							</a>
+						{/if}				
 					</div>
 				</div>
 			</svelte:fragment>

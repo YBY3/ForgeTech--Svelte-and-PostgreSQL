@@ -182,12 +182,12 @@
                     <a href="/control/order-control" class="w-full block">
                         <button class="{navButtonClass}">Order Control</button>
                     </a>
-                </div>
-
-                <div class="w-full card variant-soft rounded-lg p-1">
-                <a href="/control/analytics" class="w-full block">
-                    <button class="{navButtonClass}">Analytics</button>
-                </a>
+                    <a href="/control/analytics" class="w-full block">
+                        <button class="{navButtonClass}">Analytics</button>
+                    </a>
+                    <a href="/threads" class="w-full block">
+                        <button class="{navButtonClass}">Threads</button>
+                    </a>
                 </div>
 
                 <!-- Info Filters -->
@@ -339,8 +339,6 @@
                     <a href={`/dashboard/expandedView?orderId=${order.id}`} class="block">
                       <OrderInfoCard
                         {order}
-                        showCancelButton={true}
-                        
                       />
                     </a>
                   {/each}
