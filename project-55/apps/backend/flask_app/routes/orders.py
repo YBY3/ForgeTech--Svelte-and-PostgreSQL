@@ -17,85 +17,50 @@ order_bp = Blueprint('orders', __name__)
 # 401: Unauthorized - Authentication is required and has failed or not been provided
 # 500: Internal Server Error - Server encountered an unexpected condition (used in catch blocks)
 
+
 @order_bp.route('/add_order', methods=['POST'])
 def add_order():
-    try:
-        data = request.get_json()
+    data             = request.get_json() or {}
+    user_id          = data.get('user_id')
+    product_ids      = data.get('product_ids', [])
+    product_options  = data.get('product_options', [])
+    total            = data.get('total')
 
-        # # Checks for Missing Data
-        # if (not data) or ('user_id' not in data) or ('items' not in data):
-        #     return jsonify({
-        #         'success': False,
-        #         'error': 'Missing Order Data'
-        #     }), 400
-        
-        user_id = data.get('user_id')
-        items = data.get('product_ids')
-        total = data.get('total')  
+    # basic validation
+    if not user_id or not product_ids or total is None:
+        return jsonify(success=False, error='Missing fields'), 400
+    if len(product_ids)!=len(product_options):
+        return jsonify(success=False, error='IDs/options length mismatch'), 400
 
-        for item in items:
-            product = Product.query.get(item)
-            if not product:
-                print(f"Product not found for ID: {item}")
-                return jsonify({
-                    'success': False,
-                    'error': f'Product not found for ID: {item}'
-                }), 404
-        
-        #checks if there is enough inventory
-        # if product.product_stock < item['quantity']:
-        #     return jsonify({
-        #         'success': False,
-        #         'error': 'Not enough inventory for {product.name}'
-        #     }), 400
-        
-        # # Reduce inventory
-        # product.product_stock -= item['quantity']
+    # create order
+    order = Order(
+      user_id=user_id,
+      total=float(total),
+      status=data.get('status','pending'),
+      arrive_by=datetime.now(ZoneInfo('UTC'))
+    )
+    db.session.add(order)
+    db.session.flush()
 
-        # Create a new Order
-        new_order = Order(
-            user_id= user_id,
-            total = total,
-            status=data.get('status', 'Pending'),
-            arrive_by=datetime.now(ZoneInfo("UTC")) #Temp, should get this datetime from frontend
-        )
+    # zip and count pairs
+    pairs = list(zip(product_ids, product_options))
+    counts = Counter(pairs)   # e.g. {(1,'Red'):2, (1,'Blue'):1}
 
+    for (pid, opt), qty in counts.items():
+        prod = Product.query.get(pid)
+        if not prod:
+            db.session.rollback()
+            return jsonify(success=False, error=f'No product {pid}'), 404
+        # optional: validate opt in prod.options
+        db.session.add(OrderProduct(
+          order_id=order.id,
+          product_id=pid,
+          order_quantity=qty,
+          product_option=opt
+        ))
 
-        # Add to the Database
-        db.session.add(new_order)
-        # To get the order ID
-        db.session.flush()  
-
-        item_counts = Counter(items)
-        print(f"Item counts: {item_counts}")
-
-        # Create OrderProduct per product_id
-        for product_id, quantity in item_counts.items():
-            order_product = OrderProduct(
-                order_id=new_order.id,
-                product_id=product_id,
-                order_quantity=quantity
-            )
-            db.session.add(order_product)
-
-        db.session.commit()
-
-        # Return a Confirmation Message
-        return jsonify({
-            'success': True,
-            'message': 'Order Added',
-            'order_id': new_order.id
-
-        }), 201
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            'success': False,
-            'error': 'Failed to Add Order',
-            'message': str(e)
-        }), 500
-   
+    db.session.commit()
+    return jsonify(success=True, order_id=order.id), 201
 
 
 # remove_order route
@@ -420,46 +385,44 @@ def unclaim_order():
 
 
 #RETRIEVE ORDER DETAILS (PARAM: ORDER_ID)
+# Backend: add quantity & product_option to your JSON payload
 @order_bp.route('/orderDetails/<int:order_id>', methods=['GET'])
 def get_order_details(order_id):
     try:
-        # Fetch the order by its ID
         order = Order.query.get(order_id)
         if not order:
-            return jsonify({
-                'success': False,
-                'error': 'Order not found'
-            }), 404
+            return jsonify({'success': False, 'error': 'Order not found'}), 404
 
-        # Build the order info dictionary
+        products = []
+        for assoc in order.order_items:
+            products.append({
+                "id":              assoc.product.id,
+                "name":            assoc.product.name,
+                "price":           assoc.product.price,
+                "quantity":        assoc.order_quantity,     # ← use the real field
+                "product_option":  assoc.product_option
+            })
+
         order_info = {
-            "id": order.id,
-            "user_id": order.user_id,
-            "total": order.total,
-            "status": order.status,
-            "products": [
-                {
-                    "id": product.id,
-                    "name": product.name,
-                    "price": product.price,
-                } for product in order.products
-            ],
-            "created_at": order.created_at.isoformat()
+            "id":         order.id,
+            "user_id":    order.user_id,
+            "total":      order.total,
+            "status":     order.status,
+            "created_at": order.created_at.isoformat(),
+            "products":   products
         }
 
-        # Return the order details
-        return jsonify({
-            'success': True,
-            'order': order_info
-        }), 200
-
+        return jsonify({'success': True, 'order': order_info}), 200
 
     except Exception as e:
+        app.logger.exception("Failed to fetch order details")
         return jsonify({
             'success': False,
             'error': 'Failed to fetch order details',
             'message': str(e)
         }), 500
+
+
 
 @order_bp.route('/confirm', methods=['POST'])
 def confirm_order():
