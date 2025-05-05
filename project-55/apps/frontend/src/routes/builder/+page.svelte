@@ -26,8 +26,9 @@
   </div>
 
   <div class="flex-1 p-4">
+    <h2 class="w-[150px] card variant-filled-primary rounded-lg p-2 text-center font-bold">Work in Progress</h2>
     <h1>ForgeTech's 3D Builder</h1>
-    <h2>Build Your Computer Here Before you Buy!</h2>
+    <h2 class="pb-2">Build Your Computer Here Before you Buy!</h2>
     <PCViewer {selectedParts} />
   </div>
 

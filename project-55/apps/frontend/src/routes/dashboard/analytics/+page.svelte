@@ -92,7 +92,21 @@
 </script>
 
 
-<div class="h-full bg-background flex flex-col lg:flex-row items-center overflow-y-auto overflow-x-hidden scroll-smooth gap-4 p-4">
+<div class="w-full flex justify-center pt-4 pr-4 pl-4">
+    <div class="w-full h-16 flex justify-between items-center pl-4 pr-4 card variant-surface rounded-lg">
+        <a 
+            href="/dashboard"
+            class="w-20 h-10 btn variant-ghost hover:text-primary-500 font-bold uppercase text-xl rounded-lg shadow-lg p-2" 
+        >
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <h1 class="h-12 text-2xl md:text-3xl rounded-lg p-2 font-bold">Analytics</h1>
+        <div class="w-20"></div> <!-- Spacer -->
+    </div>
+</div>
+
+
+<div class="bg-background flex flex-col lg:flex-row items-center scroll-smooth gap-4 p-4">
     <div class="w-full h-[450px] max-h-[450px] flex flex-col items-center card variant-surface gap-2 p-2">
         <h1 class="text-3xl rounded-lg p-2">Active Users</h1>
 

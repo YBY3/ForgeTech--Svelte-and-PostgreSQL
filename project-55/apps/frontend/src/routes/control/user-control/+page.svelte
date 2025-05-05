@@ -58,6 +58,20 @@
 </script>
 
 
+<div class="w-full flex justify-center pt-4 pr-4 pl-4">
+    <div class="w-full h-16 flex justify-between items-center pl-4 pr-4 card variant-surface rounded-lg">
+        <a 
+            href="/dashboard"
+            class="w-20 h-10 btn variant-ghost hover:text-primary-500 font-bold uppercase text-xl rounded-lg shadow-lg p-2" 
+        >
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <h1 class="h-12 text-2xl md:text-3xl rounded-lg p-2 font-bold">User Control</h1>
+        <div class="w-20"></div> <!-- Spacer -->
+    </div>
+</div>
+
+
 <div class="h-full max-w-7xl mx-auto p-6 flex flex-col md:flex-row justify-between gap-x-10 overflow-x-hidden">
     
     <!-- User List (Left Side) -->

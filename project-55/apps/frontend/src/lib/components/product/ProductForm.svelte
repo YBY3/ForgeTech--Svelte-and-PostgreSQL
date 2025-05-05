@@ -4,15 +4,12 @@
     import { createEventDispatcher } from "svelte";
     import { getToastStore } from '@skeletonlabs/skeleton';
     import type { ProductType } from "$lib/types/ProductTypes"
-    import type { ImageType } from "$lib/types/ImageTypes"
 
     //Tailwind Classes
-    let inputClass = " input w-full md:w-3/4 h-[50px] min-h-[30px] focus:outline-none p-2 rounded-lg shadow-lg ";
+    let inputClass = " input w-full h-[50px] min-h-[30px] focus:outline-none p-2 rounded-lg shadow-lg ";
 
     //Product Data
     export let product: ProductType | null = null;
-
-    $: console.log('Hidden changed to:', hidden);
 
     //Image Elements
     let imageFiles: File[] = []; 
@@ -134,152 +131,160 @@
 
 <form 
     on:submit|preventDefault={handleSubmit}
-    class="flex flex-col gap-[1.5vh] w-full rounded-lg justify-center items-center text-base-content"  
+    class="w-full flex flex-col gap-[1.5vh] items-center justify-center text-base-content pb-4"  
 >   
-    <!-- Images -->
-    <div class="flex gap-4 w-full md:w-3/4 overflow-x-auto">
+    <!-- Form Card -->
+    <div class="flex flex-col gap-[1.5vh] justify-center items-center w-full md:w-3/4 card variant-soft rounded-lg p-4">
 
-        <div class="{imageFiles.length > 0 || image_ids.length > 0 ? 'flex-none w-[350px]' : 'flex-1 w-full'} h-[300px] card variant-soft rounded-lg">
-            <FileDropzone name="files" rounded="rounded-lg" class="h-full flex flex-col justify-center items-center" multiple on:change={handleFile}>
-                <svelte:fragment slot="lead">
-                    <i class="fa-solid fa-plus text-8xl"></i>
-                </svelte:fragment>
-                <svelte:fragment slot="message">
-                    <h2 class="text-2xl">Add Image</h2>
-                </svelte:fragment>
-                <svelte:fragment slot="meta">
-                    <h3 class="text-xl">JPG / JPEG, PNG, and GIF Only</h3>
-                </svelte:fragment>
-            </FileDropzone>
+        <!-- Images -->
+        <div class="flex gap-4 w-full overflow-x-auto rounded-lg">
+
+            <div class="{imageFiles.length > 0 || image_ids.length > 0 ? 'flex-none w-[350px]' : 'flex-1 w-full'} h-[300px] card variant-soft rounded-lg">
+                <FileDropzone name="files" rounded="rounded-lg" class="h-full flex flex-col justify-center items-center" multiple on:change={handleFile}>
+                    <svelte:fragment slot="lead">
+                        <i class="fa-solid fa-plus text-8xl"></i>
+                    </svelte:fragment>
+                    <svelte:fragment slot="message">
+                        <h2 class="text-2xl">Add Image</h2>
+                    </svelte:fragment>
+                    <svelte:fragment slot="meta">
+                        <h3 class="text-xl">JPG / JPEG, PNG, and GIF Only</h3>
+                    </svelte:fragment>
+                </FileDropzone>
+            </div>
+
+            <!-- Existing Images -->
+            {#if image_urls.length > 0}
+                {#each image_urls as image_url, i}
+                    <div class="flex-none relative h-[300px] rounded-lg">
+                        {#if image_url}
+                            <img
+                                class="h-[300px] object-contain rounded-lg"
+                                src={image_url}
+                                alt={'Existing Image'}
+                            />
+                        {/if}
+                        <button
+                            type="button"
+                            class="absolute top-2 right-2 btn btn-sm variant-filled-error"
+                            on:click={() => {
+                                image_ids = image_ids.filter((_, idx) => idx !== i);
+                                image_urls = image_urls.filter((_, idx) => idx !== i);
+                            }}
+                        >
+                            X
+                        </button>
+                    </div>
+                {/each}
+            {/if}
+
+            <!-- New Images -->
+            {#if imagePreviews.length > 0}
+                {#each imagePreviews as preview, index}
+                    <div class="flex-none relative h-[300px] rounded-lg">
+                        <img 
+                            class="h-[300px] object-contain rounded-lg" 
+                            src={preview} 
+                            alt={name || 'Uploaded Image'}
+                        />
+                        <button 
+                            type="button"
+                            class="absolute top-2 right-2 btn btn-sm variant-filled-error" 
+                            on:click={() => removeImage(index)}
+                        >
+                            X
+                        </button>
+                    </div>
+                {/each}
+            {/if}
         </div>
 
-        <!-- Existing Images -->
-        {#if image_urls.length > 0}
-            {#each image_urls as image_url, i}
-                <div class="flex-none relative h-[300px] rounded-lg">
-                    {#if image_url}
-                        <img
-                            class="h-[300px] object-contain rounded-lg"
-                            src={image_url}
-                            alt={'Existing Image'}
-                        />
-                    {/if}
-                    <button
-                        type="button"
-                        class="absolute top-2 right-2 btn btn-sm variant-filled-error"
-                        on:click={() => {
-                            image_ids = image_ids.filter((_, idx) => idx !== i);
-                            image_urls = image_urls.filter((_, idx) => idx !== i);
-                        }}
-                    >
-                        X
-                    </button>
-                </div>
-            {/each}
-        {/if}
+        <!-- Name -->
+        <input
+            id="name-field" 
+            class="{inputClass}" 
+            type="text" 
+            placeholder="Product Name"
+            bind:value={name} 
+            required 
+        />
 
-        <!-- New Images -->
-        {#if imagePreviews.length > 0}
-            {#each imagePreviews as preview, index}
-                <div class="flex-none relative h-[300px] rounded-lg">
-                    <img 
-                        class="h-[300px] object-contain rounded-lg" 
-                        src={preview} 
-                        alt={name || 'Uploaded Image'}
-                    />
-                    <button 
-                        type="button"
-                        class="absolute top-2 right-2 btn btn-sm variant-filled-error" 
-                        on:click={() => removeImage(index)}
-                    >
-                        X
-                    </button>
-                </div>
-            {/each}
-        {/if}
+        <!-- Price -->
+        <input
+            id="price-field" 
+            class="{inputClass}" 
+            type="number" 
+            placeholder="Product Price ($)"
+            step="0.01"
+            min="0"
+            bind:value={price} 
+            required 
+        />
+
+        <!-- Description -->
+        <textarea
+            id="description-field" 
+            class="input w-full h-[175px] min-h-[30px] focus:outline-none p-2 rounded-lg shadow-lg" 
+            placeholder="Product Description"
+            bind:value={description} 
+            required 
+        />
+
+        <!-- Brand -->
+        <input
+            id="brand-field" 
+            class="{inputClass}" 
+            type="text" 
+            placeholder="Product Brand"
+            bind:value={brand} 
+            required 
+        />
+
+        <!-- Options -->
+        <input
+            id="options-field" 
+            class="{inputClass}" 
+            type="text" 
+            placeholder="Product Options (example: color, size options, spec options, etc)"
+            bind:value={options} 
+            required 
+        />
+
+        <!-- Product Type -->
+        <input
+            id="product-type-field" 
+            class="{inputClass}" 
+            type="text" 
+            placeholder="Product Type"
+            bind:value={product_type} 
+            required 
+        />
+
+        <!-- Product Stock -->
+        <input
+            id="price-field" 
+            class="{inputClass}" 
+            type="number" 
+            placeholder="Product Stock"
+            step="1"
+            min="0"
+            bind:value={product_stock} 
+            required 
+        />
+
+        <!-- Hidden Toggle -->
+        <div class="w-full md:w-3/4 flex items-center justify-center gap-4 pl-2 pr-2">
+            <span class="text-xl font-bold uppercase">Hide Product: </span>
+            <input
+                id="hidden-toggle" 
+                class="w-[40px] h-[40px] min-h-[30px] focus:outline-none" 
+                type="checkbox" 
+                placeholder="hidden"
+                bind:checked={hidden} 
+            />
+        </div>
+
     </div>
-
-    <!-- Name -->
-    <input
-        id="name-field" 
-        class="{inputClass}" 
-        type="text" 
-        placeholder="Product Name"
-        bind:value={name} 
-        required 
-    />
-
-    <!-- Price -->
-    <input
-        id="price-field" 
-        class="{inputClass}" 
-        type="number" 
-        placeholder="Product Price ($)"
-        step="0.01"
-        min="0"
-        bind:value={price} 
-        required 
-    />
-
-    <!-- Description -->
-    <textarea
-        id="description-field" 
-        class="{inputClass}" 
-        placeholder="Product Description"
-        bind:value={description} 
-        required 
-    />
-
-    <!-- Brand -->
-    <input
-        id="brand-field" 
-        class="{inputClass}" 
-        type="text" 
-        placeholder="Product Brand"
-        bind:value={brand} 
-        required 
-    />
-
-    <!-- Options -->
-    <input
-        id="options-field" 
-        class="{inputClass}" 
-        type="text" 
-        placeholder="Product Options (example: color, size options, spec options, etc)"
-        bind:value={options} 
-        required 
-    />
-
-    <!-- Product Type -->
-    <input
-        id="product-type-field" 
-        class="{inputClass}" 
-        type="text" 
-        placeholder="Product Type"
-        bind:value={product_type} 
-        required 
-    />
-
-    <!-- Product Stock -->
-    <input
-        id="price-field" 
-        class="{inputClass}" 
-        type="number" 
-        placeholder="Product Stock"
-        step="1"
-        min="0"
-        bind:value={product_stock} 
-        required 
-    />
-
-    <!-- Product hidden -->
-    <input
-        id="hidden" 
-        class="{inputClass}" 
-        type="checkbox" 
-        placeholder="hidden"
-        bind:checked={hidden} 
-    />
 
     <!-- Submit Button -->
     <div class="pt-4">
@@ -290,4 +295,5 @@
             Save
         </button>
     </div>
+
 </form>

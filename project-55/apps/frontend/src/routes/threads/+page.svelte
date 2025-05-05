@@ -380,7 +380,7 @@
             <!-- Threads -->
             <div class="w-full md:w-3/4 h-full min-h-80 flex flex-col items-center card variant-surface p-2">
 
-                <h1 class="h-16 text-3xl rounded-lg p-2">Threads</h1>
+                <h1 class="h-16 text-2xl md:text-3xl rounded-lg p-2">Threads</h1>
 
                 <!-- Inner Card / Threads Info -->
                 <div class="w-full h-full min-h-48 flex flex-col gap-4 card variant-soft p-4 overflow-y-auto hide-scrollbar">

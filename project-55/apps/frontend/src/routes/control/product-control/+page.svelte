@@ -1,17 +1,14 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { invalidateAll } from '$app/navigation';
     import type { ActionResult } from '@sveltejs/kit';
     import { deserialize } from '$app/forms';
     import { getToastStore } from '@skeletonlabs/skeleton';
     import ProductSmallPreview from "$lib/components/product/ProductSmallPreview.svelte";
     import ProductForm from "$lib/components/product/ProductForm.svelte";
 	import type { ProductType } from "$lib/types/ProductTypes";
-	import { productsStore } from '$lib/stores/ProductsStore.js';
 
     //Tailwind Classes
     let navButtonClass = " w-full h-full btn text-xl hover:text-primary-500 font-bold uppercase rounded-lg ";
-    let navContainerClass = " w-full md:w-3/4 grid grid-cols-2 gap-1 items-center justify-center card variant-soft rounded-lg p-1 ";
 
     function getActiveNavButtonClass(view: boolean) {
         return view ? "text-primary-500" : "hover:text-primary-500";
@@ -261,13 +258,29 @@
 </script>
 
 
+<div class="w-full flex justify-center pt-4 pr-4 pl-4">
+    <div class="w-full h-16 flex justify-between items-center pl-4 pr-4 card variant-surface rounded-lg">
+        <a 
+            href="/dashboard"
+            class="w-20 h-10 btn variant-ghost hover:text-primary-500 font-bold uppercase text-xl rounded-lg shadow-lg p-2" 
+        >
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <h1 class="h-12 text-2xl md:text-3xl rounded-lg p-2 font-bold">Product Control</h1>
+        <div class="w-20"></div> <!-- Spacer -->
+    </div>
+</div>
+
+
 {#if products}
     <div class="w-full h-full flex flex-col items-center gap-4 p-4 overflow-y-auto">
 
         <!-- Product View Options -->
-        <div class="{navContainerClass}">
-            <button on:click={() => showProductView()} class="{navButtonClass} {getActiveNavButtonClass(productsView)}">View Products</button>
-            <button on:click={() => showAddProductFormView()} class="{navButtonClass} {getActiveNavButtonClass(addProductFormView)}">Add Product</button>
+        <div class="w-full md:w-3/4 flex flex-col card variant-soft rounded-lg p-2">
+            <div class="grid grid-cols-2 gap-1 items-center justify-center">
+                <button on:click={() => showProductView()} class="{navButtonClass} {getActiveNavButtonClass(productsView)}">View Products</button>
+                <button on:click={() => showAddProductFormView()} class="{navButtonClass} {getActiveNavButtonClass(addProductFormView)}">Add Product</button>
+            </div>
         </div>
 
         {#if productsView}

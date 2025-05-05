@@ -143,14 +143,6 @@
 								<a href="/threads" class="w-full block">
 									<button class="btn hover:bg-primary-500 w-full">Threads</button>
 								</a>
-								{#if data.user.user_type === 'employee' || data.user.user_type === 'admin'}
-									<a href="/control/order-control" class="w-full block">
-										<button class="btn hover:bg-primary-500 w-full">Order Control</button>
-									</a>
-									<a href="/control/product-control" class="w-full block">
-										<button class="btn hover:bg-primary-500 w-full">Product Control</button>
-									</a>
-								{/if}
 							{/if}
 							<!-- Always show About Us -->
 							<a href="/about-us" class="w-full block">
@@ -163,9 +155,6 @@
 						{:else}
 							<a href="/catalog" class="w-full block">
 								<button class="btn hover:bg-primary-500 w-full">Products</button>
-							</a>
-							<a href="/builder" class="w-full block">
-								<button class="btn hover:bg-primary-500 w-full">Build A PC</button>
 							</a>
 							<a href="/about-us" class="w-full block">
 								<button class="btn hover:bg-primary-500 w-full">About Us</button>

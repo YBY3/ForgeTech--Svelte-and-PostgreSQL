@@ -1,11 +1,12 @@
 <script lang="ts">
-    import type { ProductPreviewType } from '$lib/types/ProductTypes';
     import { createEventDispatcher } from 'svelte';
-  
+    import type { ProductType } from "$lib/types/ProductTypes";
+
+    //Tailwind Classes
     let overlayButtonClass = 'w-1/3 btn text-lg font-bold rounded-lg';
   
     export let showOverlay = false;
-    export let product: ProductPreviewType & { quantity?: number };
+    export let product: ProductType;
   
     const dispatch = createEventDispatcher();
     const handleEdit = () => dispatch('edit', { product });

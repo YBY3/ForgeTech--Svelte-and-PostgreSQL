@@ -45,7 +45,7 @@
 
     <div>
       <button on:click={() => open('motherboard')}>+ Add motherboard</button>
-      <select id="select-motherboard" bind:value={selectedParts.motherboard}>
+      <select id="select-motherboard" class="w-full card variant-surface p-2 rounded-lg" bind:value={selectedParts.motherboard}>
         <option disabled selected value={null}>Select motherboard</option>
         {#each motherboardOptions as opt}
           <option value={opt.model_url}>{opt.name}</option>
@@ -56,7 +56,7 @@
      <!-- RAM Selector -->
      <div>
       <button on:click={() => open('ram')}>+ Add RAM</button>
-      <select id="select-ram" bind:value={selectedParts.ram}>
+      <select id="select-ram" class="w-full card variant-surface p-2 rounded-lg" bind:value={selectedParts.ram}>
         <option disabled selected value={null}>Select RAM</option>
         {#each ramOptions as opt}
           <option value={opt.model_url}>{opt.name}</option>
@@ -67,7 +67,7 @@
     <!-- Processor Selector -->
     <div>
       <button on:click={() => open('processor')}>+ Add processor</button>
-      <select id="select-processor" bind:value={selectedParts.processor}>
+      <select id="select-processor" class="w-full card variant-surface p-2 rounded-lg" bind:value={selectedParts.processor}>
         <option disabled selected value={null}>Select processor</option>
         {#each processorOptions as opt}
           <option value={opt.model_url}>{opt.name}</option>
@@ -79,7 +79,7 @@
     <!-- GPU Selector -->
     <div>
       <button on:click={() => open('gpu')}>+ Add GPU</button>
-      <select id="select-gpu" bind:value={selectedParts.gpu}>
+      <select id="select-gpu" class="w-full card variant-surface p-2 rounded-lg" bind:value={selectedParts.gpu}>
         <option disabled selected value={null}>Select GPU</option>
         {#each gpuOptions as opt}
           <option value={opt.model_url}>{opt.name}</option>

@@ -59,7 +59,7 @@
 			}
 
 			ordersStore.set([]);
-			toastStore.trigger({ message: 'Order confirmed!', background: 'variant-filled-success' });
+			toastStore.trigger({ message: 'Order Placed!', background: 'variant-filled-success' });
 			//goto('/orders/confirmation');
 		} catch (err) {
 			toastStore.trigger({ message: `${err}`, background: 'variant-filled-error' });
@@ -126,7 +126,7 @@
 					disabled={!$ordersStore.length || submitting}
 					class="px-8 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
 				>
-					Confirm Order
+					Place Order
 				</button>
 			</div>
 		{/if}

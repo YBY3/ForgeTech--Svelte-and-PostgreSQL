@@ -130,8 +130,22 @@
 	}
 </script>
 
+
+<div class="w-full flex justify-center pt-4 pr-4 pl-4">
+    <div class="w-full h-16 flex justify-between items-center pl-4 pr-4 card variant-surface rounded-lg">
+        <a 
+            href="/dashboard"
+            class="w-20 h-10 btn variant-ghost hover:text-primary-500 font-bold uppercase text-xl rounded-lg shadow-lg p-2" 
+        >
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <h1 class="h-12 text-2xl md:text-3xl rounded-lg p-2 font-bold">Order Control</h1>
+        <div class="w-20"></div> <!-- Spacer -->
+    </div>
+</div>
+
+
 <div class="max-w-5xl mx-auto p-6 space-y-8">
-	<h1 class="text-center text-4xl font-bold">Order Control</h1>
 
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 		<!-- Unclaimed -->

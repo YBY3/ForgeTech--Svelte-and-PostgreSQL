@@ -164,7 +164,7 @@
 
 {#if userData}
     <!-- Dashboard -->
-    <div class="w-full h-full flex flex-col gap-4 items-center pt-4">
+    <div class="w-full h-full flex flex-col gap-4 items-center p-4">
 
         {#if showEmployeeInfo || showAdminInfo} 
             <div class="w-full md:w-3/4 flex flex-col gap-4 items-center">
@@ -182,7 +182,7 @@
                     <a href="/control/order-control" class="w-full block">
                         <button class="{navButtonClass}">Order Control</button>
                     </a>
-                    <a href="/control/analytics" class="w-full block">
+                    <a href="/dashboard/analytics" class="w-full block">
                         <button class="{navButtonClass}">Analytics</button>
                     </a>
                     <a href="/threads" class="w-full block">

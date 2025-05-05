@@ -68,7 +68,7 @@
 
 		{#if showClaimButton}
 			<button 
-				class="w-1/2 btn variant-filled-success text-lg p-2 rounded-lg"
+				class="w-1/2 btn variant-filled-primary text-lg p-2 rounded-lg"
 				on:click={() => handleClaimButtonClick(order.id, order.status)}
 			>
 				{order.status === 'pending' ? 'Claim Order' : 'Unclaim Order'}
