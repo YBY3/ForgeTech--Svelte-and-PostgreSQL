@@ -10,6 +10,9 @@ import sys
 
 order_bp = Blueprint('orders', __name__)
 
+# In-memory snapshot store: { order_id: { items: […], total: … } }
+_order_snapshots: dict[int, dict] = {}
+
 # CODES USE:
 # 200: OK - Request succeeded normally
 # 201: Created - Request succeeded and a new resource was created (used in signup when a new user is created)
@@ -25,6 +28,8 @@ def add_order():
     product_ids      = data.get('product_ids', [])
     product_options  = data.get('product_options', [])
     total            = data.get('total')
+
+    items = data.get('product_ids')
 
     # basic validation
     if not user_id or not product_ids or total is None:
@@ -42,6 +47,8 @@ def add_order():
     db.session.add(order)
     db.session.flush()
 
+    item_counts = Counter(items)
+
     # zip and count pairs
     pairs = list(zip(product_ids, product_options))
     counts = Counter(pairs)   # e.g. {(1,'Red'):2, (1,'Blue'):1}
@@ -58,8 +65,49 @@ def add_order():
           order_quantity=qty,
           product_option=opt
         ))
+    
+    # --- 5) Check & decrement stock **before** final commit ---
+    for pid, qty in item_counts.items():
+        prod = Product.query.get(pid)
+        if prod.product_stock < qty:
+            db.session.rollback()
+            return jsonify({
+                'success': False,
+                'error': f'Not enough stock for {prod.name} (have {prod.product_stock}, tried to order {qty})'
+            }), 400
+        prod.product_stock -= qty
 
     db.session.commit()
+
+    # Gather each line‐item’s frozen data
+    snapshot_items = []
+    for op in OrderProduct.query.filter_by(order_id=order.id).all():
+        prod = Product.query.get(op.product_id)
+        image_ids = [
+            ip.image_id
+            for ip in ImageProduct.query.filter_by(product_id=prod.id).all()
+        ]
+        snapshot_items.append({
+                'product_id':     prod.id,
+                'name':           prod.name,
+                'price':          float(prod.price),
+                'quantity':       op.order_quantity,
+                'product_option': op.product_option,
+                'image_ids':      image_ids
+        })
+
+        # Compute the immutable total
+        snapshot_total = sum(item['price'] * item['quantity'] for item in snapshot_items)
+
+        # Store it by order_id
+        _order_snapshots[order.id] = {
+            'items': snapshot_items,
+            'total': snapshot_total
+        }
+
+        db.session.commit()
+
+
     return jsonify(success=True, order_id=order.id), 201
 
 
@@ -94,36 +142,54 @@ def get_all_orders():
         # Convert orders to a list of dictionaries with product details
         order_data = []
         for order in past_orders:
-            # Get order items with quantities
-            order_items = OrderProduct.query.filter_by(order_id=order.id).all()
+            snap = _order_snapshots.get(order.id)
 
-            products_with_quantity = []
-            for order_item in order_items:
-                product = Product.query.get(order_item.product_id)
-                if product:
-                    # Fetch image_ids from ImageProduct
-                    image_ids = [ip.image_id for ip in ImageProduct.query.filter_by(product_id=product.id).all()]
-                    
+            if snap:
+                # Serve exclusively from the frozen snapshot
+                products_with_quantity = [
+                    {
+                        'id':             item['product_id'],
+                        'name':           item['name'],
+                        'price':          item['price'],
+                        'quantity':       item['quantity'],
+                        'product_option': item.get('product_option'),
+                        'image_ids':      item.get('image_ids', [])
+                    }
+                    for item in snap['items']
+                ]
+                total = snap['total']
+            else:
+                # Fallback to live join for orders before we snapshot‐enabled
+                products_with_quantity = []
+                for op in OrderProduct.query.filter_by(order_id=order.id):
+                    prod = Product.query.get(op.product_id)
+                    if not prod:
+                        continue
+                    image_ids = [
+                        ip.image_id
+                        for ip in ImageProduct.query.filter_by(product_id=prod.id)
+                    ]
                     products_with_quantity.append({
-                        "id": product.id,
-                        "name": product.name,
-                        "price": product.price,
-                        "quantity": order_item.order_quantity,
-                        "product_option": order_item.product_option,
-                        "image_ids": image_ids
+                        'id':             prod.id,
+                        'name':           prod.name,
+                        'price':          float(prod.price),
+                        'quantity':       op.order_quantity,
+                        'product_option': op.product_option,
+                        'image_ids':      image_ids
                     })
-            
-            order_info = {
-                "id": order.id,
-                "user_id": order.user_id,
-                "total": order.total,
-                "status": order.status,
-                "arrive_by": order.arrive_by,
-                "products": products_with_quantity,
-                "created_at": order.created_at.isoformat(),
-                "claimed_by_employee_id": order.claimed_by_employee_id
-            }
-            order_data.append(order_info)
+                total = float(order.total)
+
+            order_data.append({
+                'id':                     order.id,
+                'user_id':                order.user_id,
+                'total':                  total,
+                'status':                 order.status,
+                'arrive_by':              order.arrive_by.isoformat() if order.arrive_by else None,
+                'created_at':             order.created_at.isoformat(),
+                'claimed_by_employee_id': order.claimed_by_employee_id,
+                'products':               products_with_quantity
+            })
+
 
         return jsonify({
             'success': True,
@@ -220,34 +286,51 @@ def get_orders():
         # Convert orders to a list of dictionaries with product details
         order_data = []
         for order in all_orders:
-            order_items = OrderProduct.query.filter_by(order_id=order.id).all()
+            snap = _order_snapshots.get(order.id)
             products_with_quantity = []
 
-            for order_item in order_items:
-                product = Product.query.get(order_item.product_id)
-                if product:
-                    # Instead of product.image_ids, query the ImageProduct table.
-                    image_ids = [ip.image_id for ip in ImageProduct.query.filter_by(product_id=product.id).all()]
+            if snap:
+                # serve exclusively from the frozen snapshot
+                for item in snap['items']:
                     products_with_quantity.append({
-                        "id": product.id,
-                        "name": product.name,
-                        "price": product.price,
-                        "quantity": order_item.order_quantity,
-                        "product_option": order_item.product_option,
-                        "image_ids": image_ids
+                        "id":             item['product_id'],
+                        "name":           item['name'],
+                        "price":          item['price'],
+                        "quantity":       item['quantity'],
+                        "product_option": item.get('product_option'),
+                        "image_ids":      item.get('image_ids', [])
                     })
-            
+                total = snap['total']
+            else:
+                # fallback to live join
+                for order_item in OrderProduct.query.filter_by(order_id=order.id).all():
+                    product = Product.query.get(order_item.product_id)
+                    if not product:
+                        continue
+                    image_ids = [
+                        ip.image_id
+                        for ip in ImageProduct.query.filter_by(product_id=product.id).all()
+                    ]
+                    products_with_quantity.append({
+                        "id":             product.id,
+                        "name":           product.name,
+                        "price":          float(product.price),
+                        "quantity":       order_item.order_quantity,
+                        "product_option": order_item.product_option,
+                        "image_ids":      image_ids
+                    })
+                total = float(order.total)
+
             order_info = {
-                "id": order.id,
-                "user_id": order.user_id,
-                "total": order.total,
-                "status": order.status,
-                "products": products_with_quantity,
+                "id":         order.id,
+                "user_id":    order.user_id,
+                "total":      total,
+                "status":     order.status,
+                "products":   products_with_quantity,
                 "created_at": order.created_at.isoformat(),
-                "arrive_by": order.arrive_by.isoformat() if order.arrive_by else None
+                "arrive_by":  order.arrive_by.isoformat() if order.arrive_by else None
             }
             order_data.append(order_info)
-
 
         return jsonify({
             'success': True,

@@ -22,10 +22,11 @@
     <!-- Qty or price, no background -->
     {#if product.quantity !== undefined}
       <div class="text-black-800 text-sm font-medium">
+        ${product.price} <br>
         Qty: {product.quantity}
       </div>
-    {:else}
-      <div class="font-semibold text-black-800">${product.price}</div>
+    <!-- {:else}
+      <div class="font-semibold text-black-800">${product.price}</div> -->
     {/if}
   
     {#if showOverlay}

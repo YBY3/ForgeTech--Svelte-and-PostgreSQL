@@ -298,7 +298,7 @@
                     <!-- Orders -->
                     <div class="w-full h-full flex flex-col gap-3 overflow-y-auto hide-scrollbar card variant-soft p-4">
                         {#if recentlyPlacedOrders}
-                            {#each recentlyPlacedOrders as order (order.id)}
+                            {#each recentlyPlacedOrders.slice(0, 5) as order (order.id)}
                                 <OrderInfoCard order={order} />
                             {/each}
                         {:else}
