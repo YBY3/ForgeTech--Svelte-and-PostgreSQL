@@ -3,6 +3,7 @@
   import * as THREE from 'three';
   import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
   import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+  
 
 
   // Shared prop: URLs of the selected part models
@@ -18,7 +19,7 @@
 
 // Three.js Core Objects
   let canvas: HTMLCanvasElement;
-  let scene: THREEP.Scene;
+  let scene: THREE.Scene;
   let camera: THREE.PerspectiveCamera;
   let renderer: THREE.WebGLRenderer;
   let controls: OrbitControls;
@@ -30,7 +31,7 @@
   // let gpuMount: THREE.Object3D;
   // let ramMount: THREE.Object3D;
 
-  //UPDATED
+
 
   //this is an object literal that will hold the mount points
   let loadedParts = {
@@ -41,13 +42,37 @@
     motherboard: null
   };
 
+    //Add a function to give a more metallic look
+  function enhancecurrent(object){
+    //traverse the object will go through all the children of the object,the part that is being loaded
+    object.traverse((child)=>
+      {
+        if (child instanceof THREE.Mesh && child.material) {
+        const originalMaterial = child.material as THREE.MeshStandardMaterial;
+        const newMaterial = new THREE.MeshStandardMaterial({
+          color:   (originalMaterial as any).color ?? new THREE.Color(0xffffff),
+          metalness: 0.8,
+          emissive: new THREE.Color(0x1A140B),
+          emissiveIntensity: 0.3,
+        });
+
+        if (originalMaterial.map) newMaterial.map  = originalMaterial.map;
+        if (originalMaterial.normalMap) newMaterial.normalMap = originalMaterial.normalMap;
+
+       child.material = newMaterial;
+}
+      });
+      return object;
+    }
+
+
   /**
    * loadPart()
    * 1) Centers the part on its own bounding‐box center
    * 2) Scales it so its largest dimension = targetSize
    * 3) Snaps it into the correct mount (cpu, gpu, or ram)
    */
-  function loadPart(url: string, type: 'cpu'|'gpu'|'ram' |'processor') {
+  function loadPart(url: string, type: 'cpu'|'gpu'|'ram' |'processor' | 'motherboard') {
 
     //skip if already loaded
     if (loadedParts[type] === url) {
@@ -67,6 +92,10 @@
 
     //set up the part
     const part = gltf.scene;
+
+    //allows us to apply the material to the part oonce loaded
+    enhancecurrent(part);
+
 
     // --- prevent shared-material side effects ---
     
@@ -96,7 +125,7 @@
     const scaleMultiplier = {
       cpu: 1,         
       gpu: 1,
-      ram: 1,
+      ram: 0.6,
       processor: 0.4 ,
       motherboard: 0.7
        
@@ -116,7 +145,7 @@
     const offset = {
       cpu: new THREE.Vector3(-1.5, 0.5, 0),
       gpu: new THREE.Vector3( 0.04, 0.4, -0.55),
-      ram: new THREE.Vector3( 0.2, 0.5, -0.35),
+      ram: new THREE.Vector3( 0.1, 1.05, -0.15),
       processor: new THREE.Vector3( .22, 0.84, -0.15),
       motherboard: new THREE.Vector3( 0.15, 0.84, -0.15)
     }[type];
@@ -127,10 +156,31 @@
   });
 }
 
-  // Load case model
-  function loadCase() {
+// Load case model with enhanced visuals
+function loadCase() {
     loader.load('/models/case_with_mounts.glb', (gltf) => {
       const caseModel = gltf.scene;
+      
+      // Apply enhanced materials
+      caseModel.traverse((child) => {
+        if (child instanceof THREE.Mesh && child.material) {
+          // Create a new material for the case
+          const originalMaterial = child.material;
+          const newMaterial = new THREE.MeshStandardMaterial({
+            color: originalMaterial.color || new THREE.Color(0xffffff),
+            metalness: 0.8,
+            roughness: 0.2,
+            transparent: true,
+            opacity: 1.0
+          });
+          
+          // Copy textures
+          if (originalMaterial.map) newMaterial.map = originalMaterial.map;
+          if (originalMaterial.normalMap) newMaterial.normalMap = originalMaterial.normalMap;
+          
+          child.material = newMaterial;
+        }
+      });
       
       // Scale and position case
       caseModel.scale.setScalar(2.0);
@@ -182,18 +232,45 @@
     camera.position.set(-2, 1, 1);
 
     // Renderer
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+   // Renderer with enhanced settings
+   renderer = new THREE.WebGLRenderer({ 
+      canvas, 
+      antialias: true,
+      shadowMap: true 
+    });
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
     resize();
     
     // Controls
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     
-    // Lighting
-    scene.add(new THREE.AmbientLight(0x888888));
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-    dirLight.position.set(1, 1, 1);
+    // IMPROVED LIGHTING
+    // Ambient light (subtle base lighting)
+    const ambientLight = new THREE.AmbientLight(0x333333, 0.9);
+    scene.add(ambientLight);
+    
+    // Main directional light (simulates sunlight)
+    const dirLight = new THREE.DirectionalLight(0xff3333, 1.5);
+    dirLight.position.set(3, 4, 2);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 2048;
+    dirLight.shadow.mapSize.height = 2048;
     scene.add(dirLight);
+    
+    // Fill light (opposite side)
+    const fillLight = new THREE.DirectionalLight(0x333333	, 0.4);
+    fillLight.position.set(-3, 2, -2);
+    scene.add(fillLight);
+    
+    // Red accent light (for the Forge Tech brand identity)
+    const accentLight = new THREE.PointLight(0x333333	, 1, 10);
+    accentLight.position.set(0, -1, 2);
+    scene.add(accentLight);
     
     // Grid
     const grid = new THREE.GridHelper(10, 10);

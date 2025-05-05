@@ -9,15 +9,15 @@
 
     //GPU parts drop down menu
     const gpuOptions = [
-      { name: 'Nvidia RTX 3080', model_url: '/models/gpu-yourmodel.glb' },
+      { name: 'Nvidia RTX 3080', model_url: '/models/gpu-RTX.glb' },
       { name: 'NVIDIA RTX 3090 Ti', model_url: '/models/3090RTX.glb' },
       { name: 'VIPERA NVIDIA RTX 4090', model_url: '/models/RTX4090.glb' }   
     ];
 
     //RAM parts drop down menu
     const ramOptions = [
-      { name: 'Corsair 16 GB', model_url: '/models/ram-yourmodel.glb' },
-      { name: 'CORSAIR Vengeance RGB PRO', model_url: '/models/corsairvengeancergbRAM.glb' },
+      { name: 'Corsair Dominator', model_url: '/models/corsair_dominator.glb' },
+      { name: 'CORSAIR Vengeance RGB PRO', model_url: '/models/corsairvengeancergbram.glb' },
   ];
 
     //processor options

@@ -8,7 +8,8 @@
   const categories = [
     { key: 'gpu',     label: 'GPU'     },
     { key: 'ram',     label: 'RAM'     },
-    { key: 'processor',     label: 'Processor'     }
+    { key: 'processor',     label: 'Processor'     },
+    { key: 'motherboard',     label: 'Motherboard'     }
   ];
 
   function handleOpenSelector(e) {
