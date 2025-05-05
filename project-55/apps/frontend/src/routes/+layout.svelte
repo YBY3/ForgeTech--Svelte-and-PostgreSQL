@@ -27,6 +27,7 @@
 		placement: 'bottom',
 		closeQuery: ''
 	};
+
   
 	onMount(() => {
 		// Check if the winter sale banner was dismissed previously
@@ -36,6 +37,7 @@
 		if (data.user) {
 			isLoggedIn = true;
 		}
+
 		mounted = true;
 	});
   
