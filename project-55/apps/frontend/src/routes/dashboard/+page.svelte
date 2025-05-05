@@ -182,9 +182,11 @@
                     <a href="/control/order-control" class="w-full block">
                         <button class="{navButtonClass}">Order Control</button>
                     </a>
-                    <a href="/dashboard/analytics" class="w-full block">
-                        <button class="{navButtonClass}">Analytics</button>
-                    </a>
+                    {#if showAdminInfo} 
+                        <a href="/dashboard/analytics" class="w-full block">
+                            <button class="{navButtonClass}">Analytics</button>
+                        </a>
+                    {/if}
                     <a href="/threads" class="w-full block">
                         <button class="{navButtonClass}">Threads</button>
                     </a>

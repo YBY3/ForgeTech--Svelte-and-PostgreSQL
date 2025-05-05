@@ -78,7 +78,7 @@
                 .slice(0, 5)
                 .map(([id, _]) => Number(id));
 
-            console.log("Top 5 product IDs by total quantity:", top5ProductIDs);
+            // console.log("Top 5 product IDs by total quantity:", top5ProductIDs);
 
             if (products) {
                 popularProducts = top5ProductIDs

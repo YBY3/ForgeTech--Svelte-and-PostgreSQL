@@ -51,7 +51,7 @@ export const load = async ({ locals, fetch }) => {
                     return fail(flaskResponse.status, responseData);
                 }
         
-                console.log(orderData);
+                // console.log(orderData);
                 orderData = responseData;
         
                 
@@ -69,7 +69,7 @@ export const load = async ({ locals, fetch }) => {
                     return fail(flaskResponse.status, responseData);
                 }
         
-                console.log(orderData);
+                // console.log(orderData);
                 orderProductData = responseData;
         
                 
