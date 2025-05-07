@@ -5,8 +5,9 @@
 	import { productsStore } from '$lib/stores/ProductsStore.js';
 	import ProductCard from '$lib/components/product/ProductCard.svelte';
 	import { goto } from '$app/navigation';
+    import * as THREE from 'three';
     
-
+    let canvasContainer: HTMLDivElement;
     //Data
     export let data;
     let featuredProduct: ProductType;
@@ -32,20 +33,62 @@
       productData = data.products;
       productsStore.set(productData);
     }
+
+    if (!canvasContainer) return; // safety check
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+    );
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000, 1);
+    // Append the cavas to the container
+    canvasContainer.appendChild(renderer.domElement);
+
+    const geometry = new THREE.IcosahedronGeometry(3.6, 1); // radius, detail level
+    const material = new THREE.MeshBasicMaterial({ color: 0xf33f33, wireframe: true }); // Wireframe material
+    const icosahedron = new THREE.Mesh(geometry, material);
+    scene.add(icosahedron);
+
+    // Set the camera position
+    camera.position.z = 5;
+    camera.position.x = -2;
+
+    // Animation loop
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        // Rotate the icosahedron for some animation
+        icosahedron.rotation.x += 0.004;
+        icosahedron.rotation.y += 0.004;
+        
+        // Render the scene
+        renderer.render(scene, camera);
+    }
+
+    animate();
+
+
     });
 
   </script>
 
-  
+<div class="fixed pointer-events-none z-[-1]" bind:this={canvasContainer}></div>
   <!-- this is being rendered as a component to the layout, use div instead of main for best practice -->
   <div class="h-full bg-background flex flex-col items-center overflow-y-auto overflow-x-hidden scroll-smooth">
     
     <div class="relative w-full h-full"> 
+    <!-- 
     <img 
         class="absolute top-0 left-0 w-full h-full object-contain object-[85%] z-[-1] hidden xl:block" 
         src="misc/gpu.png" 
         alt="Sample GPU"
     >
+    -->
     <div class="z-[-2] absolute top-[47%] left-[70%] -translate-x-1/2 -translate-y-1/2 w-[30rem] h-[30rem] bg-primary-500 rounded-full blur-3xl opacity-30 animate-pulse hidden xl:block"></div>
 
 
@@ -56,13 +99,13 @@
             alt="ForgeTech Logo"
         >
         <h1 class="[@media(max-width:430px)]:text-3xl text-5xl sm:text-6xl md:text-6xl font-bold">
-            <span class="text-primary-500">Forge</span> power.
+            <span class="text-primary-500">Forge</span> <span class="text-white">power.</span>
         </h1>
         <h1 class="[@media(max-width:430px)]:text-3xl text-5xl sm:text-6xl md:text-6xl font-bold">
-            <span class="text-primary-500">Fuel</span> performance.
+            <span class="text-primary-500">Fuel</span> <span class="text-white">performance.</span>
         </h1>
         
-        <p class="text-base text-center md:text-left md:text-lg max-w-xs sm:max-w-sm md:max-w-lg">
+        <p class="text-base text-center md:text-left md:text-lg max-w-xs sm:max-w-sm md:max-w-lg text-white">
             Whether you're building a custom rig or upgrading your current setup,
             we offer a wide range of components—ranging from the latest hardware to
             reliable, refurbished parts.
@@ -72,25 +115,25 @@
             <a href="/catalog"><button type="button" class="btn border-2 border-primary-500 text-white rounded-lg bg-primary-500 px-8 py-3 hover: transition-all duration-300 ease-in-out hover:shadow-[0_0_20px_5px_rgba(212,22,60,0.7)]">
                 Shop <i class="fa-solid fa-arrow-right ml-1"></i>
             </button></a>
-            <a href="#second_tab"><button type="button" class="btn rounded-lg border-2 border-white px-8 py-3 hover:bg-white transition-all duration-300 ease-in-out hover:text-black">
+            <a href="#second_tab"><button type="button" class="btn rounded-lg border-2 border-white px-8 py-3 transition-all duration-300 ease-in-out text-white">
                 Learn More 
             </button></a>
         </div>
     </div>
     </div>
 
-<div class="sticky top-0 w-full bg-surface-200 dark:bg-surface-700 md:text-center md:flex md:justify-evenly py-6 z-[2]" id="second_tab">
+<div class="sticky top-0 w-full bg-black md:text-center md:flex md:justify-evenly py-6 z-[2]" id="second_tab">
     <!--<button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out block md:hidden px-8"><a href="#products">PRODUCTS</a></button>-->
-    <select class="select w-32 block md:hidden ml-4">
+    <select class="select w-32 block md:hidden ml-4 text-white">
         <option value="1">Featured</option>
         <option value="2">Partners</option>
         <option value="3">Contact</option>
         <option value="4">About</option>
     </select>
-    <button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out hidden md:block"><a href="#products">FEATURED</a></button>
-    <button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out hidden md:block"><a href="#partnersID">PARTNERS</a></button>
-    <button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out hidden md:block"><a href="#AboutID">CONTACT</a></button>
-    <button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out hidden md:block"><a href="#AboutID">ABOUT</a></button>
+    <button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out hidden md:block text-white"><a href="#products">FEATURED</a></button>
+    <button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out hidden md:block text-white"><a href="#partnersID">PARTNERS</a></button>
+    <button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out hidden md:block text-white"><a href="#AboutID">CONTACT</a></button>
+    <button class="border-b-4 border-primary-500 border-opacity-0 hover:border-opacity-100 transition-all duration-300 ease-in-out hidden md:block text-white"><a href="#AboutID">ABOUT</a></button>
 </div>
     
     <!-- Main Content -->

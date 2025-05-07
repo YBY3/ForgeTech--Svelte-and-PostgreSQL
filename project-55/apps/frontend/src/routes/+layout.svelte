@@ -120,7 +120,7 @@
   
 				<!-- Menu Popup: Hidden by default using the "hidden" class.
 				     The Skeleton popup directive should remove the hidden class when triggered. -->
-				<div class="card p-4 bg-surface-200 -translate-x-[12%] pointer-events-auto z-[3] flex justify-between hidden" data-popup="popupClickIcon">
+				<div class="card p-4 -translate-x-[12%] pointer-events-auto z-[3] flex justify-between hidden" data-popup="popupClickIcon">
 					<div class="grid grid-cols-1 gap-1">
 						<div class="py-2 flex justify-center"><LightSwitch /></div>
 						<hr class="border-t w-full mx-auto">

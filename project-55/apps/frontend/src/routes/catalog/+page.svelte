@@ -1,4 +1,4 @@
-<div class="flex flex-col items-center w-full h-full overflow-y-auto px-4">
+<div class="flex flex-col items-center w-full h-full overflow-y-auto px-4 dark:bg-black">
   <br>
   <div class="flex flex-wrap gap-4 justify-center">
 
