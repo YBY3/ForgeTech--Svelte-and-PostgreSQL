@@ -21,63 +21,150 @@
     let productData: ProductType[];
     const ALLProducts = productsStore;
 
+    // onMount(() => {
+    //     if (data.products) {
+    //         featuredProduct = data.products.find(p => p.name.includes("3090")) ?? data.products[0];
+    //     }
+    //     if (data.isLoggedIn) {
+    //         isLoggedIn = data.isLoggedIn;
+    //     }
+
+    //     if (data.products) {
+    //         productData = data.products;
+    //         productsStore.set(productData);
+    //     }
+
+    //     if (!canvasContainer) return; // safety check
+    //     const scene = new THREE.Scene();
+    //     const camera = new THREE.PerspectiveCamera(
+    //         75,
+    //         window.innerWidth / window.innerHeight,
+    //         0.1,
+    //         1000
+    //     );
+
+    //     const renderer = new THREE.WebGLRenderer({ alpha: true });
+    //     renderer.setSize(window.innerWidth, window.innerHeight);
+    //     renderer.setClearColor(0x000000, 1);
+    //     // Append the cavas to the container
+    //     canvasContainer.appendChild(renderer.domElement);
+
+    //     const geometry = new THREE.IcosahedronGeometry(3.6, 1); // radius, detail level
+    //     const material = new THREE.MeshBasicMaterial({ color: 0xf33f33, wireframe: true }); // Wireframe material
+    //     const icosahedron = new THREE.Mesh(geometry, material);
+    //     scene.add(icosahedron);
+
+    //     // Set the camera position
+    //     camera.position.z = 5;
+    //     camera.position.x = -2;
+
+    //     // Animation loop
+    //     function animate() {
+    //         requestAnimationFrame(animate);
+            
+    //         // Rotate the icosahedron for some animation
+    //         icosahedron.rotation.x += 0.004;
+    //         icosahedron.rotation.y += 0.004;
+            
+    //         // Render the scene
+    //         renderer.render(scene, camera);
+    //     }
+
+    //     animate();
+    // });
+
+    let scene: THREE.Scene | null = null;
+    let camera: THREE.PerspectiveCamera | null = null;
+    let renderer: THREE.WebGLRenderer | null = null;
+    let icosahedron: THREE.Mesh | null = null;
+
     onMount(() => {
+        // Initialize data
         if (data.products) {
-            featuredProduct = data.products.find(p => p.name.includes("3090")) ?? data.products[0];
+        featuredProduct = data.products.find(p => p.name.includes("3090")) ?? data.products[0];
         }
         if (data.isLoggedIn) {
-            isLoggedIn = data.isLoggedIn;
+        isLoggedIn = data.isLoggedIn;
+        }
+        if (data.products) {
+        productData = data.products;
+        productsStore.set(productData);
         }
 
-        if (data.products) {
-      productData = data.products;
-      productsStore.set(productData);
-    }
+        if (!canvasContainer) return;
 
-    if (!canvasContainer) return; // safety check
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
+        // Set up Three.js scene
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(
         75,
         window.innerWidth / window.innerHeight,
         0.1,
         1000
-    );
+        );
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x000000, 1);
-    // Append the cavas to the container
-    canvasContainer.appendChild(renderer.domElement);
+        renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000, 1);
+        canvasContainer.appendChild(renderer.domElement);
 
-    const geometry = new THREE.IcosahedronGeometry(3.6, 1); // radius, detail level
-    const material = new THREE.MeshBasicMaterial({ color: 0xf33f33, wireframe: true }); // Wireframe material
-    const icosahedron = new THREE.Mesh(geometry, material);
-    scene.add(icosahedron);
+        const geometry = new THREE.IcosahedronGeometry(3.6, 1);
+        const material = new THREE.MeshBasicMaterial({ color: 0xf33f33, wireframe: true });
+        icosahedron = new THREE.Mesh(geometry, material);
+        scene.add(icosahedron);
 
-    // Set the camera position
-    camera.position.z = 5;
-    camera.position.x = -2;
+        camera.position.z = 5;
+        camera.position.x = -2;
 
-    // Animation loop
-    function animate() {
+        // Animation loop
+        function animate() {
         requestAnimationFrame(animate);
-        
-        // Rotate the icosahedron for some animation
         icosahedron.rotation.x += 0.004;
         icosahedron.rotation.y += 0.004;
-        
-        // Render the scene
         renderer.render(scene, camera);
-    }
+        }
+        animate();
 
-    animate();
+        // Handle window resize
+        function handleResize() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+        }
+        window.addEventListener('resize', handleResize);
+        handleResize();
 
+        // Mouse movement for camera panning
+        function handleMouseMove(event: MouseEvent) {
+        // Normalize mouse coordinates to [-1, 1]
+        const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
 
+        // Adjust camera position based on mouse
+        camera.position.x = -2 + mouseX * 2; // Pan left/right
+        camera.position.y = mouseY * 2; // Pan up/down
+        }
+        window.addEventListener('mousemove', handleMouseMove);
+
+        // Cleanup
+        return () => {
+        window.removeEventListener('resize', handleResize);
+        window.removeEventListener('mousemove', handleMouseMove);
+        if (canvasContainer && renderer.domElement) {
+            canvasContainer.removeChild(renderer.domElement);
+        }
+        renderer.dispose();
+        };
     });
+</script>
 
-  </script>
 
-<div class="fixed pointer-events-none z-[-1]" bind:this={canvasContainer}></div>
+<!-- Background -->
+<div class="w-full h-screen object-cover absolute top-0 right-0 z-[-1]" bind:this={canvasContainer}></div>
+
+
+<div class="fixed pointer-events-none"></div>
   <!-- this is being rendered as a component to the layout, use div instead of main for best practice -->
   <div class="h-full bg-background flex flex-col items-center overflow-y-auto overflow-x-hidden scroll-smooth">
     
@@ -300,7 +387,7 @@
             </p>
             <br>
             <a href="/about-us"><button class="text-black font-bold p-2 border-2 border-black rounded-lg hover:bg-white transition-all duration-300 ease-in-out hover:border-white">Meet the Team <i class="fa-solid fa-arrow-right ml-1"></i></button></a>
-            <a href="/about-us"><button class="text-black font-bold p-2 border-2 border-black rounded-lg hover:bg-white transition-all duration-300 ease-in-out hover:border-white">Contact Us <i class="fa-solid fa-arrow-right ml-1"></i></button></a>
+            <a href="/threads"><button class="text-black font-bold p-2 border-2 border-black rounded-lg hover:bg-white transition-all duration-300 ease-in-out hover:border-white">Contact Us <i class="fa-solid fa-arrow-right ml-1"></i></button></a>
         </div> 
         
             <div class="p-2">

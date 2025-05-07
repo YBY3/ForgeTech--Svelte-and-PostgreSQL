@@ -498,7 +498,7 @@ def get_order_details(order_id):
         return jsonify({'success': True, 'order': order_info}), 200
 
     except Exception as e:
-        app.logger.exception("Failed to fetch order details")
+        # app.logger.exception("Failed to fetch order details")
         return jsonify({
             'success': False,
             'error': 'Failed to fetch order details',
