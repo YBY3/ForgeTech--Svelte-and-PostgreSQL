@@ -36,6 +36,21 @@ def add_order():
         return jsonify(success=False, error='Missing fields'), 400
     if len(product_ids)!=len(product_options):
         return jsonify(success=False, error='IDs/options length mismatch'), 400
+    
+    # 2) STOCK PRE‐CHECK (before any DB writes)
+    counts = Counter(product_ids)
+    for pid, qty in counts.items():
+        prod = Product.query.get(pid)
+        if not prod:
+            return jsonify(success=False, error=f'Product {pid} not found'), 404
+        if prod.product_stock - qty < 1:
+            return jsonify(
+                success=False,
+                error=(
+                    f'Not enough stock for {prod.name} '
+                    f'(have {prod.product_stock}, tried to order {qty})'
+                )
+            ), 400
 
     # create order
     order = Order(
@@ -69,11 +84,11 @@ def add_order():
     # --- 5) Check & decrement stock **before** final commit ---
     for pid, qty in item_counts.items():
         prod = Product.query.get(pid)
-        if prod.product_stock < qty:
+        if prod.product_stock - qty < 1:
             db.session.rollback()
             return jsonify({
                 'success': False,
-                'error': f'Not enough stock for {prod.name} (have {prod.product_stock}, tried to order {qty})'
+                'error': f'Not enough stock)'
             }), 400
         prod.product_stock -= qty
 

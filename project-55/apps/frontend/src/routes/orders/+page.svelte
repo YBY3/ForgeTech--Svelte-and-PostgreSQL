@@ -3,6 +3,8 @@
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import { ordersStore, removeFromOrder } from '$lib/stores/OrdersStore';
 	import type { UserType } from '$lib/types/UserTypes.js';
+	import type { ActionResult } from '@sveltejs/kit';
+    import { deserialize } from '$app/forms';
 	import { goto } from '$app/navigation';
 
 	export let data: { user: UserType };
@@ -51,15 +53,25 @@
 				method: 'POST',
 				body:   formData
 			});
-			const result = await response.json();
+			// const result = await response.json();
+			const result: ActionResult = deserialize(await response.text());
 			console.log('Backend response:', result);
 
-			if (!response.ok) {
-				throw new Error(result.error || 'Failed to confirm order');
+
+			if (result.type === 'success') {
+				ordersStore.set([]);
+				toastStore.trigger({ message: 'Order Placed!', background: 'variant-filled-success' });
+  				// throw new Error(result.error || 'Failed to confirm order');
+			}else if (result.type === 'failure'){
+				if (result.data) {
+					const errorMessage = result.data.error;
+					throw new Error (errorMessage);
+				}
+				throw new Error("Failed to confirm order");
 			}
 
-			ordersStore.set([]);
-			toastStore.trigger({ message: 'Order Placed!', background: 'variant-filled-success' });
+			// ordersStore.set([]);
+			// toastStore.trigger({ message: 'Order Placed!', background: 'variant-filled-success' });
 			//goto('/orders/confirmation');
 		} catch (err) {
 			toastStore.trigger({ message: `${err}`, background: 'variant-filled-error' });
