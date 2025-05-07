@@ -42,6 +42,15 @@
         }
     }
 
+    $: initials = userData?.name
+        ? userData.name
+            .split(' ')
+            .filter(Boolean)
+            .map(n => n[0].toUpperCase())
+            .slice(0, 2)
+            .join('')
+        : '';
+
     onMount(() => {
         if (data.user != null) {
             if (data.user.success == true) {
@@ -239,7 +248,7 @@
                 
                 <!-- Profile Icon -->
                 <div class="w-1/2 flex flex-col items-center gap-6">  
-                    <Avatar initials="JD" background="bg-primary-500" width="w-32" />
+                    <Avatar initials={initials} background="bg-primary-500" width="w-32" />
                     <FileButton name="files" class="px-4" accept="image/*">Edit</FileButton>
                 </div>
 
