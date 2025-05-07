@@ -124,7 +124,7 @@
 // set the size of the different parts,one means remain the same
     const scaleMultiplier = {
       cpu: 1,         
-      gpu: 1,
+      gpu: 0.65,
       ram: 0.6,
       processor: 0.4 ,
       motherboard: 0.7
@@ -144,8 +144,8 @@
     // position on case
     const offset = {
       cpu: new THREE.Vector3(-1.5, 0.5, 0),
-      gpu: new THREE.Vector3( 0.04, 0.4, -0.55),
-      ram: new THREE.Vector3( 0.1, 1.05, -0.15),
+      gpu: new THREE.Vector3( 0.04, 1, -0.15),
+      ram: new THREE.Vector3( 0.1, 1.1, -0.15),
       processor: new THREE.Vector3( .22, 0.84, -0.15),
       motherboard: new THREE.Vector3( 0.15, 0.84, -0.15)
     }[type];
